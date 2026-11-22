@@ -1,0 +1,2 @@
+# informatika
+Interaktívne hodiny informatiky
