@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Interaktívna vyučovacia hodina pre Sekundu: dokončenie nastavení Windows a cvičný test z programových manažérov, operačných systémov a nastavení.">
-  <meta name="author" content="Gymnázium – informatika">
+  <meta name="author" content="Miroslav Lajgút">
   <meta name="color-scheme" content="light">
   <title>Nastavenia operačného systému a cvičný test – Sekunda</title>
   <style>
@@ -1734,8 +1734,8 @@
     byId("timerReset").addEventListener("click", resetTimer);
 
     /* Záverečné ovládanie */
-    byId("printBtn").addEventListener("click", function () { window.print(); });
-    byId("resetAll").addEventListener("click", function () {
+    byId("printBtn")?.addEventListener("click", function () { window.print(); });
+    byId("resetAll")?.addEventListener("click", function () {
       if (!window.confirm("Naozaj chceš vynulovať všetky aktivity a výsledok testu?")) return;
       buildWarmup();
       resetSimulator();
@@ -1762,5 +1762,6 @@
 
     initialize();
   </script>
+<div class="ml-author" style="font:13px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;text-align:center;padding:14px 16px 18px;opacity:.75;color:inherit">© 2026 Miroslav Lajgút · Informatika · Gymnázium Ivana Kraska – Ivan Krasko Gimnázium a Obchodná akadémia – Kereskedelmi Akadémia, Rimavská Sobota<br>Všetky práva vyhradené · Použitie len so súhlasom autora · <a href="../" style="color:inherit">Všetky hodiny</a></div>
 </body>
 </html>
