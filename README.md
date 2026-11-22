@@ -23,6 +23,7 @@ Materiál vznikol ako digitálny učebný materiál v rámci záverečnej práce
 | 2 | [Nastavenia OS a cvičný test](https://mlajgut.github.io/informatika/hodiny/sekunda-nastavenia-os-cvicny-test.html) | Nastavenia Windows, cvičný test z programových manažérov, OS a nastavení |
 | 3 | [Kancelárske balíky](https://mlajgut.github.io/informatika/hodiny/sekunda-kancelarske-baliky.html) | Programy na text, tabuľky a prezentácie; licencie a formáty súborov |
 | 4 | [Popis prostredia MS Word](https://mlajgut.github.io/informatika/hodiny/sekunda-popis-prostredia-ms-word.html) | Časti okna textového editora a práca s nimi |
+| 5 | [Nastavenie stránky, písmo a tabulátory](https://mlajgut.github.io/informatika/hodiny/sekunda-nastavenie-stranky-tabulatory.html) | Papier, orientácia, okraje, písmo, riadkovanie a tabulátory vo Worde |
 
 ### 2. ročník (II.C)
 
@@ -31,6 +32,7 @@ Materiál vznikol ako digitálny učebný materiál v rámci záverečnej práce
 | 1 | [Prostredie Windows](https://mlajgut.github.io/informatika/hodiny/iic-prostredie-windows.html) | Pracovná plocha, okná a ovládanie systému |
 | 2 | [Súbory a priečinky](https://mlajgut.github.io/informatika/hodiny/iic-subory-a-priecinky.html) | Organizácia súborov, prípony, práca s priečinkami |
 | 3 | [Systémové nástroje a nastavenie OS](https://mlajgut.github.io/informatika/hodiny/iic-systemove-nastroje.html) | Systémové nástroje a bezpečné nastavenia operačného systému |
+| 4 | [OS Linux – distribúcie a prostredie](https://mlajgut.github.io/informatika/hodiny/iic-linux-distribucie-prostredie.html) | Linux, distribúcie, grafické prostredie a terminál |
 
 ## Ako hodiny fungujú
 

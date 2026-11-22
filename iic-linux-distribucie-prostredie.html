@@ -1,0 +1,1253 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>OS Linux – distribúcie a prostredie · II.C</title>
+<meta name="author" content="Miroslav Lajgút">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Kancelársky stôl: každý šanón je zložka so štítkom; aktivity sú listy v zložke. */
+:root{
+  --desk:#EDF1FA;--paper:#FFFFFF;--paper2:#F5F7FD;--ink:#1E1B3A;--muted:#55527A;--line:#1E1B3A;--hair:#D2D8EC;--soft:#E3E8FA;--shadow:#1E1B3A;
+  --acc:#3B4CCB;--on-acc:#FFFFFF;--cpu:#2B5FD9;--ram:#7E47DB;--disk:#0F8A45;--net:#D9561A;
+  --sun:#FFC93C;--mint:#2EC4B6;--coral:#FF8A80;--sky:#62D2F3;--lilac:#CDAEF7;--peach:#FFB98F;--lime:#C3E670;--rose:#F8AED3;
+  --on-bright:#1E1B3A;
+  --ok:#11743C;--okbg:#DCF2E4;--bad:#BF2830;--badbg:#FBE3E3;--warn:#8A5700;--warnbg:#FFF0C9;--stamp:#C3233F;
+  --go:#2BB673;--mid:#F2A50C;--stop:#E5484D;--pl:#FFF6CC;--plb:#B8860B;
+  --fh:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --fb:"Nunito","Segoe UI",system-ui,sans-serif;
+  --fm:"JetBrains Mono",ui-monospace,Consolas,"Courier New",monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#13122A;--paper:#1E1C3F;--paper2:#191838;--ink:#F0EEFF;--muted:#B6B2DE;--line:#8D86D6;--hair:#35325F;--soft:#2A2756;--shadow:#06050F;
+  --acc:#909CFF;--on-acc:#12102A;--cpu:#8AABFF;--ram:#BC9BFF;--disk:#5BD893;--net:#FFA06C;
+  --ok:#62DE9B;--okbg:#163A29;--bad:#FF8E8E;--badbg:#47192A;--warn:#FFCB6B;--warnbg:#3D2E12;--stamp:#FF7590;--pl:#3A3214;--plb:#E9C46A;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#13122A;--paper:#1E1C3F;--paper2:#191838;--ink:#F0EEFF;--muted:#B6B2DE;--line:#8D86D6;--hair:#35325F;--soft:#2A2756;--shadow:#06050F;
+  --acc:#909CFF;--on-acc:#12102A;--cpu:#8AABFF;--ram:#BC9BFF;--disk:#5BD893;--net:#FFA06C;
+  --ok:#62DE9B;--okbg:#163A29;--bad:#FF8E8E;--badbg:#47192A;--warn:#FFCB6B;--warnbg:#3D2E12;--stamp:#FF7590;--pl:#3A3214;--plb:#E9C46A;
+  color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:120px}
+html.board{font-size:125%}
+body{margin:0;background:var(--desk);color:var(--ink);font:400 1rem/1.55 var(--fb);overflow-x:hidden;
+  background-image:radial-gradient(var(--hair) 1px,transparent 1px);background-size:22px 22px}
+h1,h2,h3,h4{font-family:var(--fh);line-height:1.2;margin:0 0 .5em;font-weight:600}
+p{margin:0 0 .8em}
+a{color:var(--acc)}
+code,.mono{font-family:var(--fm);font-size:.92em}
+kbd{font-family:var(--fm);font-size:.85em;background:var(--paper2);border:1.5px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:0 .35em;white-space:nowrap}
+button{font:inherit;color:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left)) 0 max(16px,env(safe-area-inset-right))}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* ---------- header ---------- */
+.top{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:2px solid var(--line);padding-top:env(safe-area-inset-top)}
+.topin{display:flex;align-items:center;gap:10px;padding:8px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;background:none;border:0;padding:0;cursor:pointer;min-width:0}
+.logo svg{width:36px;height:36px;flex:none}
+.brand{display:flex;flex-direction:column;line-height:1.15;text-align:left;min-width:0}
+.brand b{font-family:var(--fh);font-weight:600;font-size:1.02rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{color:var(--muted);font-size:.78rem}
+.sp{flex:1}
+.xp{display:flex;align-items:center;gap:6px;font-weight:800;font-size:.9rem}
+.xpbar{width:90px;height:10px;border:2px solid var(--line);border-radius:6px;overflow:hidden;background:var(--paper2)}
+.xpbar i{display:block;height:100%;background:var(--sun);width:0;transition:width .4s}
+.rank{font-size:.78rem;color:var(--muted);font-weight:700}
+.hbtn{border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:5px 10px;cursor:pointer;font-weight:800;font-size:.85rem;display:inline-flex;align-items:center;gap:6px;min-height:36px}
+.hbtn:hover{background:var(--soft)}
+.hbtn svg{width:18px;height:18px}
+.lang{display:inline-flex;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.lang button{border:0;background:var(--paper);padding:5px 9px;cursor:pointer;font-weight:800;font-size:.85rem;min-height:32px}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.nav{display:flex;gap:6px;overflow-x:auto;padding:0 0 8px;scrollbar-width:thin}
+.nav a{flex:none;text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:999px;padding:2px 10px 2px 4px;font-weight:700;font-size:.8rem;display:inline-flex;align-items:center;gap:6px;background:var(--paper)}
+.nav a .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:var(--on-bright);font-family:var(--fh);font-size:.78rem;border:1.5px solid var(--line)}
+.nav a.ok .n{background:var(--ok);color:var(--paper)}
+.nav a.bn{border-style:dashed}
+@media (max-width:640px){.brand{display:none}.xpbar{width:56px}.rank{display:none}.hbtn .lbl{display:none}}
+/* ---------- hero ---------- */
+.hero{padding:26px 0 8px}
+.kicker{display:inline-block;font-family:var(--fm);font-size:.78rem;font-weight:700;background:var(--ink);color:var(--paper);padding:3px 10px;border-radius:6px;letter-spacing:.02em}
+.hero h1{font-size:clamp(1.7rem,4.5vw,2.6rem);margin:.4em 0 .3em}
+.story{background:var(--paper);border:2px solid var(--line);border-radius:16px;box-shadow:5px 5px 0 var(--shadow);padding:18px;margin:14px 0}
+.cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 4px}
+@media (max-width:640px){.cast{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.who{border:2px solid var(--line);background:var(--paper2);border-radius:14px;padding:10px 8px;cursor:pointer;text-align:center;font-weight:800}
+.who svg{width:64px;height:64px;display:block;margin:0 auto 4px}
+.who small{display:block;font-weight:600;color:var(--muted);font-size:.78rem}
+.who[aria-expanded="true"]{background:var(--soft);box-shadow:3px 3px 0 var(--shadow)}
+.bubble{position:relative;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:12px}
+.bubble::before{content:"";position:absolute;top:-10px;left:var(--bx,40px);width:16px;height:16px;background:var(--paper);border-left:2px solid var(--line);border-top:2px solid var(--line);transform:rotate(45deg)}
+.goals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+@media (max-width:640px){.goals{grid-template-columns:minmax(0,1fr)}}
+.goal{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:10px}
+.goal svg{width:26px;height:26px;flex:none;color:var(--acc)}
+.plan{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:6px}
+.plan li{display:flex;gap:10px;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:6px 10px}
+.plan .n{width:26px;height:26px;border-radius:50%;background:var(--c);border:1.5px solid var(--line);display:grid;place-items:center;font-family:var(--fh);color:var(--on-bright);flex:none}
+.plan .m{margin-left:auto;font-family:var(--fm);font-size:.82rem;color:var(--muted);white-space:nowrap}
+.plan li.bn{border-style:dashed}
+/* ---------- folders (šanóny) ---------- */
+.lvl{margin:44px 0 0;position:relative}
+.tab{display:inline-flex;align-items:center;gap:8px;background:var(--c);color:var(--on-bright);border:2px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;padding:6px 14px 6px 8px;font-family:var(--fh);font-weight:600;position:relative;top:2px;max-width:100%}
+.tab .n{background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:0 7px;font-size:.9rem}
+.tab .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder{background:var(--paper);border:2px solid var(--line);border-radius:0 16px 16px 16px;box-shadow:6px 6px 0 var(--shadow);padding:18px 18px 10px;position:relative;border-top:8px solid var(--c)}
+.fhead{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:6px}
+.fhead h2{font-size:clamp(1.25rem,3vw,1.6rem);flex:1;min-width:200px;margin:0}
+.clock{border:2px solid var(--line);background:var(--paper2);border-radius:999px;padding:3px 10px;font-family:var(--fm);font-weight:700;font-size:.82rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center;min-height:32px}
+.clock svg{width:16px;height:16px}
+.bonus-tag{font-family:var(--fm);font-size:.75rem;border:1.5px dashed var(--line);border-radius:6px;padding:2px 6px;font-weight:700}
+.stamp{position:absolute;right:18px;top:-18px;transform:rotate(8deg);border:3px solid var(--stamp);color:var(--stamp);font-family:var(--fh);font-weight:700;font-size:1.05rem;padding:2px 12px;border-radius:8px;background:var(--paper);letter-spacing:.06em;text-transform:uppercase;pointer-events:none}
+.lead{font-size:1.03rem}
+.explain{background:var(--paper2);border:2px solid var(--hair);border-left:6px solid var(--c);border-radius:12px;padding:12px 14px;margin:10px 0}
+.explain h4{font-size:1rem;margin-bottom:.35em}
+.explain ul{margin:.2em 0 .4em;padding-left:1.2em}
+.explain li{margin:.15em 0}
+.cards3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
+.cards2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+@media (max-width:700px){.cards3,.cards2{grid-template-columns:minmax(0,1fr)}.cards3.catg{grid-template-columns:repeat(2,minmax(0,1fr));font-size:.88rem}}
+.mini{border:2px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--paper)}
+.mini b{font-family:var(--fh);font-weight:600}
+.term{font-weight:800}
+.path{font-family:var(--fm);font-size:.86em;background:var(--soft);border-radius:6px;padding:1px 6px;white-space:normal;overflow-wrap:anywhere}
+/* ---------- activities ---------- */
+.act{border-top:2.5px dashed var(--hair);padding:16px 0 12px;margin-top:12px}
+.ahead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.ahead h3{font-size:1.12rem;margin:0}
+.kind{font-family:var(--fm);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--ink);color:var(--paper);border-radius:6px;padding:2px 7px}
+.adone{margin-left:auto;font-size:.8rem;font-weight:800;color:var(--ok);display:inline-flex;gap:4px;align-items:center}
+.adone svg{width:16px;height:16px}
+.btn{border:2px solid var(--line);background:var(--acc);color:var(--on-acc);border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;box-shadow:3px 3px 0 var(--shadow);min-height:40px;display:inline-flex;align-items:center;gap:6px}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+.btn.small{padding:4px 10px;min-height:32px;font-size:.88rem;box-shadow:2px 2px 0 var(--shadow)}
+.btn[aria-disabled="true"],.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.opts{display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.opts.one{grid-template-columns:minmax(0,1fr)}
+@media (max-width:640px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;font-weight:700;min-height:44px;width:100%}
+.opt:hover{background:var(--soft)}
+.opt[aria-pressed="true"]{background:var(--soft);box-shadow:inset 0 0 0 2px var(--acc)}
+.opt.good{background:var(--okbg);border-color:var(--ok)}
+.opt.badc{background:var(--badbg);border-color:var(--bad)}
+.opt[aria-disabled="true"]{cursor:default}
+.fb{border-radius:10px;padding:10px 12px;margin:10px 0;font-weight:600;border:2px solid}
+.fb.ok{background:var(--okbg);border-color:var(--ok);color:var(--ink)}
+.fb.no{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+.fb.info{background:var(--warnbg);border-color:var(--warn);color:var(--ink)}
+.fb b:first-child{font-family:var(--fh)}
+/* worksheet box */
+.pl{background:var(--pl);border:2.5px dashed var(--plb);border-radius:12px;padding:10px 12px;margin:12px 0 4px;display:flex;gap:10px;align-items:flex-start}
+.pl svg{width:24px;height:24px;flex:none;color:var(--plb)}
+.pl b{font-family:var(--fh);font-weight:600}
+/* sorting / tickets */
+.ticket{border:2px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--paper);margin:8px 0}
+.ticket .q{font-weight:700;margin-bottom:6px}
+.ticket .who2{font-size:.8rem;color:var(--muted);font-weight:700}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:2px solid var(--line);background:var(--paper2);border-radius:999px;padding:4px 12px;font-weight:700;font-size:.88rem;cursor:pointer;min-height:36px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.chip.good{background:var(--okbg);border-color:var(--ok);color:var(--ink)}
+.chip.badc{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+/* envelope */
+.env{border:2px solid var(--line);border-radius:14px;background:repeating-linear-gradient(135deg,var(--paper2) 0 12px,var(--paper) 12px 24px);padding:14px;position:relative}
+.env.sealed::after{content:"";position:absolute;right:14px;top:12px;width:30px;height:30px;border-radius:50%;background:var(--stamp);opacity:.85}
+/* task manager */
+.win{border:2px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);box-shadow:4px 4px 0 var(--shadow)}
+.wbar{display:flex;align-items:center;gap:8px;background:var(--soft);border-bottom:2px solid var(--line);padding:6px 10px;font-weight:800;font-size:.9rem}
+.wbar .dots{margin-left:auto;display:flex;gap:6px}
+.wbar .dots i{width:12px;height:12px;border:1.5px solid var(--line);border-radius:3px;display:block}
+.wtabs{display:flex;gap:4px;padding:6px 8px;border-bottom:1.5px solid var(--hair);overflow-x:auto;font-size:.82rem;font-weight:700}
+.wtabs span{padding:3px 8px;border-radius:6px;white-space:nowrap;color:var(--muted)}
+.wtabs span.on{background:var(--ink);color:var(--paper)}
+.tmw{overflow-x:auto}
+table.tm{width:100%;border-collapse:collapse;font-size:.86rem;min-width:520px}
+.tm th{font-family:var(--fm);font-size:.74rem;text-align:right;padding:6px 8px;border-bottom:2px solid var(--line);background:var(--paper2);cursor:pointer;white-space:nowrap}
+.tm th:first-child,.tm td:first-child{text-align:left}
+.tm td{padding:6px 8px;border-bottom:1px solid var(--hair);text-align:right;font-family:var(--fm);font-size:.82rem;white-space:nowrap}
+.tm td:first-child{font-family:var(--fb);font-weight:700;font-size:.88rem;white-space:normal}
+.tm tr{cursor:pointer}
+.tm tr.sel td{background:var(--soft);box-shadow:inset 0 2px 0 var(--acc),inset 0 -2px 0 var(--acc)}
+.tm tr.ended td{text-decoration:line-through;opacity:.45}
+.tm .grp td{background:var(--paper2);font-family:var(--fh);font-size:.82rem;color:var(--muted);cursor:default}
+.heat1{background:color-mix(in srgb,var(--sun) 25%,transparent)}
+.heat2{background:color-mix(in srgb,var(--peach) 55%,transparent)}
+.heat3{background:color-mix(in srgb,var(--coral) 70%,transparent)}
+.stat{color:var(--bad);font-weight:800;font-size:.75rem;font-family:var(--fb)}
+.sysb{font-size:.7rem;border:1.5px solid var(--line);border-radius:5px;padding:0 4px;margin-left:4px;font-family:var(--fm);font-weight:700;color:var(--muted)}
+.wfoot{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:8px 10px;border-top:2px solid var(--line);background:var(--paper2)}
+.meter{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--fm);font-size:.8rem;font-weight:700}
+.meter span{display:inline-flex;gap:4px;align-items:center}
+.meter i{width:10px;height:10px;border-radius:3px;display:inline-block}
+/* toggles */
+.sw{display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:12px;padding:8px 10px;margin:6px 0;background:var(--paper)}
+.sw .nm{flex:1;min-width:0;font-weight:700}
+.sw .nm small{display:block;color:var(--muted);font-weight:600}
+.imp{font-family:var(--fm);font-size:.75rem;font-weight:700;border-radius:6px;padding:2px 6px;border:1.5px solid var(--line);white-space:nowrap}
+.imp.h{background:var(--badbg)}.imp.m{background:var(--warnbg)}.imp.l{background:var(--okbg)}.imp.n{background:var(--paper2)}
+.tog{width:52px;height:30px;border-radius:999px;border:2px solid var(--line);background:var(--paper2);position:relative;cursor:pointer;flex:none}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--ink);transition:left .2s}
+.tog[aria-checked="true"]{background:var(--acc)}
+.tog[aria-checked="true"]::after{left:25px;background:var(--on-acc)}
+.tog[aria-disabled="true"]{opacity:.6;cursor:default}
+.sw.good{border-color:var(--ok);background:var(--okbg)}.sw.badc{border-color:var(--bad);background:var(--badbg)}
+.boot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0;font-weight:800}
+.bootbar{flex:1;min-width:160px;height:16px;border:2px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper2)}
+.bootbar i{display:block;height:100%;background:var(--coral);transition:width .35s}
+/* storage */
+.disk{height:26px;border:2px solid var(--line);border-radius:8px;overflow:hidden;display:flex;background:var(--paper2);margin:8px 0}
+.disk i{display:block;height:100%}
+.disk .used{background:var(--ram)}.disk .fr{background:var(--go)}
+.chk{display:flex;gap:10px;align-items:center;border:2px solid var(--line);border-radius:12px;padding:8px 10px;margin:6px 0;cursor:pointer;background:var(--paper)}
+.chk .box{width:24px;height:24px;border:2px solid var(--line);border-radius:6px;display:grid;place-items:center;flex:none;background:var(--paper)}
+.chk[aria-checked="true"] .box{background:var(--acc);color:var(--on-acc)}
+.chk .box svg{width:16px;height:16px}
+.chk .nm{flex:1;min-width:0;font-weight:700}
+.chk .nm small{display:block;color:var(--muted);font-weight:600}
+.chk .gb{font-family:var(--fm);font-weight:700;white-space:nowrap}
+.chk.good{border-color:var(--ok);background:var(--okbg)}.chk.badc{border-color:var(--bad);background:var(--badbg)}
+.chk[aria-disabled="true"]{cursor:default}
+/* true / myth, semafor */
+.tf{border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--paper)}
+.tf .s{font-weight:700;margin-bottom:6px}
+.tf .ex{font-size:.92rem;margin-top:6px;color:var(--ink)}
+.tf.good{border-color:var(--ok);background:var(--okbg)}.tf.badc{border-color:var(--bad);background:var(--badbg)}
+.lights{display:flex;gap:6px;flex-wrap:wrap}
+.light{border:2px solid var(--line);border-radius:999px;padding:4px 12px 4px 6px;display:inline-flex;align-items:center;gap:6px;background:var(--paper);font-weight:700;cursor:pointer;min-height:36px;font-size:.88rem}
+.light i{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);display:block}
+.light[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--acc);background:var(--soft)}
+/* pairing */
+.pairs{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 34px}
+.pcol{display:grid;gap:8px;align-content:start}
+.pitem{border:2px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--paper);cursor:pointer;font-weight:700;font-size:.9rem;text-align:left;min-height:44px;position:relative;z-index:1;width:100%}
+.pitem[aria-pressed="true"]{box-shadow:inset 0 0 0 3px var(--acc);background:var(--soft)}
+.pitem.linked{background:var(--paper2)}
+.pitem.good{background:var(--okbg);border-color:var(--ok)}.pitem.badc{background:var(--badbg);border-color:var(--bad)}
+.plines{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:0}
+.plines line{stroke:var(--acc);stroke-width:3;stroke-linecap:round}
+.plines line.good{stroke:var(--ok)}.plines line.badc{stroke:var(--bad);stroke-dasharray:6 5}
+/* settings window / about */
+.setw{display:grid;grid-template-columns:200px minmax(0,1fr);min-height:220px}
+@media (max-width:640px){.setw{grid-template-columns:minmax(0,1fr)}.setw .side{display:none}}
+.side{border-right:2px solid var(--hair);padding:8px;font-size:.84rem;font-weight:700;display:grid;gap:2px;align-content:start}
+.side span{padding:4px 8px;border-radius:6px;color:var(--muted)}
+.side span.on{background:var(--soft);color:var(--ink)}
+.kv{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:4px 12px;padding:12px;font-size:.9rem}
+.kv dt{color:var(--muted);font-weight:700}
+.kv dd{margin:0;font-family:var(--fm);font-size:.84rem;overflow-wrap:anywhere}
+@media (max-width:480px){.kv{grid-template-columns:minmax(0,1fr)}.kv dd{margin-bottom:6px}}
+.inp{border:2px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;background:var(--paper);color:var(--ink);min-height:40px;width:100%;max-width:320px}
+.field{display:grid;gap:4px;margin:8px 0}
+.field label{font-weight:700}
+.field.good .inp{border-color:var(--ok);background:var(--okbg)}.field.badc .inp{border-color:var(--bad);background:var(--badbg)}
+/* test */
+.qcard{border:2px solid var(--line);border-radius:14px;padding:14px;background:var(--paper2)}
+.qmeta{display:flex;justify-content:space-between;font-family:var(--fm);font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:6px}
+.qbar{height:8px;border:1.5px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:10px;background:var(--paper)}
+.qbar i{display:block;height:100%;background:var(--acc)}
+.res{border:2px solid var(--line);border-radius:14px;padding:14px;background:var(--paper2);margin:10px 0}
+.resg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:8px 0}
+@media (max-width:640px){.resg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rbox{border:2px solid var(--line);border-radius:10px;padding:8px;background:var(--paper);text-align:center}
+.rbox b{display:block;font-family:var(--fh);font-size:1.35rem}
+.rbox small{color:var(--muted);font-weight:700;font-size:.76rem}
+.grade{font-family:var(--fh);font-size:1.4rem;font-weight:700}
+.topics{display:grid;gap:4px;margin:8px 0;font-size:.9rem}
+.topics div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--hair);padding:2px 0}
+.cert{border:4px double var(--line);border-radius:14px;padding:22px;text-align:center;background:var(--paper);margin:12px 0}
+.cert h3{font-size:1.5rem}
+.cert .nm{font-family:var(--fh);font-size:1.6rem;border-bottom:2px solid var(--line);display:inline-block;padding:0 20px;margin:6px 0}
+/* ---------- Linux: vrstvy, plocha, terminál, hra ---------- */
+.layers{display:grid;gap:6px;margin:10px 0}
+.layer{display:flex;gap:10px;align-items:center;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--paper)}
+.layer .lt{font-family:var(--fh);font-weight:600;min-width:9.5em}
+.layer small{color:var(--muted);font-weight:600}
+@media (max-width:560px){.layer{flex-direction:column;align-items:flex-start;gap:2px}.layer .lt{min-width:0}}
+.fam{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
+@media (max-width:700px){.fam{grid-template-columns:minmax(0,1fr)}}
+.fam .mini h5{font-family:var(--fh);font-size:1rem;margin:0 0 4px;font-weight:600}
+.tree{font-family:var(--fm);font-size:.84rem;margin:4px 0 0;padding:0;list-style:none}
+.tree li{padding:1px 0}
+.desk{position:relative;border:2px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:4px 4px 0 var(--shadow);background:var(--paper)}
+.desk svg{display:block;width:100%;height:auto}
+.nums{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.numb{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--sun);color:var(--on-bright);font-family:var(--fh);font-size:1.1rem;font-weight:600;cursor:pointer}
+.numb[aria-pressed="true"]{box-shadow:0 0 0 3px var(--acc)}
+.numb.filled{background:var(--paper2);color:var(--ink)}
+.numb.good{background:var(--okbg);border-color:var(--ok);color:var(--ink)}.numb.badc{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+.lbls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+@media (max-width:560px){.lbls{grid-template-columns:minmax(0,1fr)}}
+.lbl2{display:flex;gap:8px;align-items:center;border:2px solid var(--hair);border-radius:10px;padding:6px 10px;background:var(--paper2);font-size:.92rem}
+.lbl2 .n{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-family:var(--fh);flex:none;background:var(--sun);color:var(--on-bright)}
+.lbl2.good{border-color:var(--ok);background:var(--okbg)}.lbl2.badc{border-color:var(--bad);background:var(--badbg)}
+.term{font-weight:800}
+.tbox{background:#16141F;color:#E8E6F5;border:2px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:4px 4px 0 var(--shadow)}
+.tbox .wbar{background:#2A2738;color:#E8E6F5;border-bottom-color:#000}
+.tout{font-family:var(--fm);font-size:.86rem;padding:10px 12px;max-height:280px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.tout .pr{color:#7EE787}.tout .er{color:#FF9B9B}
+.tin{display:flex;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid #3A3650;font-family:var(--fm);font-size:.86rem}
+.tin .pr{color:#7EE787;white-space:nowrap}
+.tin input{flex:1;min-width:0;background:transparent;border:0;color:#E8E6F5;font:inherit;outline:none;padding:4px 0}
+.tin input:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.goalsT{display:grid;gap:4px;margin:8px 0;padding:0;list-style:none}
+.goalsT li{display:flex;gap:8px;align-items:center}
+.goalsT li .bx{width:22px;height:22px;border:2px solid var(--line);border-radius:6px;display:grid;place-items:center;flex:none;background:var(--paper)}
+.goalsT li.ok .bx{background:var(--ok);color:var(--paper);border-color:var(--ok)}
+.gm{border:2px solid var(--line);border-radius:16px;background:var(--paper2);padding:14px}
+.gm-top{display:flex;flex-wrap:wrap;gap:8px 18px;font-weight:800}
+.gm-t{color:var(--stamp)}
+.gm-order{margin-top:10px;border:2px solid var(--line);border-radius:14px;background:var(--paper);padding:12px 14px;display:grid;gap:2px}
+.gm-order small{font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:.72rem}
+.gm-order b{font-family:var(--fm);font-weight:700;font-size:1.3rem}
+.gm-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+@media (max-width:640px){.gm-tools{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.gm-tool{border:2px solid var(--line);border-radius:12px;background:var(--paper);padding:12px 6px;font-weight:800;font-size:.9rem;color:var(--ink);text-align:center;cursor:pointer;min-height:52px}
+.gm-tool:active{transform:translate(2px,2px)}
+.lockbox{display:flex;gap:12px;align-items:flex-start;border:3px dashed var(--line);border-radius:16px;padding:14px;background:var(--paper2)}
+.dec{border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--paper)}
+.dec .q{font-weight:700;margin-bottom:6px}
+.dec.good{border-color:var(--ok);background:var(--okbg)}.dec.badc{border-color:var(--bad);background:var(--badbg)}
+.dec .ex{font-size:.92rem;margin-top:6px}
+/* footer, toast, timer, dialog */
+.foot{margin-top:50px;border-top:2px solid var(--line);background:var(--paper);padding:16px 0 calc(16px + env(safe-area-inset-bottom));font-size:.88rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-weight:800;opacity:0;visibility:hidden;transition:.25s;z-index:60;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.timer{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:calc(70px + env(safe-area-inset-bottom));z-index:50;background:var(--paper);border:2px solid var(--line);border-radius:14px;box-shadow:4px 4px 0 var(--shadow);padding:10px 12px;min-width:200px}
+.timer .big{font-family:var(--fm);font-size:1.8rem;font-weight:700;text-align:center}
+.timer .big.end{color:var(--bad)}
+.timer .row{margin:4px 0 0;justify-content:center}
+dialog.tdlg{border:2px solid var(--line);border-radius:16px;padding:0;max-width:min(900px,calc(100vw - 24px));width:100%;max-height:calc(100vh - 40px);background:var(--paper);color:var(--ink);box-shadow:6px 6px 0 var(--shadow)}
+dialog.tdlg::backdrop{background:rgba(10,8,30,.5)}
+.dh{position:sticky;top:0;background:var(--paper);border-bottom:2px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:2}
+.dh h2{margin:0;font-size:1.2rem;flex:1}
+.db{padding:14px 16px 20px}
+.db h3{font-size:1.05rem;margin:18px 0 6px;padding-top:10px;border-top:2px dashed var(--hair)}
+.db h3:first-child{border-top:0;margin-top:0}
+.db table{border-collapse:collapse;width:100%;font-size:.88rem;margin:6px 0}
+.db th,.db td{border:1.5px solid var(--hair);padding:5px 7px;text-align:left;vertical-align:top}
+.db th{background:var(--paper2)}
+.tblw{overflow-x:auto}
+.ok-t{color:var(--ok);font-weight:800}.bad-t{color:var(--bad);font-weight:800}.warn-t{color:var(--warn);font-weight:800}
+.note{font-size:.86rem;color:var(--muted)}
+#certPrint{display:none}
+@media print{
+  body *{visibility:hidden!important}
+  #certPrint,#certPrint *{visibility:visible!important}
+  #certPrint{display:block!important;position:absolute;inset:0;padding:40px;background:#fff;color:#000}
+  #certPrint .cert{border-color:#000;background:#fff;color:#000}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="wrap">
+    <div class="topin" id="topin"></div>
+    <nav class="nav" id="nav" aria-label="Šanóny"></nav>
+  </div>
+</header>
+<main class="wrap" id="main">
+  <section class="hero" id="hero"></section>
+  <section class="lvl" id="s1" style="--c:var(--sun)"></section>
+  <section class="lvl" id="s2" style="--c:var(--sky)"></section>
+  <section class="lvl" id="s3" style="--c:var(--mint)"></section>
+  <section class="lvl" id="s4" style="--c:var(--coral)"></section>
+  <section class="lvl" id="s5" style="--c:var(--lilac)"></section>
+  <section class="lvl" id="s6" style="--c:var(--peach)"></section>
+  <section class="lvl" id="s7" style="--c:var(--lime)"></section>
+</main>
+<footer class="foot"><div class="wrap" id="foot"></div></footer>
+<div class="timer" id="timer" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<dialog class="tdlg" id="tdlg" aria-labelledby="tdlgT"></dialog>
+<div id="certPrint" aria-hidden="true"></div>
+<script>window.KB_STUDENT=true;</script>
+<script>
+'use strict';
+/* ================= core: jazyk, pomocníci, ikony, postavy, stav, XP, hodnotenie ================= */
+const LID='linux-distribucie-iic-2026';
+const SKEY='linux-iic-v1', LKEY='linux-iic-lang', THKEY='linux-iic-theme';
+const STUDENT=!!window.KB_STUDENT;
+let LI=0; // 0 = slovenčina, 1 = magyar (predvolená pre II.C)
+const tr=a=>Array.isArray(a)?(a[LI]??a[0]):(a??'');
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={
+  get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+  set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fill=(s,o)=>String(s).replace(/\{(\w+)\}/g,(m,k)=>o[k]??m);
+const loc=()=>LI?'hu-HU':'sk-SK';
+const fmt=(n,d=0)=>Number(n).toLocaleString(loc(),{minimumFractionDigits:d,maximumFractionDigits:d});
+const pnum=s=>{const v=parseFloat(String(s??'').replace(/[\s ]/g,'').replace(',','.'));return Number.isFinite(v)?v:NaN};
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const INFRAME=(()=>{try{return window.self!==window.top}catch(e){return true}})();
+/* deterministické miešanie (rovnaké poradie po prekreslení) */
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function dshuffle(arr,seed){const a=arr.slice();let x=hashStr(String(seed))||1;for(let i=a.length-1;i>0;i--){x^=x<<13;x>>>=0;x^=x>>17;x^=x<<5;x>>>=0;const j=x%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+
+/* ---------- všeobecné texty ---------- */
+const T={
+  title:['OS Linux – distribúcie a prostredie','A Linux operációs rendszer – disztribúciók és a környezet'],
+  brandS:['Informatika · II.C','Informatika · II.C'],
+  author:['Miroslav Lajgút - Informatika - II.C','Miroslav Lajgút - Informatika - II.C'],
+  teacher:['Pre učiteľa','Tanároknak'],
+  themeL:['Prepnúť svetlé/tmavé farby','Világos/sötét színek váltása'],
+  min:['min','perc'], bonus:['bonus','bónusz'], done:['Hotovo','Kész'],
+  check:['Skontrolovať','Ellenőrzés'], again:['Skúsiť znova','Újra'], next:['Ďalej','Tovább'],
+  correct:['Správne!','Helyes!'], wrong:['Ešte nie.','Még nem.'], timeUp:['Čas vypršal!','Lejárt az idő!'],
+  pause:['Pauza','Szünet'], resume:['Pokračovať','Folytatás'], plus1:['+1 min','+1 perc'], close:['Zavrieť','Bezárás'],
+  secDone:['Šanón „{n}“ je hotový!','Kész a dosszié: „{n}”!'], rankUp:['Nová hodnosť: {r}','Új rang: {r}'],
+  footR:['Postup sa ukladá len v tomto prehliadači. Stránka nič neposiela na internet.','A haladás csak ebben a böngészőben mentődik. Az oldal semmit nem küld az internetre.'],
+  plT:['Pracovný list – úloha {n}:','Feladatlap – {n}. feladat:'],
+  xpNote:['XP a body dostanete len za prvý pokus.','XP és pont csak az első próbálkozásért jár.'],
+  doneA:['splnené','teljesítve'],
+  kindHyp:['Hypotéza','Hipotézis'],kindSort:['Triedenie','Válogatás'],kindSim:['Simulácia','Szimuláció'],kindCalc:['Kalkulačka','Kalkulátor'],
+  kindPair:['Spájanie','Párosítás'],kindDec:['Rozhodovanie','Döntés'],kindLight:['Semafor','Közlekedési lámpa'],kindMyth:['Pravda / mýtus','Igaz / tévhit'],
+  kindTest:['Test','Teszt'],kindGame:['Hra na čas','Időre menő játék'],kindLabel:['Popis obrázka','Képleírás'],kindTerm:['Terminál','Terminál'],kindRead:['Čítanie údajov','Adatok leolvasása'],kindReal:['Na skutočnom PC','Valódi gépen'],kindHome:['Doma','Otthon'],kindEnv:['Obálka','Boríték'],
+};
+const t=k=>tr(T[k]);
+const RANKS=[[0,['Nováčik','Újonc']],[.2,['Skúšač distribúcií','Disztrópróbálgató']],[.45,['Používateľ Linuxu','Linux-felhasználó']],[.7,['Inštalatér','Telepítőmester']],[.9,['Linuxový mentor','Linux-mentor']]];
+
+/* šanóny: req = povinné aktivity (body sa rátajú do známky) */
+const SECS=[
+  {id:'s1',c:'sun',min:5,tab:['Čo je Linux','Mi a Linux?'],h:['Čo je Linux: jadro a distribúcia','Mi a Linux? Rendszermag és disztribúció'],req:['hyp','layers'],pl:1},
+  {id:'s2',c:'sky',min:5,tab:['Distribúcie','Disztribúciók'],h:['Distribúcie: rodiny, podpora a výber','Disztribúciók: családok, támogatás és választás'],req:['advisor','dpairs'],pl:2},
+  {id:'s3',c:'mint',min:5,tab:['Prostredie','Környezet'],h:['Popis prostredia: pracovná plocha a súbory','A környezet leírása: asztal és fájlok'],req:['desk','w2l'],pl:3},
+  {id:'s4',c:'coral',min:7,tab:['Test','Teszt'],h:['Test a odovzdanie výsledku','Teszt és az eredmény leadása'],req:['test']},
+  {id:'s5',c:'lilac',min:3,reward:1,tab:['Mini hra','Minijáték'],h:['Mini hra: Linuxový triedič','Minijáték: Linux-válogató'],req:['game']},
+  {id:'s6',c:'peach',min:6,bonus:1,tab:['Terminál','Terminál'],h:['Prvé príkazy v termináli','Első parancsok a terminálban'],req:['term']},
+  {id:'s7',c:'lime',min:4,bonus:1,tab:['Mýty','Tévhitek'],h:['Pravda, či mýtus o Linuxe?','Igaz vagy tévhit a Linuxról?'],req:['myths']},
+];
+const SEC=id=>SECS.find(s=>s.id===id);
+const GRADED=['s1','s2','s3'];
+
+/* ---------- ikony (vlastné SVG, currentColor) ---------- */
+const P={
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5" stroke-width="2.6"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+  moon:'<path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>',
+  teach:'<path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M7 10v5c0 1.5 2.5 3 5 3s5-1.5 5-3v-5"/><path d="M21 8v6"/>',
+  sheet:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/>',
+  gauge:'<path d="M4 17a8 8 0 1116 0"/><path d="M12 17l4-6"/><circle cx="12" cy="17" r="1.3"/>',
+  disk:'<rect x="3.5" y="6" width="17" height="12" rx="2.5"/><circle cx="16.5" cy="12" r="1.3"/><path d="M6.5 12h6"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/><circle cx="12" cy="12" r="6.3"/>',
+  shield:'<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.4-7.5 9.5-4.3-1.1-7.5-4.9-7.5-9.5V6z"/><path d="M8.8 12l2.3 2.3 4.3-4.6"/>',
+  bolt:'<path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"/>',
+  download:'<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>',
+  upload:'<path d="M12 20V9M7 13.5l5-5 5 5M5 4h14"/>',
+  print:'<rect x="6" y="3.5" width="12" height="5"/><rect x="4" y="8.5" width="16" height="8" rx="2"/><rect x="7" y="13.5" width="10" height="7"/>',
+  mail:'<rect x="3.5" y="6" width="17" height="12" rx="2"/><path d="M4 7l8 6 8-6"/>',
+  layers:'<path d="M12 3l9 4.5-9 4.5-9-4.5z"/><path d="M3 12l9 4.5 9-4.5"/><path d="M3 16.5l9 4.5 9-4.5"/>',
+  box:'<path d="M3.5 7.5L12 3l8.5 4.5v9L12 21l-8.5-4.5z"/><path d="M3.5 7.5L12 12l8.5-4.5M12 12v9"/>',
+  desk:'<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M3 7h18M8 21h8M12 17v4"/><path d="M5.5 10v4"/>',
+  term:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M12.5 15h4.5"/>',
+  game:'<rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M7 10.5v3.5M5.25 12.25h3.5"/><circle cx="16" cy="11" r="1"/><circle cx="18" cy="14" r="1"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  play:'<path d="M7 4.5l12 7.5-12 7.5z"/>',
+  folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+};
+const ic=(n,cls="")=>`<svg class="${cls}" width="1.25em" height="1.25em" style="vertical-align:-.25em;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
+const LOGO=`<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="6" width="34" height="24" rx="4" fill="var(--ink)" stroke="var(--line)" stroke-width="2.5"/><path d="M14 36h12M20 30v6" stroke="var(--line)" stroke-width="2.5" stroke-linecap="round"/><path d="M9 13l4.5 4.5L9 22" fill="none" stroke="var(--lime)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 22h9" stroke="var(--sun)" stroke-width="2.6" stroke-linecap="round"/></svg>`;
+
+/* ---------- postavy (SVG avatary) ---------- */
+function avatar(o){
+  const {skin='#F2C6A0',hair='#4A2F1E',shirt='#62D2F3',style=0,glasses=0}=o;
+  const hairS=[
+    `<path d="M14 30c0-12 7-19 18-19s18 7 18 19c-3-6-8-9-14-9-7 0-14 3-22 9z" fill="${hair}"/>`,
+    `<path d="M13 33c-1-14 7-22 19-22s20 8 19 22l-3 14c0-10-1-17-4-21-5 3-14 4-24 2-3 4-4 11-4 19z" fill="${hair}"/>`,
+    `<path d="M15 27c1-9 8-15 17-15s16 6 17 15c-5-4-11-5-17-5s-12 1-17 5z" fill="${hair}"/><path d="M20 15l5-5 4 4 4-5 4 5 5-3 1 6" fill="${hair}"/>`,
+    `<path d="M13 31c0-13 8-20 19-20s19 7 19 20c-2-2-3-6-4-9-6 3-21 3-30 0-1 3-2 7-4 9z" fill="${hair}"/><circle cx="49" cy="26" r="6" fill="${hair}"/>`
+  ][style];
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/>
+  <path d="M12 62c2-11 10-16 20-16s18 5 20 16" fill="${shirt}" stroke="var(--line)" stroke-width="2"/>
+  <ellipse cx="32" cy="31" rx="15" ry="16" fill="${skin}" stroke="var(--line)" stroke-width="2"/>${hairS}
+  <circle cx="26" cy="32" r="2" fill="#1E1B3A"/><circle cx="38" cy="32" r="2" fill="#1E1B3A"/>
+  ${glasses?'<circle cx="26" cy="32" r="5" fill="none" stroke="#1E1B3A" stroke-width="1.8"/><circle cx="38" cy="32" r="5" fill="none" stroke="#1E1B3A" stroke-width="1.8"/><path d="M31 32h2" stroke="#1E1B3A" stroke-width="1.8"/>':''}
+  <path d="M27 40q5 4 10 0" fill="none" stroke="#1E1B3A" stroke-width="2" stroke-linecap="round"/></svg>`;
+}
+const CAST=[
+  {id:'lilla',name:'Lilla',av:{hair:'#7A3B1D',shirt:'#F8AED3',style:1},role:['vedie projekt','a projekt vezetője'],sec:'s1',
+   say:['„Škola dostala darom 12 starších notebookov. Windows 11 na nich nepôjde a Windows 10 už nemá bežnú podporu. Vraj im vdýchne život Linux – ale čo to vlastne je?“','„Az iskola 12 régebbi laptopot kapott ajándékba. Windows 11 nem fut rajtuk, a Windows 10-nek pedig már nincs általános támogatása. Azt mondják, a Linux új életet lehel beléjük – de mi is az pontosan?”']},
+  {id:'mate',name:'Máté',av:{hair:'#1E1B3A',shirt:'#C3E670',style:0,glasses:1},role:['vyberá distribúciu','disztribúciót választ'],sec:'s2',
+   say:['„Ubuntu, Mint, Fedora, Debian… Linuxov je strašne veľa! Ktorý nainštalujeme na staré notebooky, aby to zvládli aj mladší žiaci?“','„Ubuntu, Mint, Fedora, Debian… Rengeteg Linux van! Melyiket telepítsük a régi laptopokra, hogy az alsóbb évesek is boldoguljanak vele?”']},
+  {id:'zsofi',name:'Zsófi',av:{hair:'#D9A441',shirt:'#CDAEF7',style:3},role:['píše návod','útmutatót ír'],sec:'s3',
+   say:['„Napíšem k notebookom krátky návod. Potrebujem vedieť, ako sa volajú časti obrazovky a kde je čo – Štart tu nie je!“','„Rövid útmutatót írok a laptopokhoz. Tudnom kell, hogy hívják a képernyő részeit, és mi hol van – itt nincs Start gomb!”']},
+  {id:'adam',name:'Ádám',av:{hair:'#5B3A29',shirt:'#FFB98F',style:2},role:['skúša terminál','a terminált próbálja'],sec:'s6',
+   say:['„Videl som, ako niekto píše príkazy do čierneho okna. Je to hackovanie? Chcem to skúsiť – ale aby som nič nepokazil.“','„Láttam, hogy valaki parancsokat gépel egy fekete ablakba. Ez hekkelés? Ki akarom próbálni – de úgy, hogy semmit ne rontsak el.”']},
+];
+
+/* ---------- stav ---------- */
+const S0=()=>({v:1,xp:0,ans:{},pts:{},done:{},act:{t:0,per:{},doneAt:{}},test:{i:0,ans:[],first:null,fin:false,round:1},game:{best:null,runs:0},name:'',cls:'II.C',ranked:0});
+let S=S0();
+function load(){try{const r=JSON.parse(store.get(SKEY)||'null');if(r&&r.v===1)S=Object.assign(S0(),r)}catch(e){}}
+let saveT=0;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>store.set(SKEY,JSON.stringify(S)),120)}
+const st=k=>S.ans[k]||(S.ans[k]={});
+
+/* ---------- aktivity: register ---------- */
+const A={}; // A[key]={sec,max,render(),on(verb,arg,el)}
+function reg(key,def){A[key]=def}
+const MAXXP=()=>Object.keys(A).reduce((s,k)=>s+(A[k].max||0)*10,0);
+function award(k,got){
+  if(S.pts[k])return false;
+  const max=A[k].max||0;got=clamp(got,0,max);
+  S.pts[k]=[got,max];S.xp+=got*10;save();
+  if(got>0)toast(`+${got*10} XP`);
+  checkRank();return true;
+}
+function finish(k){
+  const s=st(k);if(s.done)return;s.done=1;save();
+  const sec=A[k].sec;const so=SEC(sec);
+  if(so&&so.req.every(r=>st(r).done)&&!S.done[sec]){
+    S.done[sec]=1;S.act.doneAt[sec]=S.act.t;save();
+    setTimeout(()=>toast(fill(t('secDone'),{n:tr(so.tab)})),900);
+    renderNav();
+  }
+}
+function rankIdx(){const f=MAXXP()?S.xp/MAXXP():0;let r=0;RANKS.forEach((x,i)=>{if(f>=x[0])r=i});return r}
+function checkRank(){const r=rankIdx();if(r>S.ranked){S.ranked=r;save();setTimeout(()=>toast(fill(t('rankUp'),{r:tr(RANKS[r][1])})),1800)}renderTop()}
+
+/* ---------- hodnotenie ---------- */
+const GRADES=[[90,['výborný (1)','jeles (1)']],[75,['chválitebný (2)','dicséretes (2)']],[50,['dobrý (3)','jó (3)']],[25,['dostatočný (4)','elégséges (4)']],[0,['nedostatočný (5)','elégtelen (5)']]];
+const gradeOf=p=>{for(const g of GRADES)if(p>=g[0])return g;return GRADES[4]};
+const gradeNum=p=>GRADES.indexOf(gradeOf(p))+1;
+const TFULL=15*60; // 15 min aktívnej práce = 100 %
+function results(){
+  let got=0,max=0;
+  GRADED.forEach(id=>SEC(id).req.forEach(k=>{max+=A[k].max;if(S.pts[k])got+=S.pts[k][0]}));
+  const tasks=max?got/max:0;
+  const test=S.test.first==null?0:S.test.first/TQ.length;
+  const time=clamp(S.act.t/TFULL,0,1);
+  const total=Math.round((.4*test+.4*tasks+.2*time)*100);
+  return {tasksGot:got,tasksMax:max,tasks:Math.round(tasks*100),test:Math.round(test*100),testRaw:S.test.first,time:Math.round(time*100),total,grade:gradeNum(total)};
+}
+/* ================= UI: hlavička, navigácia, úvod, rámce šanónov, časovač, udalosti ================= */
+let toastT=0;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2600)}
+
+let showTeacher=!STUDENT;
+function renderTop(){
+  const f=MAXXP()?S.xp/MAXXP():0;const r=RANKS[rankIdx()];
+  const dark=document.documentElement.dataset.theme==='dark'||(!document.documentElement.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);
+  $('#topin').innerHTML=`
+  <button class="logo" data-a="ui:logo" aria-label="${esc(t('title'))}">${LOGO}<span class="brand"><b>${esc(t('title'))}</b><small>${esc(t('brandS'))}</small></span></button>
+  <span class="sp"></span>
+  <span class="xp" title="XP"><span>${S.xp} XP</span><span class="xpbar"><i style="width:${Math.round(f*100)}%"></i></span><span class="rank">${esc(tr(r[1]))}</span></span>
+  <span class="lang" role="group" aria-label="Jazyk / Nyelv"><button data-a="ui:lang:1" aria-pressed="${LI===1}">HU</button><button data-a="ui:lang:0" aria-pressed="${LI===0}">SK</button></span>
+  ${showTeacher?`<button class="hbtn" data-a="ui:teacher">${ic('teach')}<span class="lbl">${esc(t('teacher'))}</span></button>`:''}
+  <button class="hbtn" data-a="ui:theme" aria-label="${esc(t('themeL'))}" title="${esc(t('themeL'))}">${ic(dark?'sun':'moon')}</button>`;
+}
+function renderNav(){
+  $('#nav').innerHTML=SECS.map((s,i)=>`<a href="#${s.id}" class="${S.done[s.id]?'ok':''} ${s.bonus?'bn':''}" style="--c:var(--${s.c})"><span class="n">${S.done[s.id]?ic('check'):i+1}</span>${esc(tr(s.tab))}</a>`).join('');
+}
+
+/* ---------- úvod ---------- */
+let openWho=null;
+const HERO={
+  kicker:['Misia · Informatika · II.C','Küldetés · Informatika · II.C'],
+  story:['Škola dostala darom <b>12 starších notebookov</b>. Windows 11 na nich nepobeží a Windows 10 od októbra 2025 nemá bežnú podporu. Trieda II.C ich má pripraviť pre krúžok mladších žiakov – s operačným systémom <b>Linux</b>. Najprv zistíte, čo Linux je, potom vyberiete vhodnú <b>distribúciu</b> a nakoniec opíšete jej <b>prostredie</b>, aby sa v ňom vyznal každý. Kliknite na spolužiaka a vypočujte si, čo rieši.',
+         'Az iskola <b>12 régebbi laptopot</b> kapott ajándékba. Windows 11 nem fut rajtuk, a Windows 10-nek pedig 2025 októbere óta nincs általános támogatása. A II.C feladata, hogy előkészítse őket az alsóbb évesek szakköréhez – <b>Linux</b> operációs rendszerrel. Először kiderítitek, mi a Linux, aztán kiválasztjátok a megfelelő <b>disztribúciót (distribúcia)</b>, végül leírjátok a <b>környezetét (prostredie)</b>, hogy mindenki eligazodjon benne. Kattintsatok egy osztálytársra, és hallgassátok meg, min dolgozik.'],
+  goalsH:['Ciele misie','A küldetés céljai'],
+  goals:[
+    [['Vysvetlím rozdiel medzi jadrom Linux a distribúciou a čo znamená otvorený zdrojový kód.','Elmagyarázom a Linux rendszermag (kernel) és a disztribúció közötti különbséget, és hogy mit jelent a nyílt forráskód.'],'layers'],
+    [['Poznám hlavné distribúcie a ich rodiny a vyberiem distribúciu podľa potreby.','Ismerem a fő disztribúciókat és családjaikat, és igény szerint választok közülük.'],'box'],
+    [['Opíšem pracovnú plochu Linuxu (GNOME, Cinnamon) a porovnám ju s Windows.','Leírom a Linux asztalát (GNOME, Cinnamon), és összehasonlítom a Windowsszal.'],'desk'],
+    [['Rozumiem, ako Linux zapisuje cesty k súborom a čo je terminál.','Értem, hogyan írja le a Linux a fájlok elérési útját, és mi a terminál.'],'term'],
+  ],
+  planH:['Plán (25 min)','Terv (25 perc)'],
+  planNote:['Po teste sa odomkne mini hra. Bonusové šanóny sú pre rýchlych alebo na doma. Výsledok si stiahnete v šanóne 4 – ešte pred hrou.','A teszt után feloldódik a minijáték. A bónuszdossziék a gyorsaknak vagy otthonra valók. Az eredményt a 4. dossziéban töltitek le – még a játék előtt.'],
+  sheet:['<b>Majte pri sebe pracovný list.</b> Pri každom šanóne je žltý rámček „Pracovný list – úloha“ – tú istú úlohu nájdete na papieri a odpovede zapíšete tam.','<b>Legyen kéznél a feladatlap.</b> Minden dossziénál van egy sárga „Feladatlap – feladat” keret – ugyanezt a feladatot megtaláljátok a papíron, és oda írjátok a válaszokat.'],
+  act:['Aktívny čas','Aktív idő'],actN:['(počíta sa, len keď pracujete)','(csak akkor számít, ha dolgoztok)'],
+  go:['Prejsť na šanón','Ugrás a dossziéhoz'],
+  reward:['odmena','jutalom'],
+};
+function renderHero(){
+  const w=openWho&&CAST.find(c=>c.id===openWho);const wi=w?CAST.indexOf(w):0;
+  $('#hero').innerHTML=`<span class="kicker">${esc(tr(HERO.kicker))}</span>
+  <h1>${esc(t('title'))}</h1>
+  <div class="story"><p class="lead">${tr(HERO.story)}</p>
+   <div class="cast">${CAST.map(c=>`<button class="who" data-a="ui:who:${c.id}" aria-expanded="${openWho===c.id}">${avatar(c.av)}${esc(c.name)}<small>${esc(tr(c.role))}</small></button>`).join('')}</div>
+   ${w?`<div class="bubble" style="--bx:${12+wi*25}%"><b>${esc(w.name)}:</b> ${esc(tr(w.say))}<div class="row"><a class="btn small" href="#${w.sec}">${esc(tr(HERO.go))} ${SECS.findIndex(s=>s.id===w.sec)+1}</a></div></div>`:''}
+  </div>
+  <h2>${esc(tr(HERO.goalsH))}</h2>
+  <div class="goals">${HERO.goals.map(g=>`<div class="goal">${ic(g[1])}<span>${esc(tr(g[0]))}</span></div>`).join('')}</div>
+  <h2>${esc(tr(HERO.planH))}</h2>
+  <ol class="plan">${SECS.map((s,i)=>`<li class="${s.bonus?'bn':''}" style="--c:var(--${s.c})"><span class="n">${i+1}</span><span>${esc(tr(s.h))}${s.bonus?` <span class="bonus-tag">${esc(t('bonus'))}</span>`:s.reward?` <span class="bonus-tag">${esc(tr(HERO.reward))}</span>`:''}</span><span class="m">${s.min} ${esc(t('min'))}</span></li>`).join('')}</ol>
+  <p class="note">${esc(tr(HERO.planNote))}</p>
+  <p class="note">${ic('clock')} ${esc(tr(HERO.act))}: <b id="actVal">${mmss(S.act.t)}</b> ${esc(tr(HERO.actN))}</p>
+  <div class="pl">${ic('sheet')}<div>${tr(HERO.sheet)}</div></div>`;
+}
+
+/* ---------- rámce ---------- */
+function plBox(n,txt){return `<div class="pl">${ic('sheet')}<div><b>${esc(fill(t('plT'),{n}))}</b> ${tr(txt)}</div></div>`}
+function actBox(key,kind,title,inner){
+  const d=st(key).done;
+  return `<div class="act" id="a-${key}"><div class="ahead"><span class="kind">${esc(t(kind))}</span><h3>${esc(tr(title))}</h3>${d?`<span class="adone">${ic('check')}${esc(t('doneA'))}</span>`:''}</div>${inner}</div>`;
+}
+const SECR={}; // SECR[id]() vráti obsah šanónu
+function renderSec(id){
+  const s=SEC(id),i=SECS.indexOf(s);const el=document.getElementById(id);if(!el||!SECR[id])return;
+  el.innerHTML=`<div class="tab"><span class="n">${i+1}</span><span class="tt">${esc(tr(s.tab))}</span></div>
+  <div class="folder">${S.done[id]?`<div class="stamp">${esc(t('done'))}</div>`:''}
+   <div class="fhead"><h2>${esc(tr(s.h))}</h2>${s.bonus?`<span class="bonus-tag">${esc(t('bonus'))}</span>`:''}
+    ${s.reward?`<span class="bonus-tag">${esc(tr(HERO.reward))}</span>`:''}<button class="clock" data-a="ui:timer:${id}" aria-label="${esc(t('timerFor'))}">${ic('clock')}${s.min} ${esc(t('min'))}</button></div>
+   ${SECR[id]()}
+  </div>`;
+}
+T.timerFor=['Časovač','Időzítő'];
+function renderAll(){renderTop();renderNav();renderHero();SECS.forEach(s=>renderSec(s.id));renderFoot();requestAnimationFrame(afterRender)}
+const AFTER=[];function afterRender(){AFTER.forEach(f=>{try{f()}catch(e){console.error(e)}})}
+function renderFoot(){$('#foot').innerHTML=`<b>${esc(t('author'))}</b> · ${esc(t('title'))} · ${LI?'2026. november':'november 2026'}<br>${esc(t('footR'))}`}
+
+/* prekreslenie jedného šanónu so zachovaním fokusu */
+function rerender(id){
+  const ae=document.activeElement;let sel=null;
+  if(ae&&ae.closest&&ae.closest('#'+id)){sel=ae.getAttribute('data-a')?`[data-a="${ae.getAttribute('data-a')}"]`:(ae.getAttribute('data-in')?`[data-in="${ae.getAttribute('data-in')}"]`:(ae.id?'#'+ae.id:null))}
+  renderSec(id);renderTop();renderNav();
+  if(sel){const n=$('#'+id+' '+sel)||$(sel);if(n){try{n.focus({preventScroll:true})}catch(e){}}}
+  requestAnimationFrame(afterRender);
+}
+
+/* ---------- časovač šanónu ---------- */
+const TM={left:0,run:false,id:null,h:0};
+function timerOpen(id){const s=SEC(id);TM.id=id;TM.left=s.min*60;TM.run=true;timerDraw();clearInterval(TM.h);TM.h=setInterval(()=>{if(TM.run&&TM.left>0){TM.left--;if(TM.left===0)toast(t('timeUp'));timerDraw()}},1000)}
+function timerDraw(){const el=$('#timer');if(!TM.id){el.hidden=true;return}el.hidden=false;const s=SEC(TM.id);
+  el.innerHTML=`<div class="note"><b>${esc(t('timerFor'))}:</b> ${esc(tr(s.tab))}</div><div class="big ${TM.left===0?'end':''}">${mmss(TM.left)}</div>
+  <div class="row"><button class="btn small ghost" data-a="ui:tpause">${esc(TM.run?t('pause'):t('resume'))}</button><button class="btn small ghost" data-a="ui:tplus">${esc(t('plus1'))}</button><button class="btn small ghost" data-a="ui:tclose">${esc(t('close'))}</button></div>`}
+
+/* ---------- delegovanie udalostí ---------- */
+let logoClicks=[];
+function onUi(verb,arg){
+  if(verb==='lang'){LI=+arg;store.set(LKEY,String(LI));document.documentElement.lang=LI?'hu':'sk';renderAll();return}
+  if(verb==='theme'){const r=document.documentElement;const cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark';store.set(THKEY,r.dataset.theme);renderTop();return}
+  if(verb==='who'){openWho=openWho===arg?null:arg;renderHero();return}
+  if(verb==='timer'){timerOpen(arg);return}
+  if(verb==='tpause'){TM.run=!TM.run;timerDraw();return}
+  if(verb==='tplus'){TM.left+=60;timerDraw();return}
+  if(verb==='tclose'){TM.id=null;clearInterval(TM.h);timerDraw();return}
+  if(verb==='teacher'){openTeacher();return}
+  if(verb==='logo'){const n=Date.now();logoClicks=logoClicks.filter(x=>n-x<2500);logoClicks.push(n);if(false){logoClicks=[];showTeacher=true;renderTop();openTeacher()}else{window.scrollTo({top:0,behavior:'smooth'})}return}
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;
+  if(b.getAttribute('aria-disabled')==='true'){e.preventDefault();return}
+  const [key,verb,...rest]=b.getAttribute('data-a').split(':');const arg=rest.join(':');
+  if(key==='ui'){onUi(verb,arg);return}
+  if(key==='tp'){onTeacher(verb,arg,b);return}
+  if(A[key]&&A[key].on){A[key].on(verb,arg,b);save();rerender(A[key].sec);(A[key].also||[]).forEach(x=>{renderSec(x)});if(A[key].also)requestAnimationFrame(afterRender)}
+});
+document.addEventListener('input',e=>{
+  const el=e.target.closest('[data-in]');if(!el)return;
+  const [key,field]=el.getAttribute('data-in').split(':');
+  if(key==='me'){S[field]=el.value.slice(0,60);save();const c=$('#certName');if(c)c.textContent=S.name||'…';return}
+  st(key)[field]=el.value.slice(0,80);save();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#tdlg').open){$('#tdlg').close()}});
+
+/* ---------- aktívny čas ---------- */
+let lastInput=Date.now();
+['pointerdown','keydown','scroll','wheel','touchstart'].forEach(ev=>window.addEventListener(ev,()=>{lastInput=Date.now()},{passive:true}));
+function curSec(){const y=innerHeight*.4;let cur='hero';for(const s of SECS){const el=document.getElementById(s.id);if(el&&el.getBoundingClientRect().top<=y)cur=s.id}return cur}
+setInterval(()=>{
+  if(document.visibilityState!=='visible')return;
+  if(!document.hasFocus())return;
+  if(Date.now()-lastInput>60000)return;
+  S.act.t++;const c=curSec();S.act.per[c]=(S.act.per[c]||0)+1;
+  if(S.act.t%5===0)save();
+  const av=$('#actVal');if(av)av.textContent=mmss(S.act.t);
+},1000);
+/* ================= spoločné aktivity: triedenie ťuknutím, rozhodovanie ================= */
+/* triedenie: každej položke priradiť kategóriu, potom Skontrolovať (body za prvý pokus) */
+function sortAct(key,sec,items,cats){
+  reg(key,{sec,max:items.length,on(v,a){const s=st(key);s.p=s.p||{};
+    if(v==='pick'&&!s.checked){const [id,c]=a.split('|');s.p[id]=c}
+    if(v==='check'&&!s.checked&&items.every(x=>s.p[x.id])){s.checked=1;award(key,items.filter(x=>s.p[x.id]===x.ok).length);finish(key)}
+    if(v==='retry'){s.p={};s.checked=0}
+  }});
+}
+function sortRender(key,items,cats,okMin){
+  const k=st(key);k.p=k.p||{};const all=items.every(x=>k.p[x.id]);
+  const got=items.filter(x=>k.p[x.id]===x.ok).length;
+  return items.map((x,i)=>{const p=k.p[x.id];return `<div class="ticket"><div class="q">${i+1}. ${tr(x.n)}</div>
+    <div class="chips">${cats.map(o=>{let c='';if(k.checked&&p===o.id)c=p===x.ok?'good':'badc';if(k.checked&&p!==x.ok&&o.id===x.ok)c='good';
+      return `<button class="chip ${c}" data-a="${key}:pick:${x.id}|${o.id}" aria-pressed="${p===o.id}" ${k.checked?'aria-disabled="true"':''}>${esc(tr(o.n))}</button>`}).join('')}</div>
+    ${k.checked&&x.ex?`<div class="note" style="margin-top:6px">${esc(tr(x.ex))}</div>`:''}</div>`}).join('')+
+   `<div class="row">${k.checked?`<div class="fb ${got>=okMin?'ok':'info'}"><b>${got} / ${items.length}</b> ${tr(['správne.','helyes.'])} ${S.pts[key]?tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])+S.pts[key][0]+' / '+items.length:''}</div><button class="btn ghost small" data-a="${key}:retry">${esc(t('again'))}</button>`
+     :`<button class="btn" data-a="${key}:check" ${all?'':'aria-disabled="true"'}>${esc(t('check'))}</button>`}</div>`;
+}
+/* rozhodovanie: pri každej situácii jedna voľba, okamžitá spätná väzba */
+function decAct(key,sec,list){
+  reg(key,{sec,max:list.length,on(v,a){const s=st(key);s.p=s.p||{};
+    if(v==='pick'){const [id,val]=a.split('|');if(s.p[id]==null){s.p[id]=+val;if(list.every(x=>s.p[x.id]!=null)){award(key,list.filter(x=>s.p[x.id]===0).length);finish(key)}}}
+  }});
+}
+function decRender(key,list){
+  const s=st(key);s.p=s.p||{};
+  return list.map((x,i)=>{const p=s.p[x.id];const c=p==null?'':(p===0?'good':'badc');const order=dshuffle(x.o.map((_,j)=>j),key+x.id);
+    return `<div class="dec ${c}"><div class="q">${i+1}. ${tr(x.q)}</div><div class="chips">${order.map(j=>{let cc='';if(p!=null){if(j===0)cc='good';else if(j===p)cc='badc'}
+      return `<button class="chip ${cc}" data-a="${key}:pick:${x.id}|${j}" aria-pressed="${p===j}" ${p!=null?'aria-disabled="true"':''}>${esc(tr(x.o[j]))}</button>`}).join('')}</div>
+    ${p!=null?`<div class="ex"><b>${p===0?esc(t('correct')):esc(t('wrong'))+' '+tr(['Lepšia voľba:','Jobb választás:'])+' '+esc(tr(x.o[0]))+'.'}</b> ${esc(tr(x.ex))}</div>`:''}</div>`}).join('')+
+   (S.pts[key]?`<div class="fb ok">${tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])}<b>${S.pts[key][0]} / ${list.length}</b></div>`:'');
+}
+/* spájanie dvojíc čiarami (ľavá položka → pravá) */
+function pairAct(key,sec,pairs){
+  reg(key,{sec,max:pairs.length,on(v,a){const s=st(key);s.l=s.l||{};
+    if(s.checked&&v!=='retry')return;
+    if(v==='L'){s.cur=s.cur===a?null:a}
+    if(v==='R'&&s.cur){for(const k in s.l)if(s.l[k]===a)delete s.l[k];s.l[s.cur]=a;s.cur=null}
+    if(v==='check'&&pairs.every(p=>s.l[p.id])){s.checked=1;award(key,pairs.filter(p=>s.l[p.id]===p.id).length);finish(key)}
+    if(v==='retry'){s.checked=0;s.l={};s.cur=null}
+  }});
+  AFTER.push(()=>drawLines(key,pairs));
+}
+function drawLines(key,pairs){
+  const box=$('#'+key+'Box');if(!box)return;const svg=$('#'+key+'Svg');const s=st(key);s.l=s.l||{};
+  const br=box.getBoundingClientRect();let h='';
+  for(const p of pairs){const c=s.l[p.id];if(!c)continue;const L=$(`[data-a="${key}:L:${p.id}"]`,box),R=$(`[data-a="${key}:R:${c}"]`,box);if(!L||!R)continue;
+    const a=L.getBoundingClientRect(),b=R.getBoundingClientRect();const cls=s.checked?(c===p.id?'good':'badc'):'';
+    h+=`<line class="${cls}" x1="${a.right-br.left}" y1="${a.top+a.height/2-br.top}" x2="${b.left-br.left}" y2="${b.top+b.height/2-br.top}"/>`}
+  svg.innerHTML=h;
+}
+window.addEventListener('resize',()=>requestAnimationFrame(afterRender));
+function pairRender(key,pairs,okMin){
+  const s=st(key);s.l=s.l||{};const all=pairs.every(p=>s.l[p.id]);
+  const rights=dshuffle(pairs.map(p=>p.id),key+'R');
+  return `<div class="pairs" id="${key}Box"><svg class="plines" id="${key}Svg" aria-hidden="true"></svg>
+    <div class="pcol">${pairs.map(p=>{let c=s.l[p.id]?'linked':'';if(s.checked)c=s.l[p.id]===p.id?'good':'badc';return `<button class="pitem ${c}" data-a="${key}:L:${p.id}" aria-pressed="${s.cur===p.id}" ${s.checked?'aria-disabled="true"':''}>${esc(tr(p.l))}</button>`}).join('')}</div>
+    <div class="pcol">${rights.map(id=>{const p=pairs.find(x=>x.id===id);const used=Object.values(s.l).includes(id);return `<button class="pitem ${used?'linked':''}" data-a="${key}:R:${id}" ${s.checked?'aria-disabled="true"':''}>${esc(tr(p.r))}</button>`}).join('')}</div>
+   </div>
+   <div class="row">${s.checked?`<div class="fb ${S.pts[key]&&S.pts[key][0]>=okMin?'ok':'info'}">${pairs.filter(p=>s.l[p.id]!==p.id).map(p=>`${esc(tr(p.l))} → <b>${esc(tr(p.r))}</b>`).join('<br>')||tr(['Všetko správne!','Minden helyes!'])} ${S.pts[key]?`<br><b>${tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])}${S.pts[key][0]} / ${pairs.length}</b>`:''}</div><button class="btn ghost small" data-a="${key}:retry">${esc(t('again'))}</button>`
+     :`<button class="btn" data-a="${key}:check" ${all?'':'aria-disabled="true"'}>${esc(t('check'))}</button>`}</div>`;
+}
+
+/* ================= Šanón 1: Čo je Linux ================= */
+const HYP=[
+  {id:'a',n:['približne 50','körülbelül 50']},
+  {id:'b',n:['približne 250','körülbelül 250']},
+  {id:'c',n:['približne 450','körülbelül 450']},
+  {id:'d',n:['všetkých 500','mind az 500']},
+];
+reg('hyp',{sec:'s1',max:1,also:['s2'],on(v,a){const s=st('hyp');if(v==='pick'&&!s.sealed){s.pick=a}if(v==='seal'&&s.pick&&!s.sealed){s.sealed=1;award('hyp',1);finish('hyp')}if(v==='open'&&s.sealed){s.open=1}}});
+const LCATS=[
+  {id:'k',n:['Jadro','Rendszermag (kernel)']},
+  {id:'d',n:['Distribúcia','Disztribúció']},
+  {id:'e',n:['Grafické prostredie','Asztali környezet']},
+  {id:'a',n:['Aplikácia','Alkalmazás']},
+];
+const LITEMS=[
+  {id:'i1',ok:'d',n:['<b>Ubuntu</b> 26.04 LTS','<b>Ubuntu</b> 26.04 LTS'],ex:['Distribúcia od firmy Canonical – obsahuje jadro, prostredie GNOME aj aplikácie.','A Canonical cég disztribúciója – tartalmazza a rendszermagot, a GNOME környezetet és az alkalmazásokat is.']},
+  {id:'i2',ok:'k',n:['<b>Linux 7.0</b> – riadi procesor, pamäť a zariadenia','<b>Linux 7.0</b> – a processzort, a memóriát és az eszközöket vezérli'],ex:['To je samotné jadro. Ubuntu 26.04 je postavené práve na jadre Linux 7.0.','Ez maga a rendszermag. Az Ubuntu 26.04 éppen a Linux 7.0 rendszermagra épül.']},
+  {id:'i3',ok:'e',n:['<b>GNOME</b>','<b>GNOME</b>'],ex:['Grafické prostredie: panel, ponuka aplikácií, okná. Je predvolené v Ubuntu a vo Fedore.','Asztali környezet: sáv, alkalmazásmenü, ablakok. Az Ubuntu és a Fedora alapértelmezett környezete.']},
+  {id:'i4',ok:'a',n:['<b>LibreOffice</b> Writer','<b>LibreOffice</b> Writer'],ex:['Kancelárska aplikácia – beží na Linuxe, Windows aj macOS.','Irodai alkalmazás – fut Linuxon, Windowson és macOS-en is.']},
+  {id:'i5',ok:'d',n:['<b>Linux Mint</b>','<b>Linux Mint</b>'],ex:['Distribúcia postavená na Ubuntu; obľúbená u ľudí, ktorí prechádzajú z Windows.','Ubuntura épülő disztribúció; kedvelt azok körében, akik Windowsról váltanak.']},
+  {id:'i6',ok:'e',n:['<b>KDE Plasma</b>','<b>KDE Plasma</b>'],ex:['Grafické prostredie s panelom dole, podobné Windows. Používa ho napr. Kubuntu.','Asztali környezet alsó sávval, a Windowshoz hasonló. Például a Kubuntu használja.']},
+  {id:'i7',ok:'a',n:['<b>Firefox</b>','<b>Firefox</b>'],ex:['Webový prehliadač – aplikácia, nie súčasť jadra.','Webböngésző – alkalmazás, nem a rendszermag része.']},
+  {id:'i8',ok:'d',n:['<b>Fedora</b> 45','<b>Fedora</b> 45'],ex:['Komunitná distribúcia podporovaná firmou Red Hat, s veľmi novým softvérom.','A Red Hat által támogatott közösségi disztribúció, nagyon friss szoftverekkel.']},
+];
+sortAct('layers','s1',LITEMS,LCATS);
+SECR.s1=()=>{
+  const h=st('hyp');
+  return `<p class="lead">${tr(['Lilla sa pýta, čo vlastne Linux je. Odpoveď má dve časti: <b>jadro</b> a <b>distribúcia</b>.','Lilla azt kérdezi, mi is valójában a Linux. A válasznak két része van: a <b>rendszermag</b> és a <b>disztribúció</b>.'])}</p>
+  <div class="explain"><h4>${tr(['Linux = jadro operačného systému','Linux = az operációs rendszer magja'])}</h4>
+   <p>${tr(['V užšom zmysle je <span class="term">Linux</span> iba <span class="term">jadro (kernel)</span> – časť OS, ktorá priamo riadi procesor, operačnú pamäť, disky a zariadenia. Začal ho v roku <b>1991</b> písať fínsky študent <b>Linus Torvalds</b> a zverejnil ho ako <span class="term">otvorený zdrojový kód (open source)</span> pod licenciou <b>GNU GPL</b>: kód si môže ktokoľvek prečítať, upraviť a šíriť – upravené verzie však musia zostať otvorené.',
+   'Szűkebb értelemben a <span class="term">Linux</span> csak a <span class="term">rendszermag (jadro, kernel)</span> – az operációs rendszernek az a része, amely közvetlenül vezérli a processzort, az operatív memóriát, a lemezeket és az eszközöket. <b>1991</b>-ben kezdte írni a finn egyetemista, <b>Linus Torvalds</b>, és <span class="term">nyílt forráskódúként (otvorený zdrojový kód, open source)</span> tette közzé a <b>GNU GPL</b> licenc alatt: a kódot bárki elolvashatja, módosíthatja és terjesztheti – a módosított változatoknak azonban nyíltnak kell maradniuk.'])}</p>
+   <p>${tr(['Samotné jadro by ste nepoužili – chýbajú okná, programy aj inštalátor. Preto vznikajú <span class="term">distribúcie</span>: hotové balíky, ktoré k jadru pridajú všetko ostatné.','Egy puszta rendszermagot nem tudnátok használni – nincsenek ablakok, programok, telepítő. Ezért jönnek létre a <span class="term">disztribúciók (distribúcie)</span>: kész csomagok, amelyek mindent hozzáadnak a rendszermaghoz.'])}</p>
+   <div class="layers">
+    <div class="layer" style="background:color-mix(in srgb,var(--lime) 35%,var(--paper))"><span class="lt">${tr(['Aplikácie','Alkalmazások'])}</span><small>Firefox, LibreOffice, Inkscape, GIMP…</small></div>
+    <div class="layer" style="background:color-mix(in srgb,var(--sky) 35%,var(--paper))"><span class="lt">${tr(['Grafické prostredie','Asztali környezet'])}</span><small>GNOME, KDE Plasma, Cinnamon, Xfce…</small></div>
+    <div class="layer" style="background:color-mix(in srgb,var(--lilac) 40%,var(--paper))"><span class="lt">${tr(['Systémové nástroje','Rendszereszközök'])}</span><small>${tr(['nástroje GNU, správca balíkov, inštalátor, terminál','GNU-eszközök, csomagkezelő (správca balíkov), telepítő, terminál'])}</small></div>
+    <div class="layer" style="background:color-mix(in srgb,var(--sun) 45%,var(--paper))"><span class="lt">${tr(['Jadro Linux','Linux rendszermag'])}</span><small>${tr(['procesor, pamäť, disky, ovládače zariadení','processzor, memória, lemezek, eszközmeghajtók (ovládače)'])}</small></div>
+   </div>
+   <p class="note">${tr(['Distribúcia = jadro + systémové nástroje + grafické prostredie + aplikácie, všetko overené a pripravené na inštaláciu.','Disztribúció = rendszermag + rendszereszközök + asztali környezet + alkalmazások, mindez ellenőrizve és telepítésre készen.'])}</p>
+   <h4>${tr(['Kde Linux beží','Hol fut Linux?'])}</h4>
+   <div class="cards3">
+    <div class="mini"><b>${tr(['Telefóny','Telefonok'])}</b><br>${tr(['Android používa jadro Linux.','Az Android a Linux rendszermagot használja.'])}</div>
+    <div class="mini"><b>${tr(['Servery a cloud','Szerverek és felhő'])}</b><br>${tr(['webové stránky, e-shopy, superpočítače','weboldalak, webáruházak, szuperszámítógépek'])}</div>
+    <div class="mini"><b>${tr(['Zariadenia','Eszközök'])}</b><br>${tr(['smart TV, routery, autá, herná konzola Steam Deck','okostévé, router, autók, Steam Deck játékkonzol'])}</div>
+   </div>
+   <p class="note">${tr(['Na stolových počítačoch a notebookoch je Linux menšinový: podľa StatCounter mal v roku 2026 vo svete približne 4 – 7 % (údaje kolíšu). Väčšina distribúcií je <b>zadarmo</b>.','Asztali gépeken és laptopokon a Linux kisebbségben van: a StatCounter szerint 2026-ban világszerte nagyjából 4–7 % volt a részesedése (az adatok ingadoznak). A legtöbb disztribúció <b>ingyenes</b>.'])}</p>
+  </div>
+  ${actBox('hyp','kindHyp',['Tip do obálky','Tipp a borítékba'],`
+   <p>${tr(['Raz za pol roka sa zverejňuje rebríček <b>TOP500</b> – 500 najvýkonnejších superpočítačov sveta. Na koľkých z nich beží Linux? Tipnite si a obálku zalepte – otvoríme ju v šanóne 2.','Félévente megjelenik a <b>TOP500</b> lista – a világ 500 legerősebb szuperszámítógépe. Közülük hányon fut Linux? Tippeljetek, és zárjátok le a borítékot – a 2. dossziéban nyitjuk ki.'])}</p>
+   <div class="env ${h.sealed?'sealed':''}"><div class="chips">${HYP.map(o=>`<button class="chip" data-a="hyp:pick:${o.id}" aria-pressed="${h.pick===o.id}" ${h.sealed?'aria-disabled="true"':''}>${esc(tr(o.n))}</button>`).join('')}</div>
+   <div class="row">${h.sealed?`<b>${tr(['Obálka je zalepená.','A boríték lezárva.'])}</b>`:`<button class="btn" data-a="hyp:seal" ${h.pick?'':'aria-disabled="true"'}>${tr(['Zalepiť obálku','Boríték lezárása'])}</button>`}</div></div>`)}
+  ${actBox('layers','kindSort',['Jadro, distribúcia, prostredie, či aplikácia?','Rendszermag, disztribúció, környezet vagy alkalmazás?'],`
+   <p>${tr(['Ku každej položke ťuknite na správnu vrstvu. Potom skontrolujte.','Minden tételhez koppintsatok a megfelelő rétegre. Utána ellenőrizzétek.'])} <span class="note">${esc(t('xpNote'))}</span></p>
+   ${sortRender('layers',LITEMS,LCATS,6)}`)}
+  ${plBox(1,['Doplňte do schémy štyri vrstvy distribúcie (od jadra hore), zapíšte tip z obálky a pri štyroch položkách napíšte, či ide o jadro, distribúciu, prostredie alebo aplikáciu.','Írjátok be az ábrába a disztribúció négy rétegét (a rendszermagtól felfelé), írjátok le a borítékba zárt tippet, és négy tételnél írjátok mellé, hogy rendszermag, disztribúció, környezet vagy alkalmazás.'])}`;
+};
+
+/* ================= Šanón 2: Distribúcie ================= */
+const ADV=[
+  {id:'d1',q:['Mladší žiaci poznajú len Windows. Chceme ponuku vľavo dole, panel úloh a čo najmenej prekvapení.','Az alsóbb évesek csak a Windowst ismerik. Bal alsó menüt, tálcát és minél kevesebb meglepetést szeretnénk.'],
+   o:[['Linux Mint (Cinnamon)','Linux Mint (Cinnamon)'],['Arch Linux','Arch Linux'],['Debian bez grafického prostredia','Debian asztali környezet nélkül'],['SteamOS','SteamOS']],
+   ex:['Mint s prostredím Cinnamon je usporiadaný podobne ako Windows a je postavený na Ubuntu LTS.','A Mint a Cinnamon környezettel a Windowshoz hasonlóan van elrendezve, és Ubuntu LTS-re épül.']},
+  {id:'d2',q:['Školský server má roky bežať spoľahlivo a dostávať bezpečnostné záplaty, bez veľkých zmien.','Az iskolai szervernek évekig megbízhatóan kell futnia, biztonsági javításokat kapnia, nagy változások nélkül.'],
+   o:[['Debian (stabilná verzia)','Debian (stabil kiadás)'],['Arch Linux (rolling release)','Arch Linux (folyamatos kiadás)'],['Fedora','Fedora'],['SteamOS','SteamOS']],
+   ex:['Debian je známy stabilitou; verzia 13 „trixie“ má podporu do roku 2030. Vhodné je aj Ubuntu LTS.','A Debian a stabilitásáról ismert; a 13-as „trixie” 2030-ig kap támogatást. Az Ubuntu LTS is megfelelő.']},
+  {id:'d3',q:['Študent programovania chce čo najnovšie verzie nástrojov a prostredia a nevadí mu inovovať systém každý polrok.','Egy programozó diák a legfrissebb eszközöket és környezetet szeretné, és nem zavarja, hogy félévente frissíteni kell a rendszert.'],
+   o:[['Fedora','Fedora'],['Debian','Debian'],['Lubuntu','Lubuntu'],['SteamOS','SteamOS']],
+   ex:['Fedora vychádza približne každých 6 mesiacov s veľmi novým softvérom (Fedora 45 priniesla GNOME 51).','A Fedora nagyjából hathavonta jelenik meg, nagyon friss szoftverekkel (a Fedora 45 a GNOME 51-et hozta).']},
+  {id:'d4',q:['Veľmi starý notebook má len 2 GB operačnej pamäte.','Egy nagyon régi laptopban csak 2 GB operatív memória van.'],
+   o:[['Lubuntu (ľahké prostredie LXQt)','Lubuntu (könnyű LXQt környezet)'],['Ubuntu s GNOME a animáciami','Ubuntu GNOME-mal és animációkkal'],['Fedora KDE Plasma','Fedora KDE Plasma'],['SteamOS','SteamOS']],
+   ex:['Odľahčené prostredia (LXQt, Xfce) potrebujú menej pamäte. Lubuntu je oficiálna odnož Ubuntu s LXQt.','A könnyű környezetek (LXQt, Xfce) kevesebb memóriát igényelnek. A Lubuntu az Ubuntu hivatalos változata LXQt-vel.']},
+  {id:'d5',q:['Bence má prenosnú hernú konzolu Steam Deck a chce vedieť, aký systém v nej beží.','Bence Steam Deck kézi játékkonzolt kapott, és tudni szeretné, milyen rendszer fut rajta.'],
+   o:[['SteamOS (založený na Arch Linux)','SteamOS (Arch Linuxra épül)'],['Windows 11','Windows 11'],['Android','Android'],['Linux Mint','Linux Mint']],
+   ex:['Steam Deck má SteamOS od firmy Valve – distribúciu postavenú na Arch Linuxe.','A Steam Decken a Valve SteamOS-e fut – egy Arch Linuxra épülő disztribúció.']},
+];
+decAct('advisor','s2',ADV);
+const DPAIRS=[
+  {id:'q1',l:['LTS','LTS'],r:['verzia s dlhodobou podporou (Ubuntu 26.04 do 2031)','hosszú távú támogatású kiadás (Ubuntu 26.04: 2031-ig)']},
+  {id:'q2',l:['Rolling release','Rolling release (folyamatos kiadás)'],r:['priebežné aktualizácie bez veľkých nových verzií','folyamatos frissítés nagy új kiadások nélkül']},
+  {id:'q3',l:['Repozitár','Tároló (repozitár)'],r:['online sklad overeného softvéru distribúcie','a disztribúció ellenőrzött szoftvereinek online tára']},
+  {id:'q4',l:['Správca balíkov','Csomagkezelő (správca balíkov)'],r:['inštaluje, aktualizuje a odinštaluje programy (apt, dnf)','programokat telepít, frissít és távolít el (apt, dnf)']},
+  {id:'q5',l:['Live USB','Live USB (élő rendszer)'],r:['spustí Linux z USB kľúča bez inštalácie na disk','USB-kulcsról indítja a Linuxot, lemezre telepítés nélkül']},
+  {id:'q6',l:['Open source','Nyílt forráskód (open source)'],r:['zdrojový kód je verejný, dá sa skúmať a upravovať','a forráskód nyilvános, tanulmányozható és módosítható']},
+];
+pairAct('dpairs','s2',DPAIRS);
+SECR.s2=()=>{
+  const h=st('hyp');
+  return `<p class="lead">${tr(['Máté zistil, že distribúcií sú stovky. Väčšina však patrí do niekoľkých <b>rodín</b> – nová distribúcia často vznikne úpravou staršej.','Máté rájött, hogy disztribúcióból több száz van. A legtöbb azonban néhány <b>családba</b> tartozik – egy új disztribúció gyakran egy régebbi átalakításával jön létre.'])}</p>
+  <div class="explain"><h4>${tr(['Tri veľké rodiny (stav november 2026)','Három nagy család (2026. novemberi állapot)'])}</h4>
+   <div class="fam">
+    <div class="mini"><h5>Debian</h5><ul class="tree">
+     <li>Debian 13 „trixie“ <span class="note">8/2025</span></li>
+     <li>└ Ubuntu 26.04 LTS <span class="note">4/2026</span></li>
+     <li>&nbsp;&nbsp;└ Linux Mint 22.3 <span class="note">1/2026</span></li>
+     <li>&nbsp;&nbsp;└ Kubuntu, Xubuntu, Lubuntu</li></ul>
+     <p class="note" style="margin:6px 0 0">${tr(['správca balíkov <b>apt</b>; Mint 27 je ohlásený na Vianoce 2026 (na základe Ubuntu 26.04)','csomagkezelő: <b>apt</b>; a Mint 27-et 2026 karácsonyára jelentették be (Ubuntu 26.04 alapon)'])}</p></div>
+    <div class="mini"><h5>Fedora</h5><ul class="tree">
+     <li>Fedora 45 <span class="note">${tr(['jeseň 2026','2026 ősze'])}</span></li>
+     <li>└ Red Hat Enterprise Linux</li></ul>
+     <p class="note" style="margin:6px 0 0">${tr(['správca balíkov <b>dnf</b>; nová verzia približne každý polrok','csomagkezelő: <b>dnf</b>; nagyjából félévente új kiadás'])}</p></div>
+    <div class="mini"><h5>Arch Linux</h5><ul class="tree">
+     <li>Arch Linux <span class="note">rolling</span></li>
+     <li>└ SteamOS (Steam Deck)</li></ul>
+     <p class="note" style="margin:6px 0 0">${tr(['priebežne aktualizovaný, skôr pre pokročilých','folyamatosan frissül, inkább haladóknak'])}</p></div>
+   </div>
+   <ul>
+    <li>${tr(['<span class="term">LTS</span> (Long Term Support) = dlhodobá podpora. Ubuntu 26.04 LTS vyšlo 23. 4. 2026 a bezpečnostné aktualizácie dostáva <b>5 rokov – do apríla 2031</b>.','Az <span class="term">LTS</span> (Long Term Support) = hosszú távú támogatás. Az Ubuntu 26.04 LTS 2026. 4. 23-án jelent meg, és <b>5 évig – 2031 áprilisáig</b> kap biztonsági frissítéseket.'])}</li>
+    <li>${tr(['Programy sa neinštalujú stiahnutím z hocijakej stránky, ale z <span class="term">repozitára</span> distribúcie pomocou <span class="term">správcu balíkov</span> alebo obchodu s aplikáciami. Aktualizuje sa tak naraz systém aj všetky programy.','A programokat nem bármilyen oldalról letöltve telepítjük, hanem a disztribúció <span class="term">tárolójából (repozitár)</span>, <span class="term">csomagkezelővel</span> vagy alkalmazásbolttal. Így egyszerre frissül a rendszer és az összes program.'])}</li>
+    <li>${tr(['Distribúciu si môžete vyskúšať bez rizika z <span class="term">live USB</span> – Linux sa spustí z USB kľúča a na disku nič nezmení.','A disztribúciót kockázat nélkül kipróbálhatjátok <span class="term">live USB</span>-ről – a Linux az USB-kulcsról indul, és a lemezen semmit sem változtat.'])}</li>
+   </ul></div>
+  ${h.sealed?`<div class="env"><b>${tr(['Obálka zo šanónu 1','Boríték az 1. dossziéból'])}</b> – ${tr(['váš tip','a tippetek'])}: <b>${esc(tr((HYP.find(x=>x.id===h.pick)||{n:['–','–']}).n))}</b>
+    ${h.open?`<div class="fb ${h.pick==='d'?'ok':'info'}"><b>${tr(['Všetkých 500.','Mind az 500.'])}</b> ${tr(['Od novembra 2017 beží Linux na každom superpočítači v rebríčku TOP500. Dôvod: dá sa voľne upraviť pre obrovské množstvo procesorov a nič sa neplatí za licencie.','2017 novembere óta a TOP500 lista minden szuperszámítógépén Linux fut. Az ok: szabadon testre szabható rengeteg processzorhoz, és nem kell licencdíjat fizetni.'])}</div>`
+    :`<div class="row"><button class="btn small" data-a="hyp:open">${tr(['Otvoriť obálku','Boríték kinyitása'])}</button></div>`}</div>`:''}
+  ${actBox('advisor','kindDec',['Poradňa: ktorú distribúciu?','Tanácsadás: melyik disztribúció?'],`
+   <p>${tr(['Pri každej situácii vyberte najvhodnejšiu distribúciu. Spätnú väzbu dostanete hneď.','Minden helyzetben válasszátok ki a legmegfelelőbb disztribúciót. Azonnal visszajelzést kaptok.'])} <span class="note">${esc(t('xpNote'))}</span></p>
+   ${decRender('advisor',ADV)}`)}
+  ${actBox('dpairs','kindPair',['Pojem → vysvetlenie','Fogalom → magyarázat'],`
+   <p>${tr(['Ťuknite na pojem vľavo a potom na vysvetlenie vpravo – spojí ich čiara. Keď spojíte všetko, skontrolujte.','Koppintsatok egy fogalomra balra, majd a magyarázatra jobbra – vonal köti össze őket. Ha mindent összekötöttetek, ellenőrizzétek.'])}</p>
+   ${pairRender('dpairs',DPAIRS,5)}`)}
+  ${plBox(2,['Pri troch situáciách z poradne napíšte zvolenú distribúciu a jeden dôvod. Doplňte, čo znamená skratka LTS.','A tanácsadás három helyzeténél írjátok le a választott disztribúciót és egy indokot. Egészítsétek ki, mit jelent az LTS rövidítés.'])}`;
+};
+/* ================= Šanón 3: Popis prostredia ================= */
+const DLBL=[
+  {id:'L1',n:['Prehľad aktivít a pracovné plochy (klávesa Super/Win)','Tevékenységek áttekintése és munkaterületek (Super/Win billentyű)']},
+  {id:'L2',n:['Dátum a čas, kalendár a upozornenia','Dátum és idő, naptár és értesítések']},
+  {id:'L3',n:['Systémová ponuka: sieť, zvuk, batéria, vypnutie','Rendszermenü: hálózat, hang, akkumulátor, kikapcsolás']},
+  {id:'L4',n:['Dok s obľúbenými a spustenými aplikáciami','Dokk a kedvenc és a futó alkalmazásokkal']},
+  {id:'L5',n:['Zobraziť všetky aplikácie (mriežka)','Az összes alkalmazás megjelenítése (rács)']},
+  {id:'L6',n:['Správca súborov Súbory – domovský priečinok','A Fájlok fájlkezelő – saját (home) mappa']},
+  {id:'X1',n:['Tlačidlo Štart','Start gomb']},
+  {id:'X2',n:['Ovládací panel','Vezérlőpult']},
+];
+const DNUM=[1,2,3,4,5,6];
+reg('desk',{sec:'s3',max:6,on(v,a){const s=st('desk');s.l=s.l||{};
+  if(s.checked&&v!=='retry')return;
+  if(v==='num'){s.cur=a}
+  if(v==='lab'&&s.cur){for(const k in s.l)if(s.l[k]===a)delete s.l[k];s.l[s.cur]=a;const nx=DNUM.find(n=>!s.l[n]);s.cur=nx?String(nx):null}
+  if(v==='check'&&DNUM.every(n=>s.l[n])){s.checked=1;award('desk',DNUM.filter(n=>s.l[n]==='L'+n).length);finish('desk')}
+  if(v==='retry'){s.checked=0;s.l={};s.cur=null}
+}});
+/* pracovná plocha Ubuntu (GNOME) – ilustrácia, nie snímka obrazovky */
+function deskSVG(opt={}){
+  const L=LI;const nb=(n,x,y)=>opt.noNums?'':`<g><circle cx="${x}" cy="${y}" r="15" fill="#FFC93C" stroke="#1E1B3A" stroke-width="2.5"/><text x="${x}" y="${y+6}" text-anchor="middle" font-family="Fredoka,Trebuchet MS,sans-serif" font-weight="700" font-size="17" fill="#1E1B3A">${n}</text></g>`;
+  const side=L?['Saját mappa','Dokumentumok','Képek','Letöltések','Zene','Kuka']:['Domov','Dokumenty','Obrázky','Stiahnuté','Hudba','Kôš'];
+  const fold=L?['Asztal','Dokumentumok','Képek','Letöltések','Zene','Videók']:['Plocha','Dokumenty','Obrázky','Stiahnuté','Hudba','Videá'];
+  const day=L?'nov. 23., hétfő 10:45':'po 23. nov. 10:45';
+  const dockIc=[
+    '<circle cx="0" cy="0" r="13" fill="#62D2F3"/><path d="M-13 0h26M0-13c-6 6-6 20 0 26M0-13c6 6 6 20 0 26" stroke="#1E1B3A" stroke-width="1.6" fill="none"/>',
+    '<path d="M-13-7a3 3 0 0 1 3-3h7l3 3h10a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-20a3 3 0 0 1-3-3z" fill="#FFC93C" stroke="#1E1B3A" stroke-width="1.6"/>',
+    '<rect x="-10" y="-13" width="20" height="26" rx="2" fill="#fff" stroke="#1E1B3A" stroke-width="1.6"/><path d="M-6-6h12M-6-1h12M-6 4h8" stroke="#2B5FD9" stroke-width="2"/>',
+    '<path d="M-12-6h24l-3 18h-18z" fill="#FF8A80" stroke="#1E1B3A" stroke-width="1.6"/><path d="M-5-6a5 5 0 0 1 10 0" fill="none" stroke="#1E1B3A" stroke-width="1.6"/>',
+    '<rect x="-13" y="-11" width="26" height="22" rx="3" fill="#1E1B3A"/><path d="M-8-4l4 4-4 4M0 5h7" stroke="#C3E670" stroke-width="2" fill="none"/>',
+    '<rect x="-13" y="-11" width="26" height="22" rx="3" fill="#CDAEF7" stroke="#1E1B3A" stroke-width="1.6"/><path d="M-8 6l5-7 4 4 3-5 4 8z" fill="#1E1B3A"/>',
+  ];
+  return `<svg viewBox="0 0 800 470" role="img" aria-label="${esc(tr(['Ilustrácia pracovnej plochy Ubuntu s prostredím GNOME a očíslovanými časťami 1 až 6','Az Ubuntu GNOME asztali környezetének illusztrációja, 1–6-ig számozott részekkel']))}">
+  <defs><linearGradient id="wp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5E2750"/><stop offset=".55" stop-color="#A3387A"/><stop offset="1" stop-color="#E95420"/></linearGradient></defs>
+  <rect width="800" height="470" fill="url(#wp)"/>
+  <rect width="800" height="30" fill="#141218"/>
+  <rect x="12" y="9" width="24" height="12" rx="6" fill="#fff"/><circle cx="46" cy="15" r="4" fill="#8B8794"/><circle cx="58" cy="15" r="4" fill="#8B8794"/>
+  <text x="400" y="20" text-anchor="middle" font-family="Nunito,Segoe UI,sans-serif" font-weight="700" font-size="13" fill="#fff">${day}</text>
+  <g fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M708 19a10 10 0 0 1 14 0M711 16a14 14 0 0 1 8 0" /><circle cx="715" cy="21" r="1.2" fill="#fff"/><path d="M736 12v8M733 16h0M740 13a5 5 0 0 1 0 6M744 11a8 8 0 0 1 0 10"/><rect x="756" y="10" width="20" height="10" rx="2"/><path d="M778 13v4"/><rect x="758" y="12" width="12" height="6" fill="#fff" stroke="none"/></g>
+  <rect x="0" y="30" width="66" height="440" fill="#1E1B26" opacity=".92"/>
+  ${dockIc.map((d,i)=>`<g transform="translate(33 ${70+i*52})">${i===1?'<circle cx="-27" cy="0" r="3" fill="#E95420"/>':''}${d}</g>`).join('')}
+  <g transform="translate(33 432)" fill="#fff">${[0,1,2].map(r=>[0,1,2].map(c=>`<circle cx="${-8+c*8}" cy="${-8+r*8}" r="2.4"/>`).join('')).join('')}</g>
+  <g transform="translate(150 72)">
+   <rect width="560" height="350" rx="12" fill="#FAFAFB" stroke="#1E1B3A" stroke-width="2"/>
+   <path d="M0 12a12 12 0 0 1 12-12h536a12 12 0 0 1 12 12v34H0z" fill="#EBEBED"/>
+   <text x="280" y="29" text-anchor="middle" font-family="Nunito,Segoe UI,sans-serif" font-weight="800" font-size="14" fill="#1E1B3A">${side[0]}</text>
+   <g fill="#C9C7D1"><circle cx="512" cy="23" r="8"/><circle cx="536" cy="23" r="8"/></g><path d="M532 19l8 8M540 19l-8 8" stroke="#1E1B3A" stroke-width="1.6"/>
+   <rect x="0" y="46" width="150" height="304" fill="#F1F0F4"/>
+   ${side.map((s,i)=>`<g><rect x="8" y="${58+i*34}" width="134" height="28" rx="7" fill="${i===0?'#DCDAE3':'none'}"/><text x="38" y="${77+i*34}" font-family="Nunito,Segoe UI,sans-serif" font-weight="700" font-size="13" fill="#1E1B3A">${s}</text><rect x="18" y="${65+i*34}" width="13" height="13" rx="2" fill="none" stroke="#55527A" stroke-width="1.6"/></g>`).join('')}
+   <text x="168" y="72" font-family="JetBrains Mono,Consolas,monospace" font-size="12" fill="#55527A">/home/lilla</text>
+   ${fold.map((f,i)=>{const x=178+(i%3)*124,y=96+Math.floor(i/3)*112;return `<g><path d="M${x} ${y+8}a6 6 0 0 1 6-6h22l8 8h36a6 6 0 0 1 6 6v40a6 6 0 0 1-6 6h-66a6 6 0 0 1-6-6z" fill="#7FB3F5" stroke="#1E1B3A" stroke-width="1.6"/><text x="${x+39}" y="${y+86}" text-anchor="middle" font-family="Nunito,Segoe UI,sans-serif" font-weight="700" font-size="12.5" fill="#1E1B3A">${f}</text></g>`}).join('')}
+  </g>
+  ${nb(1,88,22)}${nb(2,400,52)}${nb(3,742,52)}${nb(4,88,124)}${nb(5,88,432)}${nb(6,330,95)}
+  </svg>`;
+}
+const W2L=[
+  {id:'w1',ok:'files',n:['Prieskumník (správca súborov vo Windows)','Fájlkezelő (Prieskumník) a Windowsban']},
+  {id:'w2',ok:'store',n:['Microsoft Store','Microsoft Store']},
+  {id:'w3',ok:'mon',n:['Správca úloh (Ctrl + Shift + Esc)','Feladatkezelő (Ctrl + Shift + Esc)']},
+  {id:'w4',ok:'path',n:['Priečinok <span class="path">C:\\Users\\Lilla</span>','A <span class="path">C:\\Users\\Lilla</span> mappa']},
+  {id:'w5',ok:'term',n:['PowerShell / Príkazový riadok','PowerShell / Parancssor']},
+  {id:'w6',ok:'set',n:['Nastavenia (Win + I)','Gépház (Win + I)']},
+];
+const W2C=[
+  {id:'files',n:['Súbory','Fájlok']},
+  {id:'store',n:['obchod s aplikáciami','alkalmazásbolt']},
+  {id:'mon',n:['monitor systému','rendszerfigyelő']},
+  {id:'path',n:['/home/lilla','/home/lilla']},
+  {id:'term',n:['Terminál','Terminál']},
+  {id:'set',n:['Nastavenia','Beállítások']},
+];
+sortAct('w2l','s3',W2L,W2C);
+SECR.s3=()=>{
+  const s=st('desk');s.l=s.l||{};const all=DNUM.every(n=>s.l[n]);
+  const got=DNUM.filter(n=>s.l[n]==='L'+n).length;
+  const labs=dshuffle(DLBL.map(x=>x.id),'deskL');
+  return `<p class="lead">${tr(['Zsófi píše návod. Na notebookoch bude <b>Ubuntu</b> s prostredím <b>GNOME</b> – a v ňom nie je tlačidlo Štart. Opíšte, z čoho sa obrazovka skladá.','Zsófi útmutatót ír. A laptopokon <b>Ubuntu</b> lesz <b>GNOME</b> környezettel – és abban nincs Start gomb. Írjátok le, miből áll a képernyő.'])}</p>
+  <div class="explain"><h4>${tr(['Grafické prostredie = vzhľad a ovládanie','Asztali környezet = megjelenés és kezelés'])}</h4>
+   <p>${tr(['Tá istá distribúcia môže mať rôzne <span class="term">grafické prostredia</span>. Každé má iné rozloženie panelov a ponúk, ale všetky robia to isté: spúšťajú aplikácie, spravujú okná a ukazujú stav systému.','Ugyanannak a disztribúciónak különböző <span class="term">asztali környezetei (grafické prostredie)</span> lehetnek. Mindegyikben máshol vannak a sávok és menük, de ugyanazt végzik: alkalmazásokat indítanak, ablakokat kezelnek, és mutatják a rendszer állapotát.'])}</p>
+   <div class="cards2">
+    <div class="mini"><b>GNOME</b> <span class="note">(Ubuntu, Fedora)</span><br>${tr(['horná lišta, vľavo <b>dok</b>; klávesa <kbd>Super</kbd> (kláves Windows) otvorí prehľad aktivít s vyhľadávaním. Ubuntu 26.04 má GNOME 50.','felső sáv, balra <b>dokk</b>; a <kbd>Super</kbd> (Windows) billentyű megnyitja a tevékenységek áttekintését kereséssel. Az Ubuntu 26.04-ben GNOME 50 van.'])}</div>
+    <div class="mini"><b>Cinnamon, KDE Plasma</b> <span class="note">(Linux Mint, Kubuntu)</span><br>${tr(['panel dole, <b>ponuka aplikácií vľavo dole</b>, hodiny a ikony stavu vpravo – rozloženie podobné Windows.','alsó sáv, <b>alkalmazásmenü a bal alsó sarokban</b>, óra és állapotikonok jobbra – a Windowshoz hasonló elrendezés.'])}</div>
+   </div>
+   <h4>${tr(['Súbory a cesty v Linuxe','Fájlok és elérési utak Linuxon'])}</h4>
+   <ul>
+    <li>${tr(['Nie sú písmená diskov (C:, D:). Všetko začína v <span class="term">koreňovom priečinku</span> <span class="path">/</span>; USB kľúč sa objaví napr. v <span class="path">/media/lilla/USB</span>.','Nincsenek meghajtóbetűjelek (C:, D:). Minden a <span class="term">gyökérkönyvtárban (koreňový priečinok)</span> kezdődik: <span class="path">/</span>; az USB-kulcs például a <span class="path">/media/lilla/USB</span> helyen jelenik meg.'])}</li>
+    <li>${tr(['Vaše súbory sú v <span class="term">domovskom priečinku</span> <span class="path">/home/lilla</span> (skratka <span class="path">~</span>). Nastavenia systému sú v <span class="path">/etc</span>, programy v <span class="path">/usr</span>.','A saját fájljaitok a <span class="term">saját mappában (domovský priečinok, home)</span> vannak: <span class="path">/home/lilla</span> (rövidítve <span class="path">~</span>). A rendszer beállításai az <span class="path">/etc</span>, a programok a <span class="path">/usr</span> mappában vannak.'])}</li>
+    <li>${tr(['Cesty sa oddeľujú lomkou <span class="path">/</span>, nie spätnou lomkou <span class="path">\\</span> ako vo Windows.','Az elérési út részeit perjel <span class="path">/</span> választja el, nem fordított perjel <span class="path">\\</span>, mint a Windowsban.'])}</li>
+    <li>${tr(['Linux <b>rozlišuje veľké a malé písmená</b>: <span class="path">Foto.jpg</span> a <span class="path">foto.jpg</span> sú dva rôzne súbory. Súbory, ktorých meno začína bodkou (<span class="path">.config</span>), sú <span class="term">skryté</span>.','A Linux <b>megkülönbözteti a kis- és nagybetűket</b>: a <span class="path">Foto.jpg</span> és a <span class="path">foto.jpg</span> két különböző fájl. A ponttal kezdődő nevű fájlok (<span class="path">.config</span>) <span class="term">rejtettek</span>.'])}</li>
+   </ul></div>
+  ${actBox('desk','kindLabel',['Popíšte pracovnú plochu Ubuntu','Írjátok le az Ubuntu asztalát'],`
+   <p>${tr(['Ťuknite na číslo a potom na popis, ktorý k nemu patrí. Dva popisy sú navyše – v GNOME také prvky nie sú.','Koppintsatok egy számra, majd a hozzá tartozó leírásra. Két leírás felesleges – ilyen elem a GNOME-ban nincs.'])} <span class="note">${esc(t('xpNote'))}</span></p>
+   <div class="desk">${deskSVG()}</div>
+   <div class="nums" role="group" aria-label="${tr(['Čísla na obrázku','Számok a képen'])}">${DNUM.map(n=>{let c=s.l[n]?'filled':'';if(s.checked)c=s.l[n]==='L'+n?'good':'badc';return `<button class="numb ${c}" data-a="desk:num:${n}" aria-pressed="${s.cur===String(n)}" ${s.checked?'aria-disabled="true"':''}>${n}</button>`}).join('')}</div>
+   <p class="note">${s.cur?tr(['Vybrané číslo ','Kiválasztott szám: '])+'<b>'+s.cur+'</b>'+tr([' – ťuknite na popis.',' – koppintsatok a leírásra.']):tr(['Najprv ťuknite na číslo.','Előbb koppintsatok egy számra.'])}</p>
+   <div class="chips">${labs.map(id=>{const x=DLBL.find(d=>d.id===id);const used=Object.entries(s.l).find(([k,v])=>v===id);return `<button class="chip" data-a="desk:lab:${id}" aria-pressed="${!!used}" ${s.checked||!s.cur?'aria-disabled="true"':''}>${used?'<b>'+used[0]+'</b> · ':''}${esc(tr(x.n))}</button>`}).join('')}</div>
+   ${s.checked?`<div class="lbls" style="margin-top:10px">${DNUM.map(n=>`<div class="lbl2 ${s.l[n]==='L'+n?'good':'badc'}"><span class="n">${n}</span><span>${esc(tr(DLBL.find(d=>d.id==='L'+n).n))}</span></div>`).join('')}</div>`:''}
+   <div class="row">${s.checked?`<div class="fb ${got>=5?'ok':'info'}"><b>${got} / 6</b> ${tr(['správne.','helyes.'])} ${S.pts.desk?tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])+S.pts.desk[0]+' / 6':''} ${tr(['Tlačidlo Štart ani Ovládací panel v GNOME nie sú – aplikácie spustíte z doku, z mriežky (5) alebo klávesom Super.','Start gomb és Vezérlőpult a GNOME-ban nincs – az alkalmazásokat a dokkból, a rácsból (5) vagy a Super billentyűvel indítjátok.'])}</div><button class="btn ghost small" data-a="desk:retry">${esc(t('again'))}</button>`
+     :`<button class="btn" data-a="desk:check" ${all?'':'aria-disabled="true"'}>${esc(t('check'))}</button>`}</div>
+   <p class="note">${tr(['Obrázok je zjednodušená ilustrácia; presné názvy a ikony sa líšia podľa verzie a jazyka systému.','A kép egyszerűsített illusztráció; a pontos nevek és ikonok a rendszer verziójától és nyelvétől függően eltérhetnek.'])}</p>`)}
+  ${actBox('w2l','kindSort',['Slovník Windows → Linux','Szótár: Windows → Linux'],`
+   <p>${tr(['Zsófi chce v návode napísať, čo v Ubuntu nahrádza známe veci z Windows. Ku každej položke ťuknite na linuxový náprotivok.','Zsófi az útmutatóba azt is beírná, mi helyettesíti Ubuntun a Windowsból ismert dolgokat. Minden tételhez koppintsatok a linuxos megfelelőjére.'])}</p>
+   ${sortRender('w2l',W2L,W2C,5)}`)}
+  ${plBox(3,['Popíšte na pracovnom liste očíslované časti obrázka 1 – 6 a napíšte dva rozdiely medzi Linuxom a Windows (napr. cesty k súborom, ponuka aplikácií).','Írjátok le a feladatlapon a kép 1–6. számmal jelölt részeit, és írjatok két különbséget a Linux és a Windows között (pl. elérési utak, alkalmazásmenü).'])}`;
+};
+/* ================= Šanón 4: test, výsledok, certifikát ================= */
+const TOPIC={lx:['Linux a open source','Linux és nyílt forráskód'],dist:['Distribúcie','Disztribúciók'],env:['Prostredie a súbory','Környezet és fájlok']};
+const TQ=[
+  {tp:'lx',q:['Čo je Linux v užšom zmysle slova?','Mi a Linux a szó szűkebb értelmében?'],o:[['Jadro operačného systému, ktoré riadi procesor, pamäť a zariadenia.','Az operációs rendszer magja, amely a processzort, a memóriát és az eszközöket vezérli.'],['Grafické prostredie s panelom a ikonami.','Asztali környezet sávval és ikonokkal.'],['Kancelársky balík podobný Microsoft 365.','A Microsoft 365-höz hasonló irodai programcsomag.'],['Webový prehliadač.','Webböngésző.']],ex:['Jadro (kernel) začal písať Linus Torvalds v roku 1991. Celý systém s prostredím a aplikáciami je distribúcia.','A rendszermagot (kernel) Linus Torvalds kezdte írni 1991-ben. Az egész rendszer környezettel és alkalmazásokkal együtt a disztribúció.']},
+  {tp:'lx',q:['Čo umožňuje licencia GNU GPL, pod ktorou je jadro Linux?','Mit tesz lehetővé a GNU GPL licenc, amely alatt a Linux rendszermag megjelenik?'],o:[['Kód čítať, upravovať a šíriť; upravené verzie musia zostať otvorené.','A kódot olvasni, módosítani és terjeszteni; a módosított változatoknak nyíltnak kell maradniuk.'],['Program je zadarmo, ale zdrojový kód je tajný.','A program ingyenes, de a forráskód titkos.'],['Program sa smie používať iba 30 dní.','A programot csak 30 napig szabad használni.'],['Linux smú používať iba firmy.','A Linuxot csak cégek használhatják.']],ex:['To je podstata otvoreného zdrojového kódu (open source).','Ez a nyílt forráskód (open source) lényege.']},
+  {tp:'dist',q:['Čo je linuxová distribúcia?','Mi a Linux-disztribúció?'],o:[['Jadro spolu s nástrojmi, grafickým prostredím a aplikáciami, pripravené na inštaláciu.','A rendszermag eszközökkel, asztali környezettel és alkalmazásokkal együtt, telepítésre készen.'],['Iný názov pre jadro Linux.','A Linux rendszermag másik neve.'],['Obchod, kde sa kupuje Linux.','Bolt, ahol Linuxot lehet venni.'],['Antivírusový program pre Linux.','Vírusirtó program Linuxra.']],ex:['Napr. Ubuntu, Linux Mint, Fedora či Debian.','Például az Ubuntu, a Linux Mint, a Fedora vagy a Debian.']},
+  {tp:'dist',q:['Čo znamená LTS pri Ubuntu 26.04 LTS?','Mit jelent az LTS az Ubuntu 26.04 LTS esetében?'],o:[['Dlhodobá podpora – aktualizácie 5 rokov, do apríla 2031.','Hosszú távú támogatás – 5 évig, 2031 áprilisáig kap frissítéseket.'],['Testovacia verzia pre vývojárov.','Fejlesztőknek szóló tesztváltozat.'],['Verzia iba pre servery.','Csak szervereknek szóló változat.'],['Verzia bez grafického prostredia.','Asztali környezet nélküli változat.']],ex:['LTS = Long Term Support. Ubuntu 26.04 vyšlo 23. 4. 2026.','LTS = Long Term Support. Az Ubuntu 26.04 2026. 4. 23-án jelent meg.']},
+  {tp:'dist',q:['Na ktorej distribúcii je postavený Linux Mint?','Melyik disztribúcióra épül a Linux Mint?'],o:[['Ubuntu','Ubuntu'],['Fedora','Fedora'],['Arch Linux','Arch Linux'],['Android','Android']],ex:['Rodina Debian → Ubuntu → Linux Mint.','Debian család → Ubuntu → Linux Mint.']},
+  {tp:'dist',q:['Ako sa v Linuxe najbezpečnejšie inštalujú programy?','Hogyan a legbiztonságosabb programot telepíteni Linuxon?'],o:[['Z repozitára distribúcie cez správcu balíkov alebo obchod s aplikáciami.','A disztribúció tárolójából, csomagkezelővel vagy alkalmazásbolttal.'],['Stiahnutím súboru .exe z prvej stránky vo vyhľadávači.','Egy .exe fájl letöltésével az első találatból.'],['Otvorením prílohy z neznámeho e-mailu.','Egy ismeretlen e-mail mellékletének megnyitásával.'],['Skopírovaním priečinka od spolužiaka z USB.','Egy osztálytárs mappájának átmásolásával USB-ről.']],ex:['Softvér z repozitára je overený a aktualizuje sa spolu so systémom.','A tárolóban lévő szoftver ellenőrzött, és a rendszerrel együtt frissül.']},
+  {tp:'env',q:['Ktorá cesta k súboru je zapísaná správne pre Linux?','Melyik elérési út helyes Linuxon?'],o:[['/home/lilla/Dokumenty/referat.odt','/home/lilla/Dokumenty/referat.odt'],['C:\\home\\lilla\\Dokumenty\\referat.odt','C:\\home\\lilla\\Dokumenty\\referat.odt'],['home\\lilla\\Dokumenty\\referat.odt','home\\lilla\\Dokumenty\\referat.odt'],['D:/Dokumenty/referat.odt','D:/Dokumenty/referat.odt']],ex:['Linux nemá písmená diskov, začína koreňom / a používa lomku /.','A Linuxban nincsenek meghajtóbetűk, a gyökérrel (/) kezdődik, és perjelet (/) használ.']},
+  {tp:'env',q:['Ako v prostredí GNOME (Ubuntu) otvoríte prehľad aktivít s vyhľadávaním aplikácií?','Hogyan nyitjátok meg a GNOME-ban (Ubuntu) a tevékenységek áttekintését az alkalmazáskereséssel?'],o:[['Klávesom Super (kláves s logom Windows).','A Super billentyűvel (a Windows-logós billentyű).'],['Klávesmi Ctrl + Alt + Del.','A Ctrl + Alt + Del billentyűkkel.'],['Klávesmi Alt + F4.','Az Alt + F4 billentyűkkel.'],['Tlačidlom Štart vľavo dole.','A bal alsó Start gombbal.']],ex:['Alt + F4 zatvára okno. Tlačidlo Štart GNOME nemá – ponuka vľavo dole je v Cinnamon či KDE Plasma.','Az Alt + F4 bezárja az ablakot. A GNOME-ban nincs Start gomb – bal alsó menü a Cinnamonban vagy a KDE Plasmában van.']},
+];
+const gradeTxt=p=>tr(gradeOf(p)[1]);
+reg('test',{sec:'s4',max:0,also:['s5'],on(v,a){const s=S.test;
+  if(v==='pick'&&s.ans[s.i]==null){s.ans[s.i]=+a}
+  if(v==='next'&&s.ans[s.i]!=null){if(s.i<TQ.length-1)s.i++;else{s.fin=true;const c=TQ.filter((q,i)=>s.ans[i]===0).length;if(s.first==null){s.first=c;finish('test')}}}
+  if(v==='again'){s.i=0;s.ans=[];s.fin=false;s.round=(s.round||1)+1}
+  if(v==='dl'){downloadResult()}
+  if(v==='print'){printCert()}
+}});
+function resultObj(){
+  const r=results();
+  const o={lesson:LID,name:(S.name||'').trim(),cls:(S.cls||'').trim(),date:new Date().toISOString().slice(0,10),active:S.act.t,secs:SECS.filter(s=>S.done[s.id]).map(s=>s.id),
+    tasks:r.tasks,tasksPts:r.tasksGot+'/'+r.tasksMax,test:r.testRaw==null?null:r.testRaw,testMax:TQ.length,time:r.time,total:r.total,grade:r.grade,per:S.act.per,doneAt:S.act.doneAt};
+  o.code=signRes(o);return o;
+}
+function signRes(o){return hashStr([o.lesson,o.name,o.cls,o.active,o.secs.join(','),o.tasks,o.test,o.time,o.total,o.grade,'IIC#linux'].join('|')).toString(36).toUpperCase()}
+const slug=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'')||'ziak';
+function dlFile(name,text,type){
+  if(INFRAME){toast(tr(['V náhľade sa súbor stiahnuť nedá – otvorte žiacky súbor.','Az előnézetben nem lehet letölteni – nyissátok meg a diákfájlt.']));return}
+  const b=new Blob([text],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},500);
+}
+function downloadResult(){
+  if(!(S.name||'').trim()){toast(tr(['Najprv vyplňte meno.','Előbb írjátok be a nevet.']));return}
+  const o=resultObj();dlFile(`linux-distribucie_${slug(o.cls)}_${slug(o.name)}.json`,JSON.stringify(o,null,1),'application/json');
+}
+function certHTML(){const r=results();return `<div class="cert"><div>${LOGO.replace('<svg','<svg width="56" height="56"')}</div><h3>${tr(['Osvedčenie','Oklevél'])}</h3>
+ <p>${tr(['Potvrdzujeme, že','Igazoljuk, hogy'])}</p><div class="nm" id="certName">${esc(S.name||'…')}</div>
+ <p>${tr(['pripravil(a) staré notebooky na nový život s Linuxom a zvládol(a) misiu','felkészítette a régi laptopokat egy új, linuxos életre, és teljesítette a küldetést:'])}<br><b>${esc(t('title'))}</b></p>
+ <p>${tr(['Výsledok','Eredmény'])}: <b>${r.total} %</b> · ${esc(gradeTxt(r.total))}</p><p class="note">${esc(t('author'))} · ${new Date().toLocaleDateString(loc())}</p></div>`}
+function printCert(){if(INFRAME){toast(tr(['V náhľade sa nedá tlačiť – certifikát si odfoťte.','Az előnézetben nem lehet nyomtatni – fényképezzétek le az oklevelet.']));return}$('#certPrint').innerHTML=certHTML();window.print()}
+SECR.s4=()=>{
+  const s=S.test;const q=TQ[s.i];const order=dshuffle([0,1,2,3],'q'+s.i);
+  let html=`<p class="lead">${tr(['Osem otázok, vždy jedna. Do známky sa počíta <b>prvý pokus</b>; potom môžete test precvičovať znova. Po teste sa odomkne mini hra.','Nyolc kérdés, egyszerre egy. Az érdemjegybe az <b>első próbálkozás</b> számít; utána újra gyakorolhatjátok. A teszt után feloldódik a minijáték.'])}</p>`;
+  let inner='';
+  if(!s.fin){const p=s.ans[s.i];
+    inner=`<div class="qcard"><div class="qmeta"><span>${tr(['Otázka','Kérdés'])} ${s.i+1} / ${TQ.length}</span><span>${esc(tr(TOPIC[q.tp]))}${s.first!=null?' · '+tr(['precvičovanie','gyakorlás']):''}</span></div><div class="qbar"><i style="width:${(s.i)/TQ.length*100}%"></i></div>
+     <h3>${esc(tr(q.q))}</h3><div class="opts one">${order.map(oi=>{let c='';if(p!=null){if(oi===0)c='good';else if(oi===p)c='badc'}return `<button class="opt ${c}" data-a="test:pick:${oi}" aria-pressed="${p===oi}" ${p!=null?'aria-disabled="true"':''}>${esc(tr(q.o[oi]))}</button>`}).join('')}</div>
+     ${p!=null?`<div class="fb ${p===0?'ok':'no'}"><b>${p===0?esc(t('correct')):esc(t('wrong'))}</b> ${esc(tr(q.ex))}</div><div class="row"><button class="btn" data-a="test:next">${s.i<TQ.length-1?esc(t('next')):tr(['Vyhodnotiť','Kiértékelés'])}</button></div>`:''}</div>`;
+  }else{const c=TQ.filter((x,i)=>s.ans[i]===0).length;
+    const by={};TQ.forEach((x,i)=>{by[x.tp]=by[x.tp]||[0,0];by[x.tp][1]++;if(s.ans[i]===0)by[x.tp][0]++});
+    inner=`<div class="res"><h3>${tr(['Test: ','Teszt: '])}${c} / ${TQ.length}${s.round>1?' '+tr(['(precvičovanie)','(gyakorlás)']):''}</h3>
+     <p>${tr(['Do známky sa počíta prvý pokus: ','Az érdemjegybe az első próbálkozás számít: '])}<b>${s.first} / ${TQ.length}</b> → ${esc(gradeTxt(Math.round(s.first/TQ.length*100)))}</p>
+     <div class="topics">${Object.keys(by).map(k=>`<div><span>${esc(tr(TOPIC[k]))}</span><b>${by[k][0]} / ${by[k][1]}</b></div>`).join('')}</div>
+     <div class="row"><button class="btn ghost small" data-a="test:again">${tr(['Precvičiť znova','Újra gyakorlom'])}</button><a class="btn small" href="#s5">${ic('game')}${tr(['Mini hra je odomknutá','A minijáték feloldva'])}</a></div></div>`;
+  }
+  html+=actBox('test','kindTest',['Záverečný test','Záró teszt'],inner);
+  const r=results();
+  html+=`<div class="act" id="a-result"><div class="ahead"><span class="kind">${tr(['Výsledok','Eredmény'])}</span><h3>${tr(['Meno, výsledok a odovzdanie','Név, eredmény és leadás'])}</h3></div>
+   <div class="cards2"><div class="field"><label for="meName">${tr(['Meno a priezvisko','Név'])}</label><input class="inp" id="meName" data-in="me:name" value="${esc(S.name)}" autocomplete="name"></div>
+   <div class="field"><label for="meCls">${tr(['Trieda','Osztály'])}</label><input class="inp" id="meCls" data-in="me:cls" value="${esc(S.cls)}"></div></div>
+   <div class="resg"><div class="rbox"><b>${r.tasks} %</b><small>${tr(['úlohy (40 %)','feladatok (40 %)'])}</small></div><div class="rbox"><b>${r.testRaw==null?'–':r.test+' %'}</b><small>${tr(['test (40 %)','teszt (40 %)'])}</small></div><div class="rbox"><b>${mmss(S.act.t)}</b><small>${tr(['aktívny čas','aktív idő'])} · ${r.time} % (20 %)</small></div><div class="rbox"><b>${r.total} %</b><small>${tr(['spolu','összesen'])}</small></div></div>
+   <p class="grade">${tr(['Známka zo stránky: ','Érdemjegy az oldal alapján: '])}${esc(gradeTxt(r.total))}</p>
+   <p class="note">${tr(['Aktívny čas sa počíta, len keď je stránka otvorená a pracujete (klikanie, písanie, posúvanie). 15 minút = 100 %. Mini hra a bonusy sa do známky nepočítajú.','Az aktív idő csak akkor számít, ha az oldal nyitva van és dolgoztok (kattintás, írás, görgetés). 15 perc = 100 %. A minijáték és a bónuszok nem számítanak bele a jegybe.'])} ${r.testRaw==null?tr(['Test ešte nie je dokončený.','A teszt még nincs befejezve.']):''}</p>
+   <div class="row"><button class="btn" data-a="test:dl">${ic('download')}${tr(['Stiahnuť výsledok (.json)','Eredmény letöltése (.json)'])}</button></div>
+   <p class="note">${tr(['Výsledok si stiahnite <b>ešte pred mini hrou</b> a odovzdajte podľa pokynov učiteľa (napr. úloha v EduPage). Stránka nič neposiela na internet.','Az eredményt <b>még a minijáték előtt</b> töltsétek le, és a tanár útmutatása szerint adjátok le (pl. EduPage-feladatként). Az oldal semmit nem küld az internetre.'])}${INFRAME?' '+tr(['V tomto náhľade sa sťahovanie nedá – slúži na to žiacky súbor.','Ebben az előnézetben nem lehet letölteni – erre a diákfájl szolgál.']):''}</p>
+   ${certHTML()}
+   <div class="row"><button class="btn ghost" data-a="test:print">${ic('print')}${tr(['Vytlačiť osvedčenie','Oklevél nyomtatása'])}</button>${INFRAME?`<span class="note">${tr(['Tip: osvedčenie si odfoťte.','Tipp: fényképezzétek le az oklevelet.'])}</span>`:''}</div></div>
+   <div class="act"><div class="ahead"><span class="kind">${esc(t('kindHome'))}</span><h3>${tr(['Domáca úloha','Házi feladat'])}</h3></div>
+   <p>${tr(['Ak máte telefón s Androidom, nájdite v Nastaveniach informácie o telefóne a položku <b>Verzia jadra</b> (presná cesta sa líši podľa výrobcu). Zapíšte číslo verzie jadra Linux. Kto má iPhone: napíšte, aký operačný systém v ňom beží a či je open source.','Ha androidos telefonotok van, keressétek meg a Beállításokban a telefon adatait és a <b>Kernelverzió</b> sort (a pontos útvonal gyártónként eltér). Írjátok le a Linux rendszermag verziószámát. Akinek iPhone-ja van: írja le, milyen operációs rendszer fut rajta, és nyílt forráskódú-e.'])}</p></div>`;
+  return html;
+};
+
+/* ================= Šanón 5: Mini hra – Linuxový triedič ================= */
+const GCATS=[{id:'d',n:['Distribúcia','Disztribúció']},{id:'e',n:['Grafické prostredie','Asztali környezet']},{id:'a',n:['Aplikácia','Alkalmazás']},{id:'c',n:['Príkaz v termináli','Terminálparancs']}];
+const GITEMS=[['Ubuntu','d'],['Fedora','d'],['Debian','d'],['Linux Mint','d'],['Arch Linux','d'],['openSUSE','d'],['Kubuntu','d'],['SteamOS','d'],
+  ['GNOME','e'],['KDE Plasma','e'],['Xfce','e'],['Cinnamon','e'],['MATE','e'],['LXQt','e'],
+  ['Firefox','a'],['LibreOffice','a'],['GIMP','a'],['Inkscape','a'],['VLC','a'],['Thunderbird','a'],
+  ['ls','c'],['cd','c'],['pwd','c'],['mkdir','c'],['sudo','c'],['apt','c']];
+const GAMESEC=45;
+const GM={run:false,end:0,score:0,streak:0,miss:0,cur:-1,last:-1,iv:0,fb:null,res:null};
+function gmNext(){let i;do{i=Math.random()*GITEMS.length|0}while(i===GM.last&&GITEMS.length>1);GM.last=i;GM.cur=i}
+reg('game',{sec:'s5',max:5,on(v,a){
+  if(v==='start'){if(S.test.first==null)return;Object.assign(GM,{run:true,end:Date.now()+GAMESEC*1000,score:0,streak:0,miss:0,fb:null,res:null});gmNext();clearInterval(GM.iv);GM.iv=setInterval(gmTick,200)}
+  if(v==='pick'&&GM.run){if(a===GITEMS[GM.cur][1]){GM.score++;GM.streak++;GM.fb='ok';gmNext()}else{GM.miss++;GM.streak=0;GM.fb='no'}}
+}});
+function gmTick(){if(!GM.run)return;const left=GM.end-Date.now();if(left<=0){gmFinish();return}const el=$('#gmT');if(el)el.textContent=Math.ceil(left/1000)+' s'}
+function gmFinish(){
+  clearInterval(GM.iv);GM.run=false;GM.res={score:GM.score,miss:GM.miss};
+  S.game.runs=(S.game.runs||0)+1;S.game.best=Math.max(S.game.best??0,GM.score);save();
+  award('game',Math.min(5,Math.floor(GM.score/3)));finish('game');rerender('s5');
+  const b=$('#s5 [data-a="game:start"]');if(b)try{b.focus({preventScroll:true})}catch(e){}
+}
+SECR.s5=()=>{
+  if(S.test.first==null) return `<p class="lead">${tr(['Odmena za test: hra na čas, ktorá precvičí pojmy z hodiny. Hrať ju môžete aj doma.','Jutalom a tesztért: időre menő játék, amely gyakoroltatja az óra fogalmait. Otthon is játszhatjátok.'])}</p>
+   <div class="act"><div class="lockbox">${ic('lock')}<div><b>${tr(['Mini hra je zamknutá.','A minijáték zárolva van.'])}</b><br>${tr(['Odomkne sa po dokončení testu v šanóne 4.','A 4. dosszié tesztjének befejezése után oldódik fel.'])} <a href="#s4">${tr(['Ísť na test','Irány a teszt'])}</a></div></div></div>`;
+  let st2;
+  if(GM.run){const it=GITEMS[GM.cur];
+    st2=`<div class="gm-top"><span class="gm-t">${ic('clock')} <span id="gmT">${Math.ceil(Math.max(0,GM.end-Date.now())/1000)} s</span></span><span>${tr(['Body','Pontok'])}: <b>${GM.score}</b></span><span>${tr(['Séria','Sorozat'])}: <b>${GM.streak}</b></span></div>
+     <div class="gm-order"><small>${tr(['Čo je to?','Mi ez?'])}</small><b>${esc(it[0])}</b></div>
+     <div class="gm-tools" role="group">${GCATS.map(c=>`<button class="gm-tool" data-a="game:pick:${c.id}">${esc(tr(c.n))}</button>`).join('')}</div>
+     <p class="note" role="status">${GM.fb==='ok'?tr(['Správne!','Helyes!']):GM.fb==='no'?tr(['Vedľa – skúste inú kategóriu.','Mellé – próbáljatok másik kategóriát.']):'&nbsp;'}</p>`;
+  }else{
+    st2=`${GM.res?`<h3>${tr(['Koniec! Body: ','Vége! Pontok: '])}${GM.res.score}</h3><p>${GM.res.score>=15?tr(['Linuxový mentor!','Igazi Linux-mentor!']):GM.res.score>=9?tr(['Výborne, ste rýchli!','Nagyszerű, gyorsak vagytok!']):tr(['Dobrý začiatok – skúste to ešte raz.','Jó kezdet – próbáljátok újra.'])} ${tr(['Chyby','Hibák'])}: ${GM.res.miss}.</p>`
+      :`<h3>${tr(['Linuxový triedič','Linux-válogató'])}</h3><p>${tr(['Za 45 sekúnd zaraďte čo najviac názvov: je to distribúcia, grafické prostredie, aplikácia, alebo príkaz v termináli? Za chybu sa body neodpočítavajú.','45 másodperc alatt soroljatok be minél több nevet: disztribúció, asztali környezet, alkalmazás vagy terminálparancs? A hibáért nem jár pontlevonás.'])}</p>`}
+     ${S.game.best!=null?`<p class="note">${tr(['Najlepší výsledok: ','Legjobb eredmény: '])}<b>${S.game.best}</b> · ${tr(['odohrané hry: ','lejátszott játékok: '])}${S.game.runs}</p>`:''}
+     <div class="row"><button class="btn" data-a="game:start">${ic('play')}${GM.res||S.game.runs?tr(['Hrať znova','Újra']):tr(['Štart','Start'])}</button></div>
+     <p class="note">${tr(['XP sa počíta len z prvej hry (max. 50 XP). Do známky sa hra nepočíta.','XP csak az első játékért jár (legfeljebb 50 XP). A játék nem számít bele a jegybe.'])}</p>`;
+  }
+  return `<p class="lead">${tr(['Odmena za test: hra na čas, ktorá precvičí pojmy z hodiny. Hrať ju môžete aj doma.','Jutalom a tesztért: időre menő játék, amely gyakoroltatja az óra fogalmait. Otthon is játszhatjátok.'])}</p>
+   ${actBox('game','kindGame',['Linuxový triedič','Linux-válogató'],`<div class="gm">${st2}</div>`)}`;
+};
+/* ================= Bonus 6: Terminál (simulácia) ================= */
+const HOME='/home/adam';
+const FS0=()=>({'/home/adam':['Dokumenty/','Obrázky/','Stiahnuté/','poznamky.txt','.config/'],'/home/adam/Dokumenty':['referat.odt'],'/home/adam/Obrázky':['vylet.jpg'],'/home/adam/Stiahnuté':['navod.pdf'],'/home/adam/.config':[]});
+const TGOALS=[
+  {id:'g1',n:['Zistite, v ktorom priečinku ste (<code>pwd</code>).','Derítsétek ki, melyik mappában vagytok (<code>pwd</code>).']},
+  {id:'g2',n:['Vypíšte obsah priečinka (<code>ls</code>).','Listázzátok ki a mappa tartalmát (<code>ls</code>).']},
+  {id:'g3',n:['Prejdite do priečinka Dokumenty (<code>cd</code> …). Pozor na veľké písmená!','Lépjetek be a Dokumenty mappába (<code>cd</code> …). Figyeljetek a nagybetűkre!']},
+  {id:'g4',n:['V Dokumentoch vytvorte priečinok <b>projekt</b> (<code>mkdir</code> …) a overte ho cez <code>ls</code>.','A Dokumenty mappában hozzátok létre a <b>projekt</b> mappát (<code>mkdir</code> …), és ellenőrizzétek <code>ls</code>-sel.']},
+  {id:'g5',n:['Vráťte sa domov (<code>cd ~</code>) a ukážte aj skryté súbory (<code>ls -a</code>).','Térjetek vissza a saját mappába (<code>cd ~</code>), és mutassátok meg a rejtett fájlokat is (<code>ls -a</code>).']},
+];
+reg('term',{sec:'s6',max:5,on(v){const s=st('term');if(v==='reset'){delete s.fs;s.cwd=HOME;s.log=[];s.g={};s.mk=0}}});
+function tState(){const s=st('term');if(!s.fs)s.fs=FS0();if(!s.cwd)s.cwd=HOME;s.log=s.log||[];s.g=s.g||{};return s}
+const short=p=>p===HOME?'~':p.startsWith(HOME+'/')?'~'+p.slice(HOME.length):p;
+function tRun(line){
+  const s=tState();const cmd=line.trim();const out=[];const hint=[];
+  s.log.push({p:short(s.cwd),c:cmd});
+  const [c,...args]=cmd.split(/\s+/);const arg=args.join(' ');
+  const list=p=>(s.fs[p]||[]);
+  if(!cmd){}
+  else if(c==='pwd'){out.push(s.cwd);s.g.g1=1}
+  else if(c==='ls'){const all=args.includes('-a');const items=list(s.cwd).filter(x=>all||!x.startsWith('.'));out.push((all?['./','../']:[]).concat(items).join('  ')||'');if(s.cwd===HOME&&!all)s.g.g2=1;if(all&&s.cwd===HOME)s.g.g5=1;if(s.cwd===HOME+'/Dokumenty'&&s.mk)s.g.g4=1}
+  else if(c==='cd'){
+    if(!arg||arg==='~'){s.cwd=HOME}
+    else if(arg==='..'){if(s.cwd!=='/')s.cwd=s.cwd.split('/').slice(0,-1).join('/')||'/'}
+    else{const nm=arg.replace(/\/$/,'');const tgt=nm.startsWith('/')?nm:(s.cwd==='/'?'':s.cwd)+'/'+nm.replace(/^~\//,'');const real=nm.startsWith('~/')?HOME+'/'+nm.slice(2):tgt;
+      if(s.fs[real]){s.cwd=real}else{out.push(`bash: cd: ${arg}: No such file or directory`);
+        if(list(s.cwd).some(x=>x.replace(/\/$/,'').toLowerCase()===nm.toLowerCase()))hint.push(['Linux rozlišuje veľké a malé písmená – skúste presne tak, ako to vypísal príkaz ls.','A Linux megkülönbözteti a kis- és nagybetűket – írjátok pontosan úgy, ahogy az ls kiírta.'])}}
+    if(s.cwd===HOME+'/Dokumenty')s.g.g3=1}
+  else if(c==='mkdir'){if(!arg){out.push('mkdir: missing operand')}else{const nm=arg.replace(/\/$/,'');const p=s.cwd+'/'+nm;
+      if(list(s.cwd).includes(nm+'/')){out.push(`mkdir: cannot create directory '${nm}': File exists`)}else{s.fs[s.cwd]=list(s.cwd).concat(nm+'/');s.fs[p]=[];if(s.cwd===HOME+'/Dokumenty'&&nm==='projekt')s.mk=1}}}
+  else if(c==='whoami'){out.push('adam')}
+  else if(c==='cat'){if(arg==='poznamky.txt'&&s.cwd===HOME)out.push(LI?'Bevásárlás: kenyér, tej. Holnap: Linux teszt!':'Nákup: chlieb, mlieko. Zajtra: test z Linuxu!');else out.push(`cat: ${arg||''}: No such file or directory`)}
+  else if(c==='clear'){s.log=[]}
+  else if(c==='help'){out.push('pwd  ls  ls -a  cd <priečinok>  cd ..  cd ~  mkdir <meno>  cat <súbor>  whoami  clear')}
+  else if(c==='rm'||c==='rmdir'){out.push(LI?'(Szimuláció) A törlés itt nem engedélyezett.':'(Simulácia) Mazanie tu nie je povolené.');hint.push(['Príkaz rm maže bez Koša – na skutočnom PC s ním opatrne!','Az rm parancs Lomtár nélkül töröl – valódi gépen óvatosan!'])}
+  else if(c==='sudo'){out.push(LI?'(Szimuláció) A sudo rendszergazdai jelszót kér – itt nem használható.':'(Simulácia) sudo pýta heslo správcu – tu sa nepoužíva.');hint.push(['sudo spustí príkaz s právami správcu (root). Používa sa napr. pri inštalácii: sudo apt install …','A sudo rendszergazdai (root) jogokkal futtat egy parancsot. Például telepítéskor használják: sudo apt install …'])}
+  else{out.push(`${c}: command not found`)}
+  if(c!=='clear'){const last=s.log[s.log.length-1];last.o=out.join('\n');last.h=hint}
+  if(s.log.length>40)s.log=s.log.slice(-40);
+  const n=TGOALS.filter(g=>s.g[g.id]).length;
+  if(n===TGOALS.length&&!S.pts.term){award('term',5);finish('term')}
+  save();
+}
+document.addEventListener('keydown',e=>{
+  if(e.target&&e.target.id==='tin'&&e.key==='Enter'){e.preventDefault();const v=e.target.value;tRun(v);rerender('s6');const i=$('#tin');if(i){try{i.focus({preventScroll:true})}catch(er){}}const o=$('#tout');if(o)o.scrollTop=o.scrollHeight}
+});
+AFTER.push(()=>{const o=$('#tout');if(o)o.scrollTop=o.scrollHeight});
+SECR.s6=()=>{const s=tState();
+  const lastH=(s.log[s.log.length-1]||{}).h||[];
+  return `<p class="lead">${tr(['Ádám videl „čierne okno“. Je to <span class="term">terminál</span> – textové rozhranie, v ktorom sa OS ovláda príkazmi. Nie je to hackovanie: správcovia v ňom pracujú rýchlo a presne. Vyskúšajte si ho bez rizika – toto je simulácia.','Ádám látott egy „fekete ablakot”. Ez a <span class="term">terminál</span> – szöveges felület, amelyben parancsokkal vezérelhető az operációs rendszer. Ez nem hekkelés: a rendszergazdák gyorsan és pontosan dolgoznak benne. Próbáljátok ki kockázat nélkül – ez szimuláció.'])}</p>
+  <div class="explain"><h4>${tr(['Ako čítať riadok terminálu','Hogyan olvassuk a terminál sorát?'])}</h4>
+   <p><code>adam@notebook:~/Dokumenty$</code> – ${tr(['používateľ <b>adam</b>, počítač <b>notebook</b>, aktuálny priečinok <b>~/Dokumenty</b>, znak <b>$</b> = bežný používateľ (nie správca).','<b>adam</b> felhasználó, <b>notebook</b> gép, aktuális mappa: <b>~/Dokumenty</b>, a <b>$</b> jel = átlagos felhasználó (nem rendszergazda).'])}</p>
+   <p class="note">${tr(['Tento bonus ide nad rámec hodiny – je pre rýchlych alebo na doma.','Ez a bónusz túlmegy az óra anyagán – a gyorsaknak vagy otthonra.'])}</p></div>
+  ${actBox('term','kindTerm',['Päť krokov v termináli','Öt lépés a terminálban'],`
+   <ul class="goalsT">${TGOALS.map(g=>`<li class="${s.g[g.id]?'ok':''}"><span class="bx">${s.g[g.id]?ic('check'):''}</span><span>${tr(g.n)}</span></li>`).join('')}</ul>
+   <div class="tbox"><div class="wbar">${ic('term')} ${tr(['Terminál','Terminál'])} – adam@notebook<span class="dots"><i></i><i></i></span></div>
+    <pre class="tout" id="tout" aria-live="polite">${s.log.length?'':`<span class="note" style="color:#B6B2DE">${tr(['Napíšte príkaz a stlačte Enter. Pomoc: help','Írjatok be egy parancsot, és nyomjatok Entert. Súgó: help'])}</span>`}${s.log.map(l=>`<span class="pr">adam@notebook:${esc(l.p)}$</span> ${esc(l.c)}${l.o?'\n'+`<span class="${/not found|No such|cannot|missing/.test(l.o)?'er':''}">${esc(l.o)}</span>`:''}`).join('\n')}</pre>
+    <div class="tin"><label class="pr" for="tin">adam@notebook:${esc(short(s.cwd))}$</label><input id="tin" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" aria-label="${tr(['Príkaz','Parancs'])}"></div></div>
+   ${lastH.length?`<div class="fb info">${lastH.map(x=>esc(tr(x))).join('<br>')}</div>`:''}
+   <div class="row">${S.pts.term?`<div class="fb ok"><b>${tr(['Výborne! Všetkých päť krokov.','Nagyszerű! Mind az öt lépés kész.'])}</b> +50 XP</div>`:''}<button class="btn ghost small" data-a="term:reset">${tr(['Začať odznova','Újrakezdés'])}</button></div>`)}`;
+};
+
+/* ================= Bonus 7: Pravda, či mýtus ================= */
+function tfAct(key,sec,list){reg(key,{sec,max:list.length,on(v,a){const s=st(key);s.p=s.p||{};
+  if(v==='pick'){const [id,val]=a.split('|');if(s.p[id]==null){s.p[id]=+val;if(list.every(x=>s.p[x.id]!=null)){award(key,list.filter(x=>s.p[x.id]===x.tru).length);finish(key)}}}}})}
+function tfRender(key,list){const s=st(key);s.p=s.p||{};
+  return list.map((x,i)=>{const p=s.p[x.id];const c=p==null?'':(p===x.tru?'good':'badc');
+   return `<div class="tf ${c}"><div class="s">${i+1}. ${esc(tr(x.s))}</div><div class="chips">
+    <button class="chip ${p!=null&&x.tru===1?'good':''}" data-a="${key}:pick:${x.id}|1" aria-pressed="${p===1}" ${p!=null?'aria-disabled="true"':''}>${tr(['Pravda','Igaz'])}</button>
+    <button class="chip ${p!=null&&x.tru===0?'good':''}" data-a="${key}:pick:${x.id}|0" aria-pressed="${p===0}" ${p!=null?'aria-disabled="true"':''}>${tr(['Mýtus','Tévhit'])}</button></div>
+    ${p!=null?`<div class="ex"><b>${p===x.tru?esc(t('correct')):esc(t('wrong'))}</b> ${esc(tr(x.ex))}</div>`:''}</div>`}).join('')+(S.pts[key]?`<div class="fb ok">${tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])}<b>${S.pts[key][0]} / ${A[key].max}</b></div>`:'')}
+const MYTHS=[
+  {id:'m1',tru:1,s:['Väčšinu distribúcií si môžete legálne stiahnuť zadarmo a nainštalovať na ľubovoľný počet počítačov.','A legtöbb disztribúciót legálisan, ingyen letölthetitek, és akárhány gépre telepíthetitek.'],ex:['Pravda. Preto sa Linux hodí aj na darované školské notebooky.','Igaz. Ezért a Linux az ajándékba kapott iskolai laptopokra is alkalmas.']},
+  {id:'m2',tru:0,s:['Na Linuxe sa nedá hrať žiadna hra.','Linuxon semmilyen játékkal nem lehet játszani.'],ex:['Mýtus. Steam spúšťa veľa hier pre Windows aj na Linuxe a Steam Deck beží na SteamOS. Niektoré hry s ochranou proti podvádzaniu však nefungujú.','Tévhit. A Steam Linuxon is sok windowsos játékot futtat, a Steam Deck pedig SteamOS-en fut. Néhány csalásvédelemmel ellátott játék viszont nem működik.']},
+  {id:'m3',tru:0,s:['Desktopové aplikácie Microsoft 365 (Word, Excel) sa dajú nainštalovať priamo na Linux.','A Microsoft 365 asztali alkalmazásai (Word, Excel) közvetlenül telepíthetők Linuxra.'],ex:['Mýtus. Linuxová verzia neexistuje. Na Linuxe použijete Microsoft 365 na webe v prehliadači alebo LibreOffice.','Tévhit. Linuxos változat nincs. Linuxon a webes Microsoft 365-öt használhatjátok böngészőben, vagy a LibreOffice-t.']},
+  {id:'m4',tru:1,s:['Inkscape, ktorý používame na hodinách, beží aj na Linuxe.','Az Inkscape, amelyet órán használunk, Linuxon is fut.'],ex:['Pravda. Inkscape je open source a je dostupný pre Linux, Windows aj macOS.','Igaz. Az Inkscape nyílt forráskódú, és Linuxra, Windowsra és macOS-re is elérhető.']},
+  {id:'m5',tru:0,s:['Linux netreba aktualizovať, lebo naň neexistujú vírusy.','A Linuxot nem kell frissíteni, mert nincsenek rá vírusok.'],ex:['Mýtus. Aj v Linuxe sa nachádzajú chyby a existuje škodlivý softvér. Aktualizácie z repozitára treba inštalovať pravidelne.','Tévhit. Linuxban is vannak hibák, és létezik kártevő. A tárolóból érkező frissítéseket rendszeresen telepíteni kell.']},
+  {id:'m6',tru:1,s:['Android v telefóne používa jadro Linux.','A telefonok Androidja a Linux rendszermagot használja.'],ex:['Pravda. Android je iný systém ako bežné distribúcie, ale jeho jadrom je Linux.','Igaz. Az Android más rendszer, mint a szokásos disztribúciók, de a magja Linux.']},
+];
+tfAct('myths','s7',MYTHS);
+SECR.s7=()=>`<p class="lead">${tr(['Pre rýchlych: rozoznáte pravdu od mýtu? O Linuxe koluje veľa povier.','A gyorsaknak: meg tudjátok különböztetni az igazat a tévhittől? A Linuxról sok babona kering.'])}</p>${actBox('myths','kindMyth',['Pravda, či mýtus?','Igaz vagy tévhit?'],tfRender('myths',MYTHS))}`;
+/* ================= Panel Pre učiteľa (po slovensky), výsledky triedy, init ================= */
+let CLASS=[];let resetArm=0;
+const SRC=[
+  ['Ubuntu 26.04 LTS – release notes (vydané 23. 4. 2026, podpora do apríla 2031)','https://documentation.ubuntu.com/release-notes/26.04/'],
+  ['Canonical: Ubuntu 26.04 LTS je postavené na jadre Linux 7.0','https://canonical.com/blog/canonical-releases-ubuntu-26-04-lts-resolute-raccoon'],
+  ['Debian 13 „trixie“ – vydané 9. 8. 2025, podpora do 30. 6. 2030','https://www.debian.org/releases/stable'],
+  ['Linux Mint – Monthly News, marec 2026 (dlhší vývojový cyklus, ďalšia verzia na Vianoce 2026)','https://blog.linuxmint.com/?p=5019'],
+  ['It’s FOSS: Linux Mint 27 „Adrien“ namiesto Mint 23 (14. 10. 2026)','https://itsfoss.com/news/linux-mint-27-announced/'],
+  ['Fedora Magazine: Announcing Fedora Linux 45','https://fedoramagazine.org/announcing-fedora-linux-45/'],
+  ['Linuxiac: StatCounter jún 2026 – Linux 4,39 % desktopov vo svete','https://linuxiac.com/windows-drops-un'],
+  ['PCWorld: nárast podielu Linuxu v júli 2026 je pravdepodobne skreslený botmi','https://www.pcworld.com/article/3204830/linux-didnt-actually-hit-10-percent-market-share-blame-bots.html'],
+  ['CommandLinux: Linux na 100 % superpočítačov TOP500 od novembra 2017 (overte aj na top500.org)','https://commandlinux.com/statistics/linux-in-top500-supercomputers-statistics/'],
+  ['ŠPÚ: ŠVP Informatika – gymnázium so 4-ročným programom (2015)','https://www.gymparnr.edu.sk//obsah/predmety/subory/informatika/svp4god2015.pdf'],
+];
+function teacherHTML(){
+  const rows=CLASS.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.cls)}</td><td>${mmss(c.active||0)}</td><td>${(c.secs||[]).length}</td><td>${c.tasks??'–'} %</td><td>${c.test==null?'–':c.test+'/'+(c.testMax||8)}</td><td>${c.time??'–'} %</td><td><b>${c.total??'–'} %</b></td><td>${c.grade??'–'}</td><td class="${c.chk==='OK'?'ok-t':c.chk==='upravený'?'bad-t':'warn-t'}">${esc(c.chk)}</td></tr>`).join('');
+  return `<div class="dh"><h2 id="tdlgT">Pre učiteľa</h2><button class="btn small ghost" data-a="tp:close">Zavrieť</button></div><div class="db">
+  <h3>Ciele hodiny</h3><ul><li>Žiak vysvetlí rozdiel medzi jadrom Linux a distribúciou a pojem otvorený zdrojový kód (GNU GPL).</li><li>Pozná hlavné rodiny distribúcií (Debian/Ubuntu/Mint, Fedora, Arch) a vyberie distribúciu podľa potreby; vysvetlí LTS, repozitár, správcu balíkov, live USB.</li><li>Opíše pracovnú plochu Ubuntu (GNOME) a porovná ju s Windows a s prostredím Cinnamon/KDE.</li><li>Zapíše cestu k súboru v Linuxe a vie, že Linux rozlišuje veľké a malé písmená.</li></ul>
+  <h3>Súvis so štandardom (ŠVP gymnázium, 4-ročné štúdium, 2015)</h3>
+  <p><b>Softvér a hardvér – práca v operačnom systéme.</b> Obsahový štandard: operačný systém, jeho úloha a služby; aplikácie. Výkonový štandard: používať nástroje OS a prispôsobiť pracovné prostredie, skúmať nové možnosti OS, porovnať prostredia (Linux × Windows).<br>
+  <b>Softvér a hardvér – práca so súbormi a priečinkami:</b> cesta k súboru, štruktúra priečinkov (nadväzuje na hodinu Súbory a priečinky).<br>
+  <b>Informačná spoločnosť:</b> softvérové licencie, otvorený zdrojový kód (GPL), legálne používanie softvéru.<br>
+  <span class="warn-t">Overte</span> presné formulácie a zaradenie podľa vášho TVVP (v projekte zatiaľ nie je nahraný). Nad rámec štandardu: bonus Terminál (príkazy pwd, ls, cd, mkdir) – je len pre rýchlych a do známky sa nepočíta.</p>
+  <h3>Priebeh (25 min)</h3><div class="tblw"><table><tr><th>Čas</th><th>Šanón</th><th>Čo robia žiaci</th></tr>
+   <tr><td>0 – 5</td><td>1 Čo je Linux</td><td>jadro × distribúcia, vrstvy, open source; tip do obálky (TOP500); triedenie 8 položiek; PL 1</td></tr>
+   <tr><td>5 – 10</td><td>2 Distribúcie</td><td>rodiny Debian/Fedora/Arch, LTS; otvorenie obálky; poradňa (5 situácií); spájanie pojmov; PL 2</td></tr>
+   <tr><td>10 – 15</td><td>3 Prostredie</td><td>popis očíslovanej plochy Ubuntu (6 častí), slovník Windows → Linux, cesty; PL 3</td></tr>
+   <tr><td>15 – 22</td><td>4 Test</td><td>8 otázok, meno, stiahnutie výsledku (.json) – ešte pred hrou, osvedčenie</td></tr>
+   <tr><td>22 – 25</td><td>5 Mini hra</td><td>Linuxový triedič (45 s, odomkne sa po teste, do známky sa nepočíta)</td></tr>
+   <tr><td>rýchli / doma</td><td>6 – 7 bonus</td><td>simulovaný terminál (5 krokov), pravda/mýtus o Linuxe</td></tr></table></div>
+  <h3>Čo povedať pri výklade</h3><ul>
+   <li><b>Šanón 1:</b> Linux = motor auta (jadro). Distribúcia = celé auto: karoséria (prostredie), výbava (aplikácie), servisná knižka (aktualizácie). Linus Torvalds 1991, GPL: kód je verejný a úpravy musia ostať verejné. Linux je všade – Android, servery, všetkých 500 superpočítačov TOP500 – len na desktopoch je menšinový (StatCounter 2026: zhruba 4 – 7 %, čísla kolíšu).</li>
+   <li><b>Šanón 2:</b> distribúcie tvoria rodokmeň: Debian → Ubuntu → Mint. Výber podľa používateľa: začiatočník z Windows → Mint, server → Debian/Ubuntu LTS, najnovší softvér → Fedora, slabé PC → ľahké prostredie (Lubuntu, Xfce). LTS = 5 rokov aktualizácií (Ubuntu 26.04 do 4/2031). Programy z repozitára, nie zo stránok s .exe. Vyskúšať sa dá z live USB.</li>
+   <li><b>Šanón 3:</b> ukážte plochu GNOME: horná lišta (vľavo prehľad aktivít/plochy, v strede čas a upozornenia, vpravo systémová ponuka), vľavo dok, dole v doku mriežka aplikácií, kláves Super. Mint/KDE vyzerajú ako Windows. Cesty: žiadne C:, koreň /, domov /home/meno, lomka /, Foto.jpg ≠ foto.jpg, skryté súbory s bodkou.</li></ul>
+  <h3>5-minútová rozcvička na začiatok ďalšej hodiny</h3><ol>
+   <li>Linux v užšom zmysle je… (jadro OS) a distribúcia je… (jadro + nástroje + prostredie + aplikácie)</li>
+   <li>Vymenujte dve distribúcie z rodiny Debian. (Ubuntu, Linux Mint, Kubuntu…)</li>
+   <li>Čo znamená LTS a dokedy má podporu Ubuntu 26.04? (dlhodobá podpora, do apríla 2031)</li>
+   <li>Prepíšte cestu C:\\Users\\Lilla\\Dokumenty do Linuxu. (/home/lilla/Dokumenty)</li>
+   <li>Ktorým klávesom otvoríte v GNOME prehľad aktivít? (Super / kláves Windows)</li></ol>
+   <p class="note">Bonus na 1 min: kto má Android, nájde v telefóne verziu jadra Linux (domáca úloha).</p>
+  <h3>Hodnotenie a pracovný list</h3>
+  <p><b>Stránka:</b> test 40 % (prvý pokus, 8 otázok) + úlohy povinných šanónov 1 – 3 40 % (body na prvý pokus, spolu 32 b.) + aktívny čas 20 % (15 min = 100 %). Mini hra a bonusy sa nepočítajú.<br>
+  <b>Stupnica INF:</b> výborný 100 – 90 %, chválitebný 89 – 75 %, dobrý 74 – 50 %, dostatočný 49 – 25 %, nedostatočný 24 – 0 %.<br>
+  <b>Pracovný list:</b> 20 b. (1: 6 b., 2: 6 b., 3: 8 b.), stupnica 20 – 18 / 17 – 15 / 14 – 10 / 9 – 5 / 4 – 0 b. Kľúč je v samostatnom súbore.</p>
+  <h3>Výsledky triedy</h3>
+  <p>Načítajte súbory <code>.json</code>, ktoré žiaci stiahli v šanóne 4 (naraz aj viac).${INFRAME?' <span class="warn-t">V tomto náhľade (artifact) súbory načítate, ale export CSV sa stiahnuť nedá – na export otvorte žiacky súbor s adresou končiacou #ucitel.</span>':''}</p>
+  <div class="row"><input type="file" id="tpFiles" accept=".json,application/json" multiple><button class="btn small" data-a="tp:csv" ${CLASS.length?'':'aria-disabled="true"'}>${ic('download')}Export CSV (Excel)</button><button class="btn small ghost" data-a="tp:clear" ${CLASS.length?'':'aria-disabled="true"'}>Vyprázdniť tabuľku</button></div>
+  ${CLASS.length?`<div class="tblw"><table><tr><th>Meno</th><th>Trieda</th><th>Aktívny čas</th><th>Šanóny</th><th>Úlohy</th><th>Test</th><th>Čas</th><th>Spolu</th><th>Známka</th><th>Kontrola</th></tr>${rows}</table></div>`:'<p class="note">Zatiaľ nič nenačítané.</p>'}
+  <h3>Tipy</h3><ul>
+   <li><b>Žiacky súbor</b> nemá tlačidlo Pre učiteľa. Panel otvoríte <b>piatimi rýchlymi kliknutiami na logo</b> vľavo hore alebo adresou končiacou <code>#ucitel</code>.</li>
+   <li><b>Aktívny čas</b> sa počíta len vtedy, keď je stránka viditeľná, okno má fokus a žiak za poslednú minútu klikol, písal alebo posúval.</li>
+   <li>Postup sa ukladá len v prehliadači. Na spoločných počítačoch ho medzi triedami vymažte (nižšie) alebo nech žiaci pracujú v súkromnom okne.</li>
+   <li>Ak máte možnosť, ukážte na projektore Ubuntu alebo Mint z live USB či vo virtuálnom počítači – žiaci Linux na školských PC nemajú. Obrázok plochy v hodine je zjednodušená ilustrácia, nie snímka obrazovky.</li>
+   <li><b>Maďarské termíny na kontrolu:</b> „rendszermag (kernel)“, „disztribúció“ (v zadaní bolo „terjesztés“ – to je skôr všeobecné „šírenie“, pre Linux sa používa „disztribúció“), „asztali környezet“, „csomagkezelő“, „tároló (repozitár)“, „gyökérkönyvtár“, „saját mappa“. Popisy prvkov GNOME („Tevékenységek“, „Fájlok“, „Beállítások“) sa môžu líšiť podľa verzie prekladu – overte v systéme.</li>
+   <li>Názvy verzií a dátumy sú k novembru 2026. Linux Mint 27 je ohlásený na Vianoce 2026 – po vydaní ho môžete doplniť.</li>
+   <li>Maďarské názvy známok sú podľa slovenskej stupnice: jeles (1), dicséretes (2), jó (3), elégséges (4), elégtelen (5).</li></ul>
+  <h3>Režim tabule a vymazanie postupu</h3>
+  <div class="row"><button class="btn small ghost" data-a="tp:board">${document.documentElement.classList.contains('board')?'Vypnúť':'Zapnúť'} režim tabule (väčšie písmo)</button>
+   <button class="btn small ${resetArm?'':'ghost'}" data-a="tp:reset">${resetArm?'Naozaj vymazať? Kliknite znova':'Vymazať postup v tomto prehliadači'}</button></div>
+  <h3>Zdroje (overené november 2026)</h3><ul>${SRC.map(s=>`<li><a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a></li>`).join('')}</ul>
+  <p class="note">${esc(T.author[0])}</p></div>`;
+}
+function openTeacher(){const d=$('#tdlg');d.innerHTML=teacherHTML();if(!d.open){try{d.showModal()}catch(e){d.setAttribute('open','')}}}
+function onTeacher(v){
+  if(v==='close'){$('#tdlg').close();return}
+  if(v==='board'){document.documentElement.classList.toggle('board');openTeacher();requestAnimationFrame(afterRender);return}
+  if(v==='reset'){if(!resetArm){resetArm=1;openTeacher();setTimeout(()=>{if(resetArm){resetArm=0;if($('#tdlg').open)openTeacher()}},5000);return}
+    resetArm=0;store.del(SKEY);S=S0();GM.run=false;GM.res=null;clearInterval(GM.iv);renderAll();openTeacher();toast('Postup vymazaný.');return}
+  if(v==='clear'){CLASS=[];openTeacher();return}
+  if(v==='csv'){const h=['Meno','Trieda','Dátum','Aktívny čas (min)','Hotové šanóny','Úlohy %','Body úloh','Test (z 8)','Čas %','Spolu %','Známka','Kontrola'];
+    const lines=[h].concat(CLASS.map(c=>[c.name,c.cls,c.date,(c.active/60).toFixed(1).replace('.',','),(c.secs||[]).length,c.tasks,c.tasksPts,c.test??'',c.time,c.total,c.grade,c.chk]))
+      .map(r=>r.map(x=>{x=String(x??'');return /[;"\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x}).join(';'));
+    dlFile('vysledky_linux-distribucie.csv','\uFEFF'+lines.join('\r\n'),'text/csv;charset=utf-8');return}
+}
+document.addEventListener('change',e=>{
+  if(e.target.id!=='tpFiles')return;const fs=[...e.target.files];let left=fs.length;
+  fs.forEach(f=>{const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);let chk='OK';
+      if(o.lesson!==LID)chk='iná hodina';else if(signRes(o)!==o.code)chk='upravený';
+      o.chk=chk;CLASS=CLASS.filter(c=>!(c.name===o.name&&c.cls===o.cls&&c.code===o.code));CLASS.push(o)}catch(err){CLASS.push({name:f.name,cls:'',chk:'chybný súbor'})}
+      if(--left===0){CLASS.sort((a,b)=>String(a.name).localeCompare(String(b.name),'sk'));openTeacher()}};r.readAsText(f)});
+});
+/* Enter/medzerník na prvkoch s data-a, ktoré nie sú tlačidlá */
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('[data-a]:not(button):not(a)')){e.preventDefault();e.target.click()}});
+function checkHash(){if(false){showTeacher=true;renderTop();openTeacher()}}
+window.addEventListener('hashchange',checkHash);
+
+/* ---------- init ---------- */
+(function init(){
+  load();
+  const l=store.get(LKEY);if(l==='0'||l==='1')LI=+l;document.documentElement.lang=LI?'hu':'sk';
+  const th=store.get(THKEY);if(th==='dark'||th==='light')document.documentElement.dataset.theme=th;
+  renderAll();checkHash();
+  window.addEventListener('beforeunload',()=>store.set(SKEY,JSON.stringify(S)));
+})();
+</script>
+<div class="ml-author" style="font:13px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;text-align:center;padding:14px 16px 18px;opacity:.75;color:inherit">© 2026 Miroslav Lajgút · Informatika · Gymnázium Ivana Kraska – Ivan Krasko Gimnázium a Obchodná akadémia – Kereskedelmi Akadémia, Rimavská Sobota<br>Všetky práva vyhradené · Použitie len so súhlasom autora · <a href="../" style="color:inherit">Všetky hodiny</a></div>
+</body></html>
