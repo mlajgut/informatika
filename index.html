@@ -4,90 +4,187 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Informatika – interaktívne hodiny | Miroslav Lajgút</title>
-<meta name="description" content="Interaktívne hodiny informatiky pre sekundu a 2. ročník – Gymnázium Ivana Kraska, Rimavská Sobota.">
+<meta name="description" content="Interaktívne hodiny informatiky pre sekundu a 2. ročník – Gymnázium Ivana Kraska – Ivan Krasko Gimnázium a Obchodná akadémia – Kereskedelmi Akadémia, Rimavská Sobota.">
 <meta name="author" content="Miroslav Lajgút">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap">
 <style>
   :root{
-    --bg:#f6f7fb; --card:#fff; --ink:#1d2233; --mut:#5b6275; --line:#e3e6ef;
-    --sek:#1f8a70; --sek-s:#e3f4ee; --iic:#3b5bdb; --iic-s:#e7ecff;
+    --bg:#FBF8F3; --paper:#FFFFFF; --ink:#1B1D2A; --mut:#606477; --line:#ECE7DE;
+    --teal:#13A08F; --teal-s:#E2F5F1; --amber:#F2A516; --amber-s:#FEF3DC; --coral:#F0644E; --coral-s:#FDE7E3;
+    --blue:#3D6DE0; --blue-s:#E6EDFC; --violet:#7C5CE6; --violet-s:#EEE9FD;
+    --fh:"Bricolage Grotesque",system-ui,sans-serif; --fb:"Inter",system-ui,sans-serif;
+    --sh:0 1px 2px rgba(27,29,42,.05),0 8px 24px -12px rgba(27,29,42,.18);
   }
   @media (prefers-color-scheme:dark){
-    :root{--bg:#141722;--card:#1d2130;--ink:#e9ecf5;--mut:#a3aabd;--line:#2d3346;
-      --sek:#4cc9a4;--sek-s:#16342c;--iic:#8ea6ff;--iic-s:#222a4a;}
+    :root{--bg:#13141B;--paper:#1B1D27;--ink:#EDEBF3;--mut:#A4A7B7;--line:#2A2C38;
+      --teal-s:#12302C;--amber-s:#382C12;--coral-s:#3A1F1B;--blue-s:#1A2545;--violet-s:#261F45;
+      --sh:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.6)}
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-  header{max-width:980px;margin:0 auto;padding:48px 20px 16px}
-  h1{font-size:clamp(1.7rem,4vw,2.4rem);margin:0 0 6px}
-  header p{margin:0;color:var(--mut)}
-  main{max-width:980px;margin:0 auto;padding:8px 20px 40px}
-  .filter{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 8px}
-  .filter button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 16px;border-radius:999px;font:inherit;cursor:pointer}
-  .filter button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-  section{margin-top:28px}
-  h2{font-size:1.2rem;margin:0 0 4px;display:flex;align-items:center;gap:10px}
-  h2 .tag{font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:999px}
-  .sek .tag{background:var(--sek-s);color:var(--sek)}
-  .iic .tag{background:var(--iic-s);color:var(--iic)}
-  .sub{color:var(--mut);margin:0 0 14px;font-size:.95rem}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-  a.card{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;border-top:4px solid var(--c);transition:transform .15s,box-shadow .15s}
-  a.card:hover,a.card:focus-visible{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08);outline:none}
-  .sek a.card{--c:var(--sek)} .iic a.card{--c:var(--iic)}
-  .card b{font-size:1.05rem}
-  .card span{color:var(--mut);font-size:.92rem}
-  .card small{margin-top:auto;padding-top:8px;color:var(--c);font-weight:600}
-  footer{max-width:980px;margin:0 auto;padding:20px;color:var(--mut);font-size:.85rem;border-top:1px solid var(--line)}
+  body{margin:0;font-family:var(--fb);background:var(--bg);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+
+  /* HERO */
+  .hero{padding:56px 0 40px;display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:center}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600;color:var(--teal);background:var(--teal-s);
+    padding:5px 12px;border-radius:999px}
+  .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal)}
+  h1{font-family:var(--fh);font-weight:700;font-size:clamp(2.2rem,5.2vw,3.5rem);line-height:1.02;letter-spacing:-.025em;margin:16px 0 16px}
+  h1 em{font-style:normal;background:linear-gradient(transparent 60%,color-mix(in srgb,var(--amber) 45%,transparent) 60%);padding:0 .06em}
+  .lead{font-size:1.1rem;color:var(--mut);margin:0 0 22px;max-width:520px}
+  .who{display:flex;align-items:center;gap:12px;font-size:.9rem}
+  .avatar{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-family:var(--fh);font-weight:700;color:#fff;
+    background:linear-gradient(135deg,var(--teal),var(--blue))}
+  .who b{display:block}
+  .who span{color:var(--mut);font-size:.84rem}
+
+  /* ilustrácia: šanóny na poličke */
+  .shelf{position:relative;height:250px;border-radius:24px;background:var(--paper);box-shadow:var(--sh);overflow:hidden}
+  .shelf::before{content:"";position:absolute;inset:0;background:
+     radial-gradient(circle at 85% 15%,var(--amber-s) 0 70px,transparent 71px),
+     radial-gradient(circle at 10% 90%,var(--violet-s) 0 90px,transparent 91px)}
+  .books{position:absolute;left:0;right:0;bottom:44px;display:flex;justify-content:center;align-items:flex-end;gap:10px}
+  .bk{width:44px;border-radius:7px 7px 4px 4px;position:relative;box-shadow:inset -6px 0 0 rgba(0,0,0,.08)}
+  .bk::before{content:"";position:absolute;left:8px;right:8px;top:14px;height:34px;border-radius:3px;background:rgba(255,255,255,.9)}
+  .bk::after{content:"";position:absolute;left:50%;bottom:14px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:rgba(255,255,255,.9)}
+  .bk:nth-child(1){height:132px;background:var(--teal)}
+  .bk:nth-child(2){height:154px;background:var(--blue)}
+  .bk:nth-child(3){height:120px;background:var(--amber);transform:rotate(-8deg);transform-origin:bottom left;margin-left:4px}
+  .bk:nth-child(4){height:146px;background:var(--coral);margin-left:12px}
+  .bk:nth-child(5){height:128px;background:var(--violet)}
+  .board{position:absolute;left:36px;right:36px;bottom:32px;height:12px;border-radius:6px;background:var(--line)}
+
+  /* FILTER */
+  .bar{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;padding:8px 0 4px}
+  .seg{display:inline-flex;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:4px;box-shadow:var(--sh)}
+  .seg button{font:600 .92rem var(--fb);color:var(--mut);background:none;border:0;border-radius:9px;padding:8px 16px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+  .count{color:var(--mut);font-size:.9rem}
+
+  /* SEKCIE */
+  section{margin-top:40px}
+  .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:4px;flex-wrap:wrap}
+  h2{font-family:var(--fh);font-weight:700;font-size:1.75rem;letter-spacing:-.02em;margin:0}
+  .badge{font-size:.78rem;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--bs);color:var(--bc)}
+  .sek{--bs:var(--teal-s);--bc:var(--teal)} .iic{--bs:var(--blue-s);--bc:var(--blue)}
+  .sub{color:var(--mut);margin:4px 0 18px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+  a.card{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;background:var(--paper);border:1px solid var(--line);
+    border-radius:18px;padding:20px;box-shadow:var(--sh);transition:transform .18s ease,box-shadow .18s ease,border-color .18s}
+  a.card:hover,a.card:focus-visible{transform:translateY(-4px);border-color:var(--c);
+    box-shadow:0 1px 2px rgba(27,29,42,.05),0 18px 32px -14px color-mix(in srgb,var(--c) 55%,transparent);outline:none}
+  .row{display:flex;align-items:center;justify-content:space-between}
+  .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;background:var(--cs);color:var(--c)}
+  .ic svg{width:24px;height:24px}
+  .no{font-family:var(--fh);font-weight:700;font-size:.85rem;color:var(--mut)}
+  .card b{font-family:var(--fh);font-weight:600;font-size:1.22rem;letter-spacing:-.01em;line-height:1.25}
+  .card p{margin:0;color:var(--mut);font-size:.94rem;flex:1}
+  .foot{display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px dashed var(--line);font-size:.86rem}
+  .tags{display:flex;gap:6px}
+  .tag{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--line);color:var(--mut)}
+  .go{font-weight:600;color:var(--c);display:inline-flex;align-items:center;gap:6px}
+  .go i{font-style:normal;transition:transform .18s}
+  a.card:hover .go i{transform:translateX(4px)}
+  .c-teal{--c:var(--teal);--cs:var(--teal-s)} .c-amber{--c:#D68A00;--cs:var(--amber-s)} .c-coral{--c:var(--coral);--cs:var(--coral-s)}
+  .c-blue{--c:var(--blue);--cs:var(--blue-s)} .c-violet{--c:var(--violet);--cs:var(--violet-s)}
+
+  footer{margin-top:64px;border-top:1px solid var(--line);padding:26px 0 40px;color:var(--mut);font-size:.85rem}
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+  footer b{display:block;color:var(--ink);font-weight:600;margin-bottom:3px}
+  footer p{margin:0}
+  .copy{margin-top:22px;font-size:.8rem}
+  @media (max-width:760px){.hero{grid-template-columns:1fr;padding-top:36px}.shelf{height:200px}}
 </style>
 </head>
 <body>
-<header>
-  <h1>Informatika – interaktívne hodiny</h1>
-  <p>Miroslav Lajgút · Gymnázium Ivana Kraska, Rimavská Sobota</p>
-</header>
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <span class="pill">Informatika · interaktívne hodiny</span>
+      <h1>Uč sa informatiku <em>hrou</em>, krok za krokom.</h1>
+      <p class="lead">Interaktívne hodiny s misiami, úlohami a cvičnými testami. Fungujú priamo v prehliadači – na počítači, tablete aj mobile.</p>
+      <div class="who">
+        <div class="avatar" aria-hidden="true">ML</div>
+        <div><b>Miroslav Lajgút</b><span>Gymnázium Ivana Kraska – Ivan Krasko Gimnázium a Obchodná akadémia – Kereskedelmi Akadémia, Rimavská Sobota</span></div>
+      </div>
+    </div>
+    <div class="shelf" aria-hidden="true">
+      <div class="books"><div class="bk"></div><div class="bk"></div><div class="bk"></div><div class="bk"></div><div class="bk"></div></div>
+      <div class="board"></div>
+    </div>
+  </header>
 
-<main>
-  <div class="filter" role="group" aria-label="Filter podľa triedy">
-    <button type="button" data-f="all" aria-pressed="true">Všetko</button>
-    <button type="button" data-f="sek" aria-pressed="false">Sekunda</button>
-    <button type="button" data-f="iic" aria-pressed="false">2. ročník (II.C)</button>
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Filter podľa triedy">
+      <button type="button" data-f="all" aria-pressed="true">Všetky</button>
+      <button type="button" data-f="sek" aria-pressed="false">Sekunda</button>
+      <button type="button" data-f="iic" aria-pressed="false">2. ročník</button>
+    </div>
+    <div class="count" id="count"></div>
   </div>
 
-  <section class="sek" data-g="sek">
-    <h2>Sekunda <span class="tag">osemročné štúdium</span></h2>
-    <p class="sub">Práca s počítačom, operačný systém a kancelárske programy.</p>
-    <div class="grid">
-      <a class="card" href="hodiny/sekunda-operacne-systemy.html"><b>Operačné systémy</b><span>Základná charakteristika operačného systému.</span><small>Otvoriť hodinu →</small></a>
-      <a class="card" href="hodiny/sekunda-nastavenia-os-cvicny-test.html"><b>Nastavenia OS a cvičný test</b><span>Nastavenia Windows a cvičný test z programových manažérov, operačných systémov a nastavení.</span><small>Otvoriť hodinu →</small></a>
-      <a class="card" href="hodiny/sekunda-kancelarske-baliky.html"><b>Kancelárske balíky</b><span>Programy na text, tabuľky a prezentácie.</span><small>Otvoriť hodinu →</small></a>
-      <a class="card" href="hodiny/sekunda-popis-prostredia-ms-word.html"><b>Popis prostredia MS Word</b><span>Časti okna textového editora a práca s nimi.</span><small>Otvoriť hodinu →</small></a>
-    </div>
-  </section>
+  <main>
+    <section class="sek" data-g="sek">
+      <div class="sec-head"><h2>Sekunda</h2><span class="badge">osemročné štúdium</span></div>
+      <p class="sub">Práca s počítačom, operačný systém a kancelárske programy.</p>
+      <div class="grid">
+        <a class="card c-teal" href="hodiny/sekunda-operacne-systemy.html">
+          <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span><span class="no">01</span></div>
+          <b>Operačné systémy</b><p>Základná charakteristika operačného systému.</p>
+          <div class="foot"><span class="tags"><span class="tag">SK</span></span><span class="go">Otvoriť <i>→</i></span></div></a>
+        <a class="card c-amber" href="hodiny/sekunda-nastavenia-os-cvicny-test.html">
+          <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span><span class="no">02</span></div>
+          <b>Nastavenia OS a cvičný test</b><p>Nastavenia Windows a cvičný test z programových manažérov, operačných systémov a nastavení.</p>
+          <div class="foot"><span class="tags"><span class="tag">SK</span><span class="tag">TEST</span></span><span class="go">Otvoriť <i>→</i></span></div></a>
+        <a class="card c-coral" href="hodiny/sekunda-kancelarske-baliky.html">
+          <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18"/></svg></span><span class="no">03</span></div>
+          <b>Kancelárske balíky</b><p>Programy na text, tabuľky a prezentácie.</p>
+          <div class="foot"><span class="tags"><span class="tag">SK</span></span><span class="go">Otvoriť <i>→</i></span></div></a>
+        <a class="card c-blue" href="hodiny/sekunda-popis-prostredia-ms-word.html">
+          <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><span class="no">04</span></div>
+          <b>Popis prostredia MS Word</b><p>Časti okna textového editora a práca s nimi.</p>
+          <div class="foot"><span class="tags"><span class="tag">SK</span></span><span class="go">Otvoriť <i>→</i></span></div></a>
+      </div>
+    </section>
 
-  <section class="iic" data-g="iic">
-    <h2>2. ročník <span class="tag">II.C · SK / HU</span></h2>
-    <p class="sub">Hodiny majú prepínač jazyka slovenčina / maďarčina.</p>
-    <div class="grid">
-      <a class="card" href="hodiny/iic-prostredie-windows.html"><b>Prostredie Windows</b><span>Pracovná plocha, okná a ovládanie systému.</span><small>Otvoriť hodinu →</small></a>
-      <a class="card" href="hodiny/iic-subory-a-priecinky.html"><b>Súbory a priečinky</b><span>Organizácia súborov, prípony a práca s priečinkami.</span><small>Otvoriť hodinu →</small></a>
-      <a class="card" href="hodiny/iic-systemove-nastroje.html"><b>Systémové nástroje a nastavenie OS</b><span>Systémové nástroje a bezpečné nastavenia operačného systému.</span><small>Otvoriť hodinu →</small></a>
-    </div>
-  </section>
-</main>
+    <section class="iic" data-g="iic">
+      <div class="sec-head"><h2>2. ročník</h2><span class="badge">II.C · slovenčina / magyar</span></div>
+      <p class="sub">Dvojjazyčné hodiny – jazyk si prepneš priamo v hodine.</p>
+      <div class="grid">
+        <a class="card c-blue" href="hodiny/iic-prostredie-windows.html">
+          <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg></span><span class="no">01</span></div>
+          <b>Prostredie Windows</b><p>Pracovná plocha, okná a ovládanie systému.</p>
+          <div class="foot"><span class="tags"><span class="tag">SK</span><span class="tag">HU</span></span><span class="go">Otvoriť <i>→</i></span></div></a>
+        <a class="card c-violet" href="hodiny/iic-subory-a-priecinky.html">
+          <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span class="no">02</span></div>
+          <b>Súbory a priečinky</b><p>Organizácia súborov, prípony a práca s priečinkami.</p>
+          <div class="foot"><span class="tags"><span class="tag">SK</span><span class="tag">HU</span></span><span class="go">Otvoriť <i>→</i></span></div></a>
+        <a class="card c-teal" href="hodiny/iic-systemove-nastroje.html">
+          <div class="row"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg></span><span class="no">03</span></div>
+          <b>Systémové nástroje a nastavenie OS</b><p>Systémové nástroje a bezpečné nastavenia operačného systému.</p>
+          <div class="foot"><span class="tags"><span class="tag">SK</span><span class="tag">HU</span></span><span class="go">Otvoriť <i>→</i></span></div></a>
+      </div>
+    </section>
+  </main>
 
-<footer>
-  Materiály sú určené na vyučovanie informatiky. Pri ich tvorbe bola použitá umelá inteligencia (Claude, Anthropic); obsah pripravil, upravil a overil autor.
-  Hodiny nezbierajú ani neodosielajú odpovede žiakov – postup sa ukladá len v prehliadači žiaka.
-</footer>
+  <footer>
+    <div class="fgrid">
+      <div><b>Ako pracovať</b><p>Otvor hodinu a postupuj po úlohách. Postup sa ukladá v tvojom prehliadači.</p></div>
+      <div><b>Súkromie</b><p>Hodiny nezbierajú ani neodosielajú odpovede žiakov a nevyžadujú prihlásenie.</p></div>
+      <div><b>Tvorba</b><p>Pri tvorbe bola použitá umelá inteligencia (Claude, Anthropic); obsah pripravil, upravil a overil autor.</p></div>
+    </div>
+    <p class="copy">© 2026 Miroslav Lajgút · Gymnázium Ivana Kraska – Ivan Krasko Gimnázium a Obchodná akadémia – Kereskedelmi Akadémia, Rimavská Sobota</p>
+  </footer>
+</div>
 
 <script>
-  const btns=[...document.querySelectorAll('.filter button')];
-  btns.forEach(b=>b.addEventListener('click',()=>{
-    btns.forEach(x=>x.setAttribute('aria-pressed',x===b));
-    document.querySelectorAll('section[data-g]').forEach(s=>{
-      s.hidden = b.dataset.f!=='all' && s.dataset.g!==b.dataset.f;
-    });
-  }));
+  const btns=[...document.querySelectorAll('.seg button')], count=document.getElementById('count');
+  function upd(f){let n=0;document.querySelectorAll('section[data-g]').forEach(s=>{const v=f==='all'||s.dataset.g===f;s.hidden=!v;if(v)n+=s.querySelectorAll('a.card').length});
+    count.textContent=n+(n===1?' hodina':n<5?' hodiny':' hodín')}
+  btns.forEach(b=>b.addEventListener('click',()=>{btns.forEach(x=>x.setAttribute('aria-pressed',x===b));upd(b.dataset.f)}));
+  upd('all');
 </script>
 </body>
 </html>
