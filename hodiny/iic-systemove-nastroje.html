@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Systémové nástroje a nastavenie OS · II.C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Kancelársky stôl: každý šanón je zložka so štítkom; aktivity sú listy v zložke. */
+:root{
+  --desk:#EDF1FA;--paper:#FFFFFF;--paper2:#F5F7FD;--ink:#1E1B3A;--muted:#55527A;--line:#1E1B3A;--hair:#D2D8EC;--soft:#E3E8FA;--shadow:#1E1B3A;
+  --acc:#3B4CCB;--on-acc:#FFFFFF;--cpu:#2B5FD9;--ram:#7E47DB;--disk:#0F8A45;--net:#D9561A;
+  --sun:#FFC93C;--mint:#2EC4B6;--coral:#FF8A80;--sky:#62D2F3;--lilac:#CDAEF7;--peach:#FFB98F;--lime:#C3E670;--rose:#F8AED3;
+  --on-bright:#1E1B3A;
+  --ok:#11743C;--okbg:#DCF2E4;--bad:#BF2830;--badbg:#FBE3E3;--warn:#8A5700;--warnbg:#FFF0C9;--stamp:#C3233F;
+  --go:#2BB673;--mid:#F2A50C;--stop:#E5484D;--pl:#FFF6CC;--plb:#B8860B;
+  --fh:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --fb:"Nunito","Segoe UI",system-ui,sans-serif;
+  --fm:"JetBrains Mono",ui-monospace,Consolas,"Courier New",monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#13122A;--paper:#1E1C3F;--paper2:#191838;--ink:#F0EEFF;--muted:#B6B2DE;--line:#8D86D6;--hair:#35325F;--soft:#2A2756;--shadow:#06050F;
+  --acc:#909CFF;--on-acc:#12102A;--cpu:#8AABFF;--ram:#BC9BFF;--disk:#5BD893;--net:#FFA06C;
+  --ok:#62DE9B;--okbg:#163A29;--bad:#FF8E8E;--badbg:#47192A;--warn:#FFCB6B;--warnbg:#3D2E12;--stamp:#FF7590;--pl:#3A3214;--plb:#E9C46A;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#13122A;--paper:#1E1C3F;--paper2:#191838;--ink:#F0EEFF;--muted:#B6B2DE;--line:#8D86D6;--hair:#35325F;--soft:#2A2756;--shadow:#06050F;
+  --acc:#909CFF;--on-acc:#12102A;--cpu:#8AABFF;--ram:#BC9BFF;--disk:#5BD893;--net:#FFA06C;
+  --ok:#62DE9B;--okbg:#163A29;--bad:#FF8E8E;--badbg:#47192A;--warn:#FFCB6B;--warnbg:#3D2E12;--stamp:#FF7590;--pl:#3A3214;--plb:#E9C46A;
+  color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:120px}
+html.board{font-size:125%}
+body{margin:0;background:var(--desk);color:var(--ink);font:400 1rem/1.55 var(--fb);overflow-x:hidden;
+  background-image:radial-gradient(var(--hair) 1px,transparent 1px);background-size:22px 22px}
+h1,h2,h3,h4{font-family:var(--fh);line-height:1.2;margin:0 0 .5em;font-weight:600}
+p{margin:0 0 .8em}
+a{color:var(--acc)}
+code,.mono{font-family:var(--fm);font-size:.92em}
+kbd{font-family:var(--fm);font-size:.85em;background:var(--paper2);border:1.5px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:0 .35em;white-space:nowrap}
+button{font:inherit;color:inherit}
+.wrap{max-width:980px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left)) 0 max(16px,env(safe-area-inset-right))}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+/* ---------- header ---------- */
+.top{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:2px solid var(--line);padding-top:env(safe-area-inset-top)}
+.topin{display:flex;align-items:center;gap:10px;padding:8px 0;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:8px;background:none;border:0;padding:0;cursor:pointer;min-width:0}
+.logo svg{width:36px;height:36px;flex:none}
+.brand{display:flex;flex-direction:column;line-height:1.15;text-align:left;min-width:0}
+.brand b{font-family:var(--fh);font-weight:600;font-size:1.02rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{color:var(--muted);font-size:.78rem}
+.sp{flex:1}
+.xp{display:flex;align-items:center;gap:6px;font-weight:800;font-size:.9rem}
+.xpbar{width:90px;height:10px;border:2px solid var(--line);border-radius:6px;overflow:hidden;background:var(--paper2)}
+.xpbar i{display:block;height:100%;background:var(--sun);width:0;transition:width .4s}
+.rank{font-size:.78rem;color:var(--muted);font-weight:700}
+.hbtn{border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:5px 10px;cursor:pointer;font-weight:800;font-size:.85rem;display:inline-flex;align-items:center;gap:6px;min-height:36px}
+.hbtn:hover{background:var(--soft)}
+.hbtn svg{width:18px;height:18px}
+.lang{display:inline-flex;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.lang button{border:0;background:var(--paper);padding:5px 9px;cursor:pointer;font-weight:800;font-size:.85rem;min-height:32px}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.nav{display:flex;gap:6px;overflow-x:auto;padding:0 0 8px;scrollbar-width:thin}
+.nav a{flex:none;text-decoration:none;color:var(--ink);border:2px solid var(--line);border-radius:999px;padding:2px 10px 2px 4px;font-weight:700;font-size:.8rem;display:inline-flex;align-items:center;gap:6px;background:var(--paper)}
+.nav a .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:var(--on-bright);font-family:var(--fh);font-size:.78rem;border:1.5px solid var(--line)}
+.nav a.ok .n{background:var(--ok);color:var(--paper)}
+.nav a.bn{border-style:dashed}
+@media (max-width:640px){.brand{display:none}.xpbar{width:56px}.rank{display:none}.hbtn .lbl{display:none}}
+/* ---------- hero ---------- */
+.hero{padding:26px 0 8px}
+.kicker{display:inline-block;font-family:var(--fm);font-size:.78rem;font-weight:700;background:var(--ink);color:var(--paper);padding:3px 10px;border-radius:6px;letter-spacing:.02em}
+.hero h1{font-size:clamp(1.7rem,4.5vw,2.6rem);margin:.4em 0 .3em}
+.story{background:var(--paper);border:2px solid var(--line);border-radius:16px;box-shadow:5px 5px 0 var(--shadow);padding:18px;margin:14px 0}
+.cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0 4px}
+@media (max-width:640px){.cast{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.who{border:2px solid var(--line);background:var(--paper2);border-radius:14px;padding:10px 8px;cursor:pointer;text-align:center;font-weight:800}
+.who svg{width:64px;height:64px;display:block;margin:0 auto 4px}
+.who small{display:block;font-weight:600;color:var(--muted);font-size:.78rem}
+.who[aria-expanded="true"]{background:var(--soft);box-shadow:3px 3px 0 var(--shadow)}
+.bubble{position:relative;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:12px}
+.bubble::before{content:"";position:absolute;top:-10px;left:var(--bx,40px);width:16px;height:16px;background:var(--paper);border-left:2px solid var(--line);border-top:2px solid var(--line);transform:rotate(45deg)}
+.goals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+@media (max-width:640px){.goals{grid-template-columns:minmax(0,1fr)}}
+.goal{display:flex;gap:10px;align-items:flex-start;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:10px}
+.goal svg{width:26px;height:26px;flex:none;color:var(--acc)}
+.plan{list-style:none;padding:0;margin:8px 0 0;display:grid;gap:6px}
+.plan li{display:flex;gap:10px;align-items:center;background:var(--paper);border:2px solid var(--line);border-radius:10px;padding:6px 10px}
+.plan .n{width:26px;height:26px;border-radius:50%;background:var(--c);border:1.5px solid var(--line);display:grid;place-items:center;font-family:var(--fh);color:var(--on-bright);flex:none}
+.plan .m{margin-left:auto;font-family:var(--fm);font-size:.82rem;color:var(--muted);white-space:nowrap}
+.plan li.bn{border-style:dashed}
+/* ---------- folders (šanóny) ---------- */
+.lvl{margin:44px 0 0;position:relative}
+.tab{display:inline-flex;align-items:center;gap:8px;background:var(--c);color:var(--on-bright);border:2px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;padding:6px 14px 6px 8px;font-family:var(--fh);font-weight:600;position:relative;top:2px;max-width:100%}
+.tab .n{background:var(--paper);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:0 7px;font-size:.9rem}
+.tab .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.folder{background:var(--paper);border:2px solid var(--line);border-radius:0 16px 16px 16px;box-shadow:6px 6px 0 var(--shadow);padding:18px 18px 10px;position:relative;border-top:8px solid var(--c)}
+.fhead{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;margin-bottom:6px}
+.fhead h2{font-size:clamp(1.25rem,3vw,1.6rem);flex:1;min-width:200px;margin:0}
+.clock{border:2px solid var(--line);background:var(--paper2);border-radius:999px;padding:3px 10px;font-family:var(--fm);font-weight:700;font-size:.82rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center;min-height:32px}
+.clock svg{width:16px;height:16px}
+.bonus-tag{font-family:var(--fm);font-size:.75rem;border:1.5px dashed var(--line);border-radius:6px;padding:2px 6px;font-weight:700}
+.stamp{position:absolute;right:18px;top:-18px;transform:rotate(8deg);border:3px solid var(--stamp);color:var(--stamp);font-family:var(--fh);font-weight:700;font-size:1.05rem;padding:2px 12px;border-radius:8px;background:var(--paper);letter-spacing:.06em;text-transform:uppercase;pointer-events:none}
+.lead{font-size:1.03rem}
+.explain{background:var(--paper2);border:2px solid var(--hair);border-left:6px solid var(--c);border-radius:12px;padding:12px 14px;margin:10px 0}
+.explain h4{font-size:1rem;margin-bottom:.35em}
+.explain ul{margin:.2em 0 .4em;padding-left:1.2em}
+.explain li{margin:.15em 0}
+.cards3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:10px 0}
+.cards2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}
+@media (max-width:700px){.cards3,.cards2{grid-template-columns:minmax(0,1fr)}.cards3.catg{grid-template-columns:repeat(2,minmax(0,1fr));font-size:.88rem}}
+.mini{border:2px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--paper)}
+.mini b{font-family:var(--fh);font-weight:600}
+.term{font-weight:800}
+.path{font-family:var(--fm);font-size:.86em;background:var(--soft);border-radius:6px;padding:1px 6px;white-space:normal;overflow-wrap:anywhere}
+/* ---------- activities ---------- */
+.act{border-top:2.5px dashed var(--hair);padding:16px 0 12px;margin-top:12px}
+.ahead{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.ahead h3{font-size:1.12rem;margin:0}
+.kind{font-family:var(--fm);font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;background:var(--ink);color:var(--paper);border-radius:6px;padding:2px 7px}
+.adone{margin-left:auto;font-size:.8rem;font-weight:800;color:var(--ok);display:inline-flex;gap:4px;align-items:center}
+.adone svg{width:16px;height:16px}
+.btn{border:2px solid var(--line);background:var(--acc);color:var(--on-acc);border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;box-shadow:3px 3px 0 var(--shadow);min-height:40px;display:inline-flex;align-items:center;gap:6px}
+.btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+.btn.small{padding:4px 10px;min-height:32px;font-size:.88rem;box-shadow:2px 2px 0 var(--shadow)}
+.btn[aria-disabled="true"],.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.opts{display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.opts.one{grid-template-columns:minmax(0,1fr)}
+@media (max-width:640px){.opts{grid-template-columns:minmax(0,1fr)}}
+.opt{border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:10px 12px;text-align:left;cursor:pointer;font-weight:700;min-height:44px;width:100%}
+.opt:hover{background:var(--soft)}
+.opt[aria-pressed="true"]{background:var(--soft);box-shadow:inset 0 0 0 2px var(--acc)}
+.opt.good{background:var(--okbg);border-color:var(--ok)}
+.opt.badc{background:var(--badbg);border-color:var(--bad)}
+.opt[aria-disabled="true"]{cursor:default}
+.fb{border-radius:10px;padding:10px 12px;margin:10px 0;font-weight:600;border:2px solid}
+.fb.ok{background:var(--okbg);border-color:var(--ok);color:var(--ink)}
+.fb.no{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+.fb.info{background:var(--warnbg);border-color:var(--warn);color:var(--ink)}
+.fb b:first-child{font-family:var(--fh)}
+/* worksheet box */
+.pl{background:var(--pl);border:2.5px dashed var(--plb);border-radius:12px;padding:10px 12px;margin:12px 0 4px;display:flex;gap:10px;align-items:flex-start}
+.pl svg{width:24px;height:24px;flex:none;color:var(--plb)}
+.pl b{font-family:var(--fh);font-weight:600}
+/* sorting / tickets */
+.ticket{border:2px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--paper);margin:8px 0}
+.ticket .q{font-weight:700;margin-bottom:6px}
+.ticket .who2{font-size:.8rem;color:var(--muted);font-weight:700}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:2px solid var(--line);background:var(--paper2);border-radius:999px;padding:4px 12px;font-weight:700;font-size:.88rem;cursor:pointer;min-height:36px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.chip.good{background:var(--okbg);border-color:var(--ok);color:var(--ink)}
+.chip.badc{background:var(--badbg);border-color:var(--bad);color:var(--ink)}
+/* envelope */
+.env{border:2px solid var(--line);border-radius:14px;background:repeating-linear-gradient(135deg,var(--paper2) 0 12px,var(--paper) 12px 24px);padding:14px;position:relative}
+.env.sealed::after{content:"";position:absolute;right:14px;top:12px;width:30px;height:30px;border-radius:50%;background:var(--stamp);opacity:.85}
+/* task manager */
+.win{border:2px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);box-shadow:4px 4px 0 var(--shadow)}
+.wbar{display:flex;align-items:center;gap:8px;background:var(--soft);border-bottom:2px solid var(--line);padding:6px 10px;font-weight:800;font-size:.9rem}
+.wbar .dots{margin-left:auto;display:flex;gap:6px}
+.wbar .dots i{width:12px;height:12px;border:1.5px solid var(--line);border-radius:3px;display:block}
+.wtabs{display:flex;gap:4px;padding:6px 8px;border-bottom:1.5px solid var(--hair);overflow-x:auto;font-size:.82rem;font-weight:700}
+.wtabs span{padding:3px 8px;border-radius:6px;white-space:nowrap;color:var(--muted)}
+.wtabs span.on{background:var(--ink);color:var(--paper)}
+.tmw{overflow-x:auto}
+table.tm{width:100%;border-collapse:collapse;font-size:.86rem;min-width:520px}
+.tm th{font-family:var(--fm);font-size:.74rem;text-align:right;padding:6px 8px;border-bottom:2px solid var(--line);background:var(--paper2);cursor:pointer;white-space:nowrap}
+.tm th:first-child,.tm td:first-child{text-align:left}
+.tm td{padding:6px 8px;border-bottom:1px solid var(--hair);text-align:right;font-family:var(--fm);font-size:.82rem;white-space:nowrap}
+.tm td:first-child{font-family:var(--fb);font-weight:700;font-size:.88rem;white-space:normal}
+.tm tr{cursor:pointer}
+.tm tr.sel td{background:var(--soft);box-shadow:inset 0 2px 0 var(--acc),inset 0 -2px 0 var(--acc)}
+.tm tr.ended td{text-decoration:line-through;opacity:.45}
+.tm .grp td{background:var(--paper2);font-family:var(--fh);font-size:.82rem;color:var(--muted);cursor:default}
+.heat1{background:color-mix(in srgb,var(--sun) 25%,transparent)}
+.heat2{background:color-mix(in srgb,var(--peach) 55%,transparent)}
+.heat3{background:color-mix(in srgb,var(--coral) 70%,transparent)}
+.stat{color:var(--bad);font-weight:800;font-size:.75rem;font-family:var(--fb)}
+.sysb{font-size:.7rem;border:1.5px solid var(--line);border-radius:5px;padding:0 4px;margin-left:4px;font-family:var(--fm);font-weight:700;color:var(--muted)}
+.wfoot{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:8px 10px;border-top:2px solid var(--line);background:var(--paper2)}
+.meter{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--fm);font-size:.8rem;font-weight:700}
+.meter span{display:inline-flex;gap:4px;align-items:center}
+.meter i{width:10px;height:10px;border-radius:3px;display:inline-block}
+/* toggles */
+.sw{display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:12px;padding:8px 10px;margin:6px 0;background:var(--paper)}
+.sw .nm{flex:1;min-width:0;font-weight:700}
+.sw .nm small{display:block;color:var(--muted);font-weight:600}
+.imp{font-family:var(--fm);font-size:.75rem;font-weight:700;border-radius:6px;padding:2px 6px;border:1.5px solid var(--line);white-space:nowrap}
+.imp.h{background:var(--badbg)}.imp.m{background:var(--warnbg)}.imp.l{background:var(--okbg)}.imp.n{background:var(--paper2)}
+.tog{width:52px;height:30px;border-radius:999px;border:2px solid var(--line);background:var(--paper2);position:relative;cursor:pointer;flex:none}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:var(--ink);transition:left .2s}
+.tog[aria-checked="true"]{background:var(--acc)}
+.tog[aria-checked="true"]::after{left:25px;background:var(--on-acc)}
+.tog[aria-disabled="true"]{opacity:.6;cursor:default}
+.sw.good{border-color:var(--ok);background:var(--okbg)}.sw.badc{border-color:var(--bad);background:var(--badbg)}
+.boot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0;font-weight:800}
+.bootbar{flex:1;min-width:160px;height:16px;border:2px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper2)}
+.bootbar i{display:block;height:100%;background:var(--coral);transition:width .35s}
+/* storage */
+.disk{height:26px;border:2px solid var(--line);border-radius:8px;overflow:hidden;display:flex;background:var(--paper2);margin:8px 0}
+.disk i{display:block;height:100%}
+.disk .used{background:var(--ram)}.disk .fr{background:var(--go)}
+.chk{display:flex;gap:10px;align-items:center;border:2px solid var(--line);border-radius:12px;padding:8px 10px;margin:6px 0;cursor:pointer;background:var(--paper)}
+.chk .box{width:24px;height:24px;border:2px solid var(--line);border-radius:6px;display:grid;place-items:center;flex:none;background:var(--paper)}
+.chk[aria-checked="true"] .box{background:var(--acc);color:var(--on-acc)}
+.chk .box svg{width:16px;height:16px}
+.chk .nm{flex:1;min-width:0;font-weight:700}
+.chk .nm small{display:block;color:var(--muted);font-weight:600}
+.chk .gb{font-family:var(--fm);font-weight:700;white-space:nowrap}
+.chk.good{border-color:var(--ok);background:var(--okbg)}.chk.badc{border-color:var(--bad);background:var(--badbg)}
+.chk[aria-disabled="true"]{cursor:default}
+/* true / myth, semafor */
+.tf{border:2px solid var(--line);border-radius:12px;padding:10px 12px;margin:8px 0;background:var(--paper)}
+.tf .s{font-weight:700;margin-bottom:6px}
+.tf .ex{font-size:.92rem;margin-top:6px;color:var(--ink)}
+.tf.good{border-color:var(--ok);background:var(--okbg)}.tf.badc{border-color:var(--bad);background:var(--badbg)}
+.lights{display:flex;gap:6px;flex-wrap:wrap}
+.light{border:2px solid var(--line);border-radius:999px;padding:4px 12px 4px 6px;display:inline-flex;align-items:center;gap:6px;background:var(--paper);font-weight:700;cursor:pointer;min-height:36px;font-size:.88rem}
+.light i{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);display:block}
+.light[aria-pressed="true"]{box-shadow:inset 0 0 0 2px var(--acc);background:var(--soft)}
+/* pairing */
+.pairs{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 34px}
+.pcol{display:grid;gap:8px;align-content:start}
+.pitem{border:2px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--paper);cursor:pointer;font-weight:700;font-size:.9rem;text-align:left;min-height:44px;position:relative;z-index:1;width:100%}
+.pitem[aria-pressed="true"]{box-shadow:inset 0 0 0 3px var(--acc);background:var(--soft)}
+.pitem.linked{background:var(--paper2)}
+.pitem.good{background:var(--okbg);border-color:var(--ok)}.pitem.badc{background:var(--badbg);border-color:var(--bad)}
+.plines{position:absolute;inset:0;pointer-events:none;overflow:visible;z-index:0}
+.plines line{stroke:var(--acc);stroke-width:3;stroke-linecap:round}
+.plines line.good{stroke:var(--ok)}.plines line.badc{stroke:var(--bad);stroke-dasharray:6 5}
+/* settings window / about */
+.setw{display:grid;grid-template-columns:200px minmax(0,1fr);min-height:220px}
+@media (max-width:640px){.setw{grid-template-columns:minmax(0,1fr)}.setw .side{display:none}}
+.side{border-right:2px solid var(--hair);padding:8px;font-size:.84rem;font-weight:700;display:grid;gap:2px;align-content:start}
+.side span{padding:4px 8px;border-radius:6px;color:var(--muted)}
+.side span.on{background:var(--soft);color:var(--ink)}
+.kv{display:grid;grid-template-columns:minmax(0,180px) minmax(0,1fr);gap:4px 12px;padding:12px;font-size:.9rem}
+.kv dt{color:var(--muted);font-weight:700}
+.kv dd{margin:0;font-family:var(--fm);font-size:.84rem;overflow-wrap:anywhere}
+@media (max-width:480px){.kv{grid-template-columns:minmax(0,1fr)}.kv dd{margin-bottom:6px}}
+.inp{border:2px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;background:var(--paper);color:var(--ink);min-height:40px;width:100%;max-width:320px}
+.field{display:grid;gap:4px;margin:8px 0}
+.field label{font-weight:700}
+.field.good .inp{border-color:var(--ok);background:var(--okbg)}.field.badc .inp{border-color:var(--bad);background:var(--badbg)}
+/* test */
+.qcard{border:2px solid var(--line);border-radius:14px;padding:14px;background:var(--paper2)}
+.qmeta{display:flex;justify-content:space-between;font-family:var(--fm);font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:6px}
+.qbar{height:8px;border:1.5px solid var(--line);border-radius:6px;overflow:hidden;margin-bottom:10px;background:var(--paper)}
+.qbar i{display:block;height:100%;background:var(--acc)}
+.res{border:2px solid var(--line);border-radius:14px;padding:14px;background:var(--paper2);margin:10px 0}
+.resg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:8px 0}
+@media (max-width:640px){.resg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rbox{border:2px solid var(--line);border-radius:10px;padding:8px;background:var(--paper);text-align:center}
+.rbox b{display:block;font-family:var(--fh);font-size:1.35rem}
+.rbox small{color:var(--muted);font-weight:700;font-size:.76rem}
+.grade{font-family:var(--fh);font-size:1.4rem;font-weight:700}
+.topics{display:grid;gap:4px;margin:8px 0;font-size:.9rem}
+.topics div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px dashed var(--hair);padding:2px 0}
+.cert{border:4px double var(--line);border-radius:14px;padding:22px;text-align:center;background:var(--paper);margin:12px 0}
+.cert h3{font-size:1.5rem}
+.cert .nm{font-family:var(--fh);font-size:1.6rem;border-bottom:2px solid var(--line);display:inline-block;padding:0 20px;margin:6px 0}
+/* footer, toast, timer, dialog */
+.foot{margin-top:50px;border-top:2px solid var(--line);background:var(--paper);padding:16px 0 calc(16px + env(safe-area-inset-bottom));font-size:.88rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:12px;font-weight:800;opacity:0;visibility:hidden;transition:.25s;z-index:60;max-width:calc(100vw - 32px);text-align:center}
+.toast.on{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.timer{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:calc(70px + env(safe-area-inset-bottom));z-index:50;background:var(--paper);border:2px solid var(--line);border-radius:14px;box-shadow:4px 4px 0 var(--shadow);padding:10px 12px;min-width:200px}
+.timer .big{font-family:var(--fm);font-size:1.8rem;font-weight:700;text-align:center}
+.timer .big.end{color:var(--bad)}
+.timer .row{margin:4px 0 0;justify-content:center}
+dialog.tdlg{border:2px solid var(--line);border-radius:16px;padding:0;max-width:min(900px,calc(100vw - 24px));width:100%;max-height:calc(100vh - 40px);background:var(--paper);color:var(--ink);box-shadow:6px 6px 0 var(--shadow)}
+dialog.tdlg::backdrop{background:rgba(10,8,30,.5)}
+.dh{position:sticky;top:0;background:var(--paper);border-bottom:2px solid var(--line);padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:2}
+.dh h2{margin:0;font-size:1.2rem;flex:1}
+.db{padding:14px 16px 20px}
+.db h3{font-size:1.05rem;margin:18px 0 6px;padding-top:10px;border-top:2px dashed var(--hair)}
+.db h3:first-child{border-top:0;margin-top:0}
+.db table{border-collapse:collapse;width:100%;font-size:.88rem;margin:6px 0}
+.db th,.db td{border:1.5px solid var(--hair);padding:5px 7px;text-align:left;vertical-align:top}
+.db th{background:var(--paper2)}
+.tblw{overflow-x:auto}
+.ok-t{color:var(--ok);font-weight:800}.bad-t{color:var(--bad);font-weight:800}.warn-t{color:var(--warn);font-weight:800}
+.note{font-size:.86rem;color:var(--muted)}
+#certPrint{display:none}
+@media print{
+  body *{visibility:hidden!important}
+  #certPrint,#certPrint *{visibility:visible!important}
+  #certPrint{display:block!important;position:absolute;inset:0;padding:40px;background:#fff;color:#000}
+  #certPrint .cert{border-color:#000;background:#fff;color:#000}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="wrap">
+    <div class="topin" id="topin"></div>
+    <nav class="nav" id="nav" aria-label="Šanóny"></nav>
+  </div>
+</header>
+<main class="wrap" id="main">
+  <section class="hero" id="hero"></section>
+  <section class="lvl" id="s1" style="--c:var(--sun)"></section>
+  <section class="lvl" id="s2" style="--c:var(--sky)"></section>
+  <section class="lvl" id="s3" style="--c:var(--mint)"></section>
+  <section class="lvl" id="s4" style="--c:var(--coral)"></section>
+  <section class="lvl" id="s5" style="--c:var(--rose)"></section>
+  <section class="lvl" id="s6" style="--c:var(--peach)"></section>
+  <section class="lvl" id="s7" style="--c:var(--lime)"></section>
+  <section class="lvl" id="s8" style="--c:var(--lilac)"></section>
+</main>
+<footer class="foot"><div class="wrap" id="foot"></div></footer>
+<div class="timer" id="timer" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<dialog class="tdlg" id="tdlg" aria-labelledby="tdlgT"></dialog>
+<div id="certPrint" aria-hidden="true"></div>
+<script>window.KB_STUDENT=true</script>
+<script>
+'use strict';
+/* ================= core: jazyk, pomocníci, ikony, postavy, stav, XP, hodnotenie ================= */
+const LID='sys-nastroje-iic-2026';
+const SKEY='sysnast-iic-v1', LKEY='sysnast-iic-lang', THKEY='sysnast-iic-theme';
+const STUDENT=!!window.KB_STUDENT;
+let LI=0; // 0 = slovenčina, 1 = magyar (predvolená pre II.C)
+const tr=a=>Array.isArray(a)?(a[LI]??a[0]):(a??'');
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={
+  get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+  set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fill=(s,o)=>String(s).replace(/\{(\w+)\}/g,(m,k)=>o[k]??m);
+const loc=()=>LI?'hu-HU':'sk-SK';
+const fmt=(n,d=0)=>Number(n).toLocaleString(loc(),{minimumFractionDigits:d,maximumFractionDigits:d});
+const pnum=s=>{const v=parseFloat(String(s??'').replace(/[\s ]/g,'').replace(',','.'));return Number.isFinite(v)?v:NaN};
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const INFRAME=(()=>{try{return window.self!==window.top}catch(e){return true}})();
+/* deterministické miešanie (rovnaké poradie po prekreslení) */
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function dshuffle(arr,seed){const a=arr.slice();let x=hashStr(String(seed))||1;for(let i=a.length-1;i>0;i--){x^=x<<13;x>>>=0;x^=x>>17;x^=x<<5;x>>>=0;const j=x%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+
+/* ---------- všeobecné texty ---------- */
+const T={
+  title:['Systémové nástroje a nastavenie OS','Rendszereszközök és az operációs rendszer beállításai'],
+  brandS:['Informatika · II.C','Informatika · II.C'],
+  author:['Miroslav Lajgút - Informatika - II.C','Miroslav Lajgút - Informatika - II.C'],
+  teacher:['Pre učiteľa','Tanároknak'],
+  themeL:['Prepnúť svetlé/tmavé farby','Világos/sötét színek váltása'],
+  min:['min','perc'], bonus:['bonus','bónusz'], done:['Hotovo','Kész'],
+  check:['Skontrolovať','Ellenőrzés'], again:['Skúsiť znova','Újra'], next:['Ďalej','Tovább'],
+  correct:['Správne!','Helyes!'], wrong:['Ešte nie.','Még nem.'], timeUp:['Čas vypršal!','Lejárt az idő!'],
+  pause:['Pauza','Szünet'], resume:['Pokračovať','Folytatás'], plus1:['+1 min','+1 perc'], close:['Zavrieť','Bezárás'],
+  secDone:['Šanón „{n}“ je hotový!','Kész a dosszié: „{n}”!'], rankUp:['Nová hodnosť: {r}','Új rang: {r}'],
+  footR:['Postup sa ukladá len v tomto prehliadači. Stránka nič neposiela na internet.','A haladás csak ebben a böngészőben mentődik. Az oldal semmit nem küld az internetre.'],
+  plT:['Pracovný list – úloha {n}:','Feladatlap – {n}. feladat:'],
+  xpNote:['XP a body dostanete len za prvý pokus.','XP és pont csak az első próbálkozásért jár.'],
+  doneA:['splnené','teljesítve'],
+  kindHyp:['Hypotéza','Hipotézis'],kindSort:['Triedenie','Válogatás'],kindSim:['Simulácia','Szimuláció'],kindCalc:['Kalkulačka','Kalkulátor'],
+  kindPair:['Spájanie','Párosítás'],kindDec:['Rozhodovanie','Döntés'],kindLight:['Semafor','Közlekedési lámpa'],kindMyth:['Pravda / mýtus','Igaz / tévhit'],
+  kindTest:['Test','Teszt'],kindRead:['Čítanie údajov','Adatok leolvasása'],kindReal:['Na skutočnom PC','Valódi gépen'],kindHome:['Doma','Otthon'],kindEnv:['Obálka','Boríték'],
+};
+const t=k=>tr(T[k]);
+const RANKS=[[0,['Nováčik','Újonc']],[.2,['Pomocník','Segítő']],[.45,['Technik','Technikus']],[.7,['Správca','Rendszergazda-gyakornok']],[.9,['Majster systému','A rendszer mestere']]];
+
+/* šanóny: req = povinné aktivity (body sa rátajú do známky) */
+const SECS=[
+  {id:'s1',c:'sun',min:3,tab:['Hlásenia','Bejelentések'],h:['Prvá služba na IT pomoci','Első ügyelet az IT-segítségnél'],req:['hyp','tickets'],pl:1},
+  {id:'s2',c:'sky',min:7,tab:['Správca úloh','Feladatkezelő'],h:['Správca úloh: procesy, výkon, spúšťanie','Feladatkezelő: folyamatok, teljesítmény, indítás'],req:['tm','startup'],pl:2},
+  {id:'s3',c:'mint',min:7,tab:['Úložisko','Tárhely'],h:['Úložisko a aplikácie: upratovanie disku','Tárhely és alkalmazások: lemezrendrakás'],req:['clean','smyth'],pl:3},
+  {id:'s4',c:'coral',min:7,tab:['Nastavenia','Gépház'],h:['Nastavenia systému a bezpečnosť','A rendszer beállításai és a biztonság'],req:['pairs','sema'],pl:4},
+  {id:'s5',c:'rose',min:5,tab:['Test','Teszt'],h:['Test a odovzdanie výsledku','Teszt és az eredmény leadása'],req:['test']},
+  {id:'s6',c:'peach',min:4,bonus:1,tab:['Mýty','Tévhitek'],h:['Pravda, či mýtus o rýchlom PC?','Igaz vagy tévhit a gyors gépről?'],req:['myths']},
+  {id:'s7',c:'lime',min:4,bonus:1,tab:['Informácie','Névjegy'],h:['Čo je to za počítač? Čítanie údajov','Milyen gép ez? Adatok leolvasása'],req:['about']},
+  {id:'s8',c:'lilac',min:6,bonus:1,tab:['Naostro','Élesben'],h:['Teraz naozaj – na skutočnom počítači','Most élesben – valódi gépen'],req:['real']},
+];
+const SEC=id=>SECS.find(s=>s.id===id);
+const GRADED=['s1','s2','s3','s4'];
+
+/* ---------- ikony (vlastné SVG, currentColor) ---------- */
+const P={
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5" stroke-width="2.6"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/>',
+  moon:'<path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>',
+  teach:'<path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M7 10v5c0 1.5 2.5 3 5 3s5-1.5 5-3v-5"/><path d="M21 8v6"/>',
+  sheet:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/>',
+  gauge:'<path d="M4 17a8 8 0 1116 0"/><path d="M12 17l4-6"/><circle cx="12" cy="17" r="1.3"/>',
+  disk:'<rect x="3.5" y="6" width="17" height="12" rx="2.5"/><circle cx="16.5" cy="12" r="1.3"/><path d="M6.5 12h6"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7"/><circle cx="12" cy="12" r="6.3"/>',
+  shield:'<path d="M12 3l7.5 3v5.5c0 4.6-3.2 8.4-7.5 9.5-4.3-1.1-7.5-4.9-7.5-9.5V6z"/><path d="M8.8 12l2.3 2.3 4.3-4.6"/>',
+  bolt:'<path d="M13 2.5L5 13.5h6l-1 8 8-11h-6z"/>',
+  download:'<path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/>',
+  upload:'<path d="M12 20V9M7 13.5l5-5 5 5M5 4h14"/>',
+  print:'<rect x="6" y="3.5" width="12" height="5"/><rect x="4" y="8.5" width="16" height="8" rx="2"/><rect x="7" y="13.5" width="10" height="7"/>',
+  mail:'<rect x="3.5" y="6" width="17" height="12" rx="2"/><path d="M4 7l8 6 8-6"/>',
+};
+const ic=(n,cls="")=>`<svg class="${cls}" width="1.25em" height="1.25em" style="vertical-align:-.25em;flex:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n]||''}</svg>`;
+const LOGO=`<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="6" width="34" height="24" rx="4" fill="var(--sky)" stroke="var(--line)" stroke-width="2.5"/><path d="M14 36h12M20 30v6" stroke="var(--line)" stroke-width="2.5" stroke-linecap="round"/><circle cx="20" cy="18" r="6.5" fill="var(--sun)" stroke="var(--line)" stroke-width="2.2"/><path d="M20 10v2.2M20 23.8V26M12 18h2.2M25.8 18H28" stroke="var(--line)" stroke-width="2.2" stroke-linecap="round"/><circle cx="20" cy="18" r="2" fill="var(--line)"/></svg>`;
+
+/* ---------- postavy (SVG avatary) ---------- */
+function avatar(o){
+  const {skin='#F2C6A0',hair='#4A2F1E',shirt='#62D2F3',style=0,glasses=0}=o;
+  const hairS=[
+    `<path d="M14 30c0-12 7-19 18-19s18 7 18 19c-3-6-8-9-14-9-7 0-14 3-22 9z" fill="${hair}"/>`,
+    `<path d="M13 33c-1-14 7-22 19-22s20 8 19 22l-3 14c0-10-1-17-4-21-5 3-14 4-24 2-3 4-4 11-4 19z" fill="${hair}"/>`,
+    `<path d="M15 27c1-9 8-15 17-15s16 6 17 15c-5-4-11-5-17-5s-12 1-17 5z" fill="${hair}"/><path d="M20 15l5-5 4 4 4-5 4 5 5-3 1 6" fill="${hair}"/>`,
+    `<path d="M13 31c0-13 8-20 19-20s19 7 19 20c-2-2-3-6-4-9-6 3-21 3-30 0-1 3-2 7-4 9z" fill="${hair}"/><circle cx="49" cy="26" r="6" fill="${hair}"/>`
+  ][style];
+  return `<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/>
+  <path d="M12 62c2-11 10-16 20-16s18 5 20 16" fill="${shirt}" stroke="var(--line)" stroke-width="2"/>
+  <ellipse cx="32" cy="31" rx="15" ry="16" fill="${skin}" stroke="var(--line)" stroke-width="2"/>${hairS}
+  <circle cx="26" cy="32" r="2" fill="#1E1B3A"/><circle cx="38" cy="32" r="2" fill="#1E1B3A"/>
+  ${glasses?'<circle cx="26" cy="32" r="5" fill="none" stroke="#1E1B3A" stroke-width="1.8"/><circle cx="38" cy="32" r="5" fill="none" stroke="#1E1B3A" stroke-width="1.8"/><path d="M31 32h2" stroke="#1E1B3A" stroke-width="1.8"/>':''}
+  <path d="M27 40q5 4 10 0" fill="none" stroke="#1E1B3A" stroke-width="2" stroke-linecap="round"/></svg>`;
+}
+const CAST=[
+  {id:'reka',name:'Réka',av:{hair:'#7A3B1D',shirt:'#F8AED3',style:1},role:['maturitná prezentácia','érettségi prezentáció'],sec:'s2',
+   say:['„Zajtra prezentujem a PowerPoint mi zamrzol. Ventilátor hučí ako lietadlo a notebook sa ráno rozbiehal tri minúty. Čo s tým?“','„Holnap prezentálok, és lefagyott a PowerPoint. A ventilátor úgy zúg, mint egy repülő, és reggel három percig indult a laptop. Mit csináljak?”']},
+  {id:'david',name:'Dávid',av:{hair:'#1E1B3A',shirt:'#C3E670',style:0,glasses:1},role:['plný disk','tele a lemez'],sec:'s3',
+   say:['„Windows hlási, že na disku C: nie je miesto. Mám tam aj video na projekt a fotky z výletu. Môžem niečo zmazať bez strachu?“','„A Windows azt írja, hogy nincs hely a C: meghajtón. Ott van a projektvideóm és a kirándulós fotók is. Mit törölhetek nyugodtan?”']},
+  {id:'nora',name:'Nóra',av:{hair:'#D9A441',shirt:'#CDAEF7',style:3},role:['nastavenia','beállítások'],sec:'s4',
+   say:['„Kúpila som si nový notebook. Nejdú mi písať ő a ű, písmo je drobné a chcem tmavý režim. Kde to všetko nájdem?“','„Új laptopot vettem. Nem tudok ő-t és ű-t írni, apró a betű, és sötét módot szeretnék. Hol találom ezeket?”']},
+  {id:'bence',name:'Bence',av:{hair:'#5B3A29',shirt:'#FFB98F',style:2},role:['bezpečnosť','biztonság'],sec:'s4',
+   say:['„Aktualizácie ma otravujú a antivírus spomaľuje hry. Najradšej by som to všetko vypol. Je to až taký problém?“','„Idegesítenek a frissítések, és a vírusirtó lassítja a játékokat. Legszívesebben mindent kikapcsolnék. Akkora baj ez?”']},
+];
+
+/* ---------- stav ---------- */
+const S0=()=>({v:1,xp:0,ans:{},pts:{},done:{},act:{t:0,per:{},doneAt:{}},test:{i:0,ans:[],first:null,fin:false,round:1},name:'',cls:'II.C',ranked:0});
+let S=S0();
+function load(){try{const r=JSON.parse(store.get(SKEY)||'null');if(r&&r.v===1)S=Object.assign(S0(),r)}catch(e){}}
+let saveT=0;
+function save(){clearTimeout(saveT);saveT=setTimeout(()=>store.set(SKEY,JSON.stringify(S)),120)}
+const st=k=>S.ans[k]||(S.ans[k]={});
+
+/* ---------- aktivity: register ---------- */
+const A={}; // A[key]={sec,max,render(),on(verb,arg,el)}
+function reg(key,def){A[key]=def}
+const MAXXP=()=>Object.keys(A).reduce((s,k)=>s+(A[k].max||0)*10,0);
+function award(k,got){
+  if(S.pts[k])return false;
+  const max=A[k].max||0;got=clamp(got,0,max);
+  S.pts[k]=[got,max];S.xp+=got*10;save();
+  if(got>0)toast(`+${got*10} XP`);
+  checkRank();return true;
+}
+function finish(k){
+  const s=st(k);if(s.done)return;s.done=1;save();
+  const sec=A[k].sec;const so=SEC(sec);
+  if(so&&so.req.every(r=>st(r).done)&&!S.done[sec]){
+    S.done[sec]=1;S.act.doneAt[sec]=S.act.t;save();
+    setTimeout(()=>toast(fill(t('secDone'),{n:tr(so.tab)})),900);
+    renderNav();
+  }
+}
+function rankIdx(){const f=MAXXP()?S.xp/MAXXP():0;let r=0;RANKS.forEach((x,i)=>{if(f>=x[0])r=i});return r}
+function checkRank(){const r=rankIdx();if(r>S.ranked){S.ranked=r;save();setTimeout(()=>toast(fill(t('rankUp'),{r:tr(RANKS[r][1])})),1800)}renderTop()}
+
+/* ---------- hodnotenie ---------- */
+const GRADES=[[90,['výborný (1)','jeles (1)']],[75,['chválitebný (2)','dicséretes (2)']],[50,['dobrý (3)','jó (3)']],[25,['dostatočný (4)','elégséges (4)']],[0,['nedostatočný (5)','elégtelen (5)']]];
+const gradeOf=p=>{for(const g of GRADES)if(p>=g[0])return g;return GRADES[4]};
+const gradeNum=p=>GRADES.indexOf(gradeOf(p))+1;
+const TFULL=18*60; // 18 min aktívnej práce = 100 %
+function results(){
+  let got=0,max=0;
+  GRADED.forEach(id=>SEC(id).req.forEach(k=>{max+=A[k].max;if(S.pts[k])got+=S.pts[k][0]}));
+  const tasks=max?got/max:0;
+  const test=S.test.first==null?0:S.test.first/TQ.length;
+  const time=clamp(S.act.t/TFULL,0,1);
+  const total=Math.round((.4*test+.4*tasks+.2*time)*100);
+  return {tasksGot:got,tasksMax:max,tasks:Math.round(tasks*100),test:Math.round(test*100),testRaw:S.test.first,time:Math.round(time*100),total,grade:gradeNum(total)};
+}
+/* ================= UI: hlavička, navigácia, úvod, rámce šanónov, časovač, udalosti ================= */
+let toastT=0;
+function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2600)}
+
+let showTeacher=!STUDENT;
+function renderTop(){
+  const f=MAXXP()?S.xp/MAXXP():0;const r=RANKS[rankIdx()];
+  const dark=document.documentElement.dataset.theme==='dark'||(!document.documentElement.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);
+  $('#topin').innerHTML=`
+  <button class="logo" data-a="ui:logo" aria-label="${esc(t('title'))}">${LOGO}<span class="brand"><b>${esc(t('title'))}</b><small>${esc(t('brandS'))}</small></span></button>
+  <span class="sp"></span>
+  <span class="xp" title="XP"><span>${S.xp} XP</span><span class="xpbar"><i style="width:${Math.round(f*100)}%"></i></span><span class="rank">${esc(tr(r[1]))}</span></span>
+  <span class="lang" role="group" aria-label="Jazyk / Nyelv"><button data-a="ui:lang:1" aria-pressed="${LI===1}">HU</button><button data-a="ui:lang:0" aria-pressed="${LI===0}">SK</button></span>
+  ${showTeacher?`<button class="hbtn" data-a="ui:teacher">${ic('teach')}<span class="lbl">${esc(t('teacher'))}</span></button>`:''}
+  <button class="hbtn" data-a="ui:theme" aria-label="${esc(t('themeL'))}" title="${esc(t('themeL'))}">${ic(dark?'sun':'moon')}</button>`;
+}
+function renderNav(){
+  $('#nav').innerHTML=SECS.map((s,i)=>`<a href="#${s.id}" class="${S.done[s.id]?'ok':''} ${s.bonus?'bn':''}" style="--c:var(--${s.c})"><span class="n">${S.done[s.id]?ic('check'):i+1}</span>${esc(tr(s.tab))}</a>`).join('');
+}
+
+/* ---------- úvod ---------- */
+let openWho=null;
+const HERO={
+  kicker:['Misia · Informatika · II.C','Küldetés · Informatika · II.C'],
+  story:['Trieda II.C dnes preberá službu na <b>študentskej IT pomoci</b>. Spolužiaci nosia notebooky s problémami: niečo zamrzlo, disk je plný, nastavenia sú „nejaké divné“ a jeden by najradšej vypol všetku ochranu. Vašou úlohou je nájsť správny <b>systémový nástroj</b>, problém vyriešiť a nič pritom nepokaziť. Kliknite na spolužiaka a vypočujte si, čo potrebuje.',
+         'A II.C ma átveszi a <b>diák IT-ügyeletet</b>. Az osztálytársak problémás laptopokat hoznak: valami lefagyott, tele a lemez, „furcsák” a beállítások, és valaki a teljes védelmet kikapcsolná. A ti feladatotok megtalálni a megfelelő <b>rendszereszközt (systémový nástroj)</b>, megoldani a gondot, és közben semmit el nem rontani. Kattintsatok egy osztálytársra, és hallgassátok meg, mire van szüksége.'],
+  goalsH:['Ciele misie','A küldetés céljai'],
+  goals:[
+    [['Vysvetlím, čo robí operačný systém a čo sú systémové nástroje.','Elmagyarázom, mit csinál az operációs rendszer, és mik a rendszereszközök.'],'gear'],
+    [['V Správcovi úloh nájdem proces, ktorý brzdí počítač, a rozumne ho ukončím.','A Feladatkezelőben megtalálom a gépet lassító folyamatot, és megfontoltan leállítom.'],'gauge'],
+    [['Uvoľním miesto na disku bez straty dôležitých súborov.','Helyet szabadítok fel a lemezen anélkül, hogy fontos fájlokat veszítenék.'],'disk'],
+    [['Nájdem správnu kategóriu v Nastaveniach a rozlíšim bezpečné a riskantné rozhodnutia.','Megtalálom a megfelelő kategóriát a Gépházban, és megkülönböztetem a biztonságos és a kockázatos döntéseket.'],'shield'],
+  ],
+  planH:['Plán (cca 30 min)','Terv (kb. 30 perc)'],
+  go:['Prejsť na šanón','Ugrás a dossziéhoz'],
+};
+function renderHero(){
+  const w=openWho&&CAST.find(c=>c.id===openWho);const wi=w?CAST.indexOf(w):0;
+  $('#hero').innerHTML=`<span class="kicker">${esc(tr(HERO.kicker))}</span>
+  <h1>${esc(t('title'))}</h1>
+  <div class="story"><p class="lead">${tr(HERO.story)}</p>
+   <div class="cast">${CAST.map(c=>`<button class="who" data-a="ui:who:${c.id}" aria-expanded="${openWho===c.id}">${avatar(c.av)}${esc(c.name)}<small>${esc(tr(c.role))}</small></button>`).join('')}</div>
+   ${w?`<div class="bubble" style="--bx:${12+wi*25}%"><b>${esc(w.name)}:</b> ${esc(tr(w.say))}<div class="row"><a class="btn small" href="#${w.sec}">${esc(tr(HERO.go))} ${SECS.findIndex(s=>s.id===w.sec)+1}</a></div></div>`:''}
+  </div>
+  <h2>${esc(tr(HERO.goalsH))}</h2>
+  <div class="goals">${HERO.goals.map(g=>`<div class="goal">${ic(g[1])}<span>${esc(tr(g[0]))}</span></div>`).join('')}</div>
+  <h2>${esc(tr(HERO.planH))}</h2>
+  <ol class="plan">${SECS.map((s,i)=>`<li class="${s.bonus?'bn':''}" style="--c:var(--${s.c})"><span class="n">${i+1}</span><span>${esc(tr(s.h))}${s.bonus?` <span class="bonus-tag">${esc(t('bonus'))}</span>`:''}</span><span class="m">${s.min} ${esc(t('min'))}</span></li>`).join('')}</ol>`;
+}
+
+/* ---------- rámce ---------- */
+function plBox(n,txt){return `<div class="pl">${ic('sheet')}<div><b>${esc(fill(t('plT'),{n}))}</b> ${tr(txt)}</div></div>`}
+function actBox(key,kind,title,inner){
+  const d=st(key).done;
+  return `<div class="act" id="a-${key}"><div class="ahead"><span class="kind">${esc(t(kind))}</span><h3>${esc(tr(title))}</h3>${d?`<span class="adone">${ic('check')}${esc(t('doneA'))}</span>`:''}</div>${inner}</div>`;
+}
+const SECR={}; // SECR[id]() vráti obsah šanónu
+function renderSec(id){
+  const s=SEC(id),i=SECS.indexOf(s);const el=document.getElementById(id);if(!el||!SECR[id])return;
+  el.innerHTML=`<div class="tab"><span class="n">${i+1}</span><span class="tt">${esc(tr(s.tab))}</span></div>
+  <div class="folder">${S.done[id]?`<div class="stamp">${esc(t('done'))}</div>`:''}
+   <div class="fhead"><h2>${esc(tr(s.h))}</h2>${s.bonus?`<span class="bonus-tag">${esc(t('bonus'))}</span>`:''}
+    <button class="clock" data-a="ui:timer:${id}" aria-label="${esc(t('timerFor'))}">${ic('clock')}${s.min} ${esc(t('min'))}</button></div>
+   ${SECR[id]()}
+  </div>`;
+}
+T.timerFor=['Časovač','Időzítő'];
+function renderAll(){renderTop();renderNav();renderHero();SECS.forEach(s=>renderSec(s.id));renderFoot();requestAnimationFrame(afterRender)}
+const AFTER=[];function afterRender(){AFTER.forEach(f=>{try{f()}catch(e){console.error(e)}})}
+function renderFoot(){$('#foot').innerHTML=`<b>${esc(t('author'))}</b> · ${esc(t('title'))} · ${LI?'2026. november':'november 2026'}<br>${esc(t('footR'))}`}
+
+/* prekreslenie jedného šanónu so zachovaním fokusu */
+function rerender(id){
+  const ae=document.activeElement;let sel=null;
+  if(ae&&ae.closest&&ae.closest('#'+id)){sel=ae.getAttribute('data-a')?`[data-a="${ae.getAttribute('data-a')}"]`:(ae.getAttribute('data-in')?`[data-in="${ae.getAttribute('data-in')}"]`:(ae.id?'#'+ae.id:null))}
+  renderSec(id);renderTop();renderNav();
+  if(sel){const n=$('#'+id+' '+sel)||$(sel);if(n){try{n.focus({preventScroll:true})}catch(e){}}}
+  requestAnimationFrame(afterRender);
+}
+
+/* ---------- časovač šanónu ---------- */
+const TM={left:0,run:false,id:null,h:0};
+function timerOpen(id){const s=SEC(id);TM.id=id;TM.left=s.min*60;TM.run=true;timerDraw();clearInterval(TM.h);TM.h=setInterval(()=>{if(TM.run&&TM.left>0){TM.left--;if(TM.left===0)toast(t('timeUp'));timerDraw()}},1000)}
+function timerDraw(){const el=$('#timer');if(!TM.id){el.hidden=true;return}el.hidden=false;const s=SEC(TM.id);
+  el.innerHTML=`<div class="note"><b>${esc(t('timerFor'))}:</b> ${esc(tr(s.tab))}</div><div class="big ${TM.left===0?'end':''}">${mmss(TM.left)}</div>
+  <div class="row"><button class="btn small ghost" data-a="ui:tpause">${esc(TM.run?t('pause'):t('resume'))}</button><button class="btn small ghost" data-a="ui:tplus">${esc(t('plus1'))}</button><button class="btn small ghost" data-a="ui:tclose">${esc(t('close'))}</button></div>`}
+
+/* ---------- delegovanie udalostí ---------- */
+let logoClicks=[];
+function onUi(verb,arg){
+  if(verb==='lang'){LI=+arg;store.set(LKEY,String(LI));document.documentElement.lang=LI?'hu':'sk';renderAll();return}
+  if(verb==='theme'){const r=document.documentElement;const cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark';store.set(THKEY,r.dataset.theme);renderTop();return}
+  if(verb==='who'){openWho=openWho===arg?null:arg;renderHero();return}
+  if(verb==='timer'){timerOpen(arg);return}
+  if(verb==='tpause'){TM.run=!TM.run;timerDraw();return}
+  if(verb==='tplus'){TM.left+=60;timerDraw();return}
+  if(verb==='tclose'){TM.id=null;clearInterval(TM.h);timerDraw();return}
+  if(verb==='teacher'){openTeacher();return}
+  if(verb==='logo'){const n=Date.now();logoClicks=logoClicks.filter(x=>n-x<2500);logoClicks.push(n);if(false){logoClicks=[];showTeacher=true;renderTop();openTeacher()}else{window.scrollTo({top:0,behavior:'smooth'})}return}
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;
+  if(b.getAttribute('aria-disabled')==='true'){e.preventDefault();return}
+  const [key,verb,...rest]=b.getAttribute('data-a').split(':');const arg=rest.join(':');
+  if(key==='ui'){onUi(verb,arg);return}
+  if(key==='tp'){onTeacher(verb,arg,b);return}
+  if(A[key]&&A[key].on){A[key].on(verb,arg,b);save();rerender(A[key].sec)}
+});
+document.addEventListener('input',e=>{
+  const el=e.target.closest('[data-in]');if(!el)return;
+  const [key,field]=el.getAttribute('data-in').split(':');
+  if(key==='me'){S[field]=el.value.slice(0,60);save();const c=$('#certName');if(c)c.textContent=S.name||'…';return}
+  st(key)[field]=el.value.slice(0,80);save();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#tdlg').open){$('#tdlg').close()}});
+
+/* ---------- aktívny čas ---------- */
+let lastInput=Date.now();
+['pointerdown','keydown','scroll','wheel','touchstart'].forEach(ev=>window.addEventListener(ev,()=>{lastInput=Date.now()},{passive:true}));
+function curSec(){const y=innerHeight*.4;let cur='hero';for(const s of SECS){const el=document.getElementById(s.id);if(el&&el.getBoundingClientRect().top<=y)cur=s.id}return cur}
+setInterval(()=>{
+  if(document.visibilityState!=='visible')return;
+  if(!document.hasFocus())return;
+  if(Date.now()-lastInput>60000)return;
+  S.act.t++;const c=curSec();S.act.per[c]=(S.act.per[c]||0)+1;
+  if(S.act.t%5===0)save();
+},1000);
+/* ================= Šanón 1: hlásenia na IT pomoci ================= */
+const TOOLS=[
+  {id:'tm',n:['Správca úloh','Feladatkezelő (Správca úloh)']},
+  {id:'set',n:['Nastavenia','Gépház (Nastavenia)']},
+  {id:'sec',n:['Zabezpečenie Windows','Windows Biztonság (Zabezpečenie Windows)']},
+];
+const TICKETS=[
+  {id:'t1',who:'Réka',ok:'tm',q:['Prehliadač zamrzol a nedá sa zavrieť krížikom.','Lefagyott a böngésző, és nem lehet bezárni az X-szel.'],ex:['Zamrznutý program ukončíte v Správcovi úloh (Ukončiť úlohu).','A lefagyott programot a Feladatkezelőben lehet leállítani (Feladat befejezése).']},
+  {id:'t2',who:'Réka',ok:'tm',q:['Notebook sa po zapnutí rozbieha tri minúty.','Bekapcsolás után három percig indul a laptop.'],ex:['Karta Spúšťacie aplikácie ukáže, čo sa spúšťa po prihlásení a aký to má vplyv.','Az Indítási alkalmazások lap megmutatja, mi indul el bejelentkezéskor, és milyen hatással.']},
+  {id:'t3',who:'Nóra',ok:'set',q:['Klávesnica nepíše ő a ű.','A billentyűzet nem írja az ő és ű betűt.'],ex:['Rozloženie klávesnice: Nastavenia › Čas a jazyk.','Billentyűzetkiosztás: Gépház › Idő és nyelv.']},
+  {id:'t4',who:'Nóra',ok:'set',q:['Písmo na obrazovke je príliš drobné.','Túl aprók a betűk a képernyőn.'],ex:['Mierka a rozlíšenie: Nastavenia › Systém › Obrazovka.','Méretezés és felbontás: Gépház › Rendszer › Kijelző.']},
+  {id:'t5',who:'Bence',ok:'sec',q:['Vyskočilo hlásenie, že v stiahnutom súbore je hrozba.','Felugrott egy üzenet, hogy a letöltött fájlban fenyegetés van.'],ex:['Hrozby a karanténu rieši Zabezpečenie Windows (Ochrana pred vírusmi a hrozbami).','A fenyegetéseket és a karantént a Windows Biztonság kezeli.']},
+  {id:'t6',who:'Bence',ok:'sec',q:['Chcem skontrolovať, či je zapnutý firewall.','Ellenőrizni szeretném, be van-e kapcsolva a tűzfal.'],ex:['Stav firewallu nájdete v aplikácii Zabezpečenie Windows.','A tűzfal (firewall) állapotát a Windows Biztonság alkalmazásban találod.']},
+  {id:'t7',who:'Réka',ok:'tm',q:['Ktorý program teraz najviac zaťažuje procesor?','Melyik program terheli most leginkább a processzort?'],ex:['Stĺpec CPU v Správcovi úloh – dá sa podľa neho aj zoradiť.','A Feladatkezelő CPU oszlopa – rendezni is lehet szerinte.']},
+  {id:'t8',who:'Dávid',ok:'set',q:['Disk C: je takmer plný.','Majdnem tele a C: meghajtó.'],ex:['Prehľad a čistenie: Nastavenia › Systém › Úložisko.','Áttekintés és tisztítás: Gépház › Rendszer › Tárhely.']},
+];
+const HYP=[
+  {id:'a',n:['menej ako 10','kevesebb mint 10']},
+  {id:'b',n:['približne 30','körülbelül 30']},
+  {id:'c',n:['100 a viac','100 vagy több']},
+];
+reg('hyp',{sec:'s1',max:1,on(v,a){const s=st('hyp');if(v==='pick'&&!s.sealed){s.pick=a}if(v==='seal'&&s.pick&&!s.sealed){s.sealed=1;award('hyp',1);finish('hyp')}}});
+reg('tickets',{sec:'s1',max:8,on(v,a){const s=st('tickets');s.p=s.p||{};
+  if(v==='pick'&&!s.checked){const [id,tool]=a.split('|');s.p[id]=tool}
+  if(v==='check'&&!s.checked&&TICKETS.every(x=>s.p[x.id])){s.checked=1;const got=TICKETS.filter(x=>s.p[x.id]===x.ok).length;award('tickets',got);finish('tickets')}
+  if(v==='retry'){s.p={};s.checked=0}
+}});
+SECR.s1=()=>{
+  const h=st('hyp'),k=st('tickets');k.p=k.p||{};
+  const all=TICKETS.every(x=>k.p[x.id]);
+  const got=TICKETS.filter(x=>k.p[x.id]===x.ok).length;
+  return `<p class="lead">${tr(['Prvá zmena na IT pomoci. Skôr ako začnete opravovať, ujasnite si, <b>kto v počítači „velí“</b> a aké nástroje na to máte.','Első műszak az IT-ügyeleten. Mielőtt bármit javítanátok, tisztázzátok, <b>ki „parancsol” a gépben</b>, és milyen eszközeitek vannak.'])}</p>
+  <div class="explain"><h4>${tr(['Operačný systém = správca prostriedkov','Operációs rendszer = az erőforrások gazdája'])}</h4>
+   <p>${tr(['<span class="term">Operačný systém (OS)</span> je softvér, ktorý spravuje prostriedky počítača – <b>procesor (CPU)</b>, <b>operačnú pamäť (RAM)</b>, <b>disk</b> a pripojené zariadenia – a poskytuje služby aplikáciám. Aplikácia si „nepýta“ procesor priamo, požiada o neho OS.',
+   'Az <span class="term">operációs rendszer (operačný systém, OR)</span> olyan szoftver, amely a számítógép erőforrásait kezeli – a <b>processzort (procesor, CPU)</b>, az <b>operatív memóriát (operačná pamäť, RAM)</b>, a <b>lemezt (disk)</b> és a csatlakoztatott eszközöket –, és szolgáltatásokat nyújt az alkalmazásoknak. Az alkalmazás nem közvetlenül „kéri” a processzort, hanem az operációs rendszertől.'])}</p>
+   <p>${tr(['<span class="term">Systémové nástroje</span> sú programy OS na sledovanie, údržbu a nastavenie počítača. Dnes použijeme tri:','A <span class="term">rendszereszközök (systémové nástroje)</span> az operációs rendszer programjai a gép figyelésére, karbantartására és beállítására. Ma hármat használunk:'])}</p>
+   <div class="cards3">
+    <div class="mini">${ic('gauge')} <b>${tr(['Správca úloh','Feladatkezelő'])}</b><br>${tr(['beh programov, výkon, spúšťanie','futó programok, teljesítmény, indítás'])}<br><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd></div>
+    <div class="mini">${ic('gear')} <b>${tr(['Nastavenia','Gépház'])}</b><br>${tr(['vzhľad, jazyk, úložisko, aplikácie, kontá','megjelenés, nyelv, tárhely, alkalmazások, fiókok'])}<br><kbd>Win</kbd>+<kbd>I</kbd></div>
+    <div class="mini">${ic('shield')} <b>${tr(['Zabezpečenie Windows','Windows Biztonság'])}</b><br>${tr(['antivírus, firewall, hrozby','vírusvédelem, tűzfal (firewall), fenyegetések'])}<br>${tr(['Štart › vyhľadať','Start › keresés'])}</div>
+   </div>
+   <p class="note">${tr(['Starší <b>Ovládací panel</b> vo Windows stále existuje, ale Microsoft postupne presúva voľby do Nastavení.','A régebbi <b>Vezérlőpult (Ovládací panel)</b> még létezik a Windowsban, de a Microsoft fokozatosan a Gépházba költözteti a beállításokat.'])}</p>
+  </div>
+  ${actBox('hyp','kindHyp',['Tip do obálky','Tipp a borítékba'],`
+   <p>${tr(['Koľko <b>procesov</b> (spustených programov a ich častí) beží vo Windows 11 hneď po prihlásení, keď ešte sami nič neotvoríte? Tipnite si a obálku zalepte – otvoríme ju v šanóne 2.','Hány <b>folyamat (proces)</b> – futó program és programrész – fut a Windows 11-ben közvetlenül bejelentkezés után, amikor még semmit sem nyitottatok meg? Tippeljetek, és zárjátok le a borítékot – a 2. dossziéban nyitjuk ki.'])}</p>
+   <div class="env ${h.sealed?'sealed':''}"><div class="chips">${HYP.map(o=>`<button class="chip" data-a="hyp:pick:${o.id}" aria-pressed="${h.pick===o.id}" ${h.sealed?'aria-disabled="true"':''}>${esc(tr(o.n))}</button>`).join('')}</div>
+   <div class="row">${h.sealed?`<b>${tr(['Obálka je zalepená.','A boríték lezárva.'])}</b>`:`<button class="btn" data-a="hyp:seal" ${h.pick?'':'aria-disabled="true"'}>${tr(['Zalepiť obálku','Boríték lezárása'])}</button>`}</div></div>`)}
+  ${actBox('tickets','kindSort',['Ktorý nástroj na ktoré hlásenie?','Melyik eszköz melyik bejelentéshez?'],`
+   <p>${tr(['Ku každému hláseniu ťuknite na nástroj, ktorým ho vyriešite. Potom skontrolujte.','Minden bejelentéshez koppintsatok arra az eszközre, amellyel megoldjátok. Utána ellenőrizzétek.'])} <span class="note">${esc(t('xpNote'))}</span></p>
+   ${TICKETS.map((x,i)=>{const p=k.p[x.id];return `<div class="ticket"><div class="who2">#${i+1} · ${esc(x.who)}</div><div class="q">${esc(tr(x.q))}</div>
+     <div class="chips">${TOOLS.map(o=>{let c='';if(k.checked&&p===o.id)c=p===x.ok?'good':'badc';if(k.checked&&p!==x.ok&&o.id===x.ok)c='good';return `<button class="chip ${c}" data-a="tickets:pick:${x.id}|${o.id}" aria-pressed="${p===o.id}" ${k.checked?'aria-disabled="true"':''}>${esc(tr(o.n))}</button>`}).join('')}</div>
+     ${k.checked?`<div class="note" style="margin-top:6px">${esc(tr(x.ex))}</div>`:''}</div>`}).join('')}
+   <div class="row">${k.checked?`<div class="fb ${got>=6?'ok':'info'}"><b>${got} / ${TICKETS.length}</b> ${tr(['správne.','helyes.'])} ${S.pts.tickets?tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])+S.pts.tickets[0]+' / 8':''}</div><button class="btn ghost small" data-a="tickets:retry">${esc(t('again'))}</button>`
+     :`<button class="btn" data-a="tickets:check" ${all?'':'aria-disabled="true"'}>${esc(t('check'))}</button>`}</div>`)}
+  ${plBox(1,['Zapíšte svoj tip z obálky a pri hláseniach 1 – 4 nástroj, ktorý ste vybrali.','Írjátok le a borítékba zárt tippeteket, és az 1–4. bejelentésnél a választott eszközt.'])}`;
+};
+
+/* ================= Šanón 2: Správca úloh ================= */
+const PROCS=[
+  {id:'ppt',g:'app',n:['Microsoft PowerPoint','Microsoft PowerPoint'],cpu:0.4,mem:690,hang:1},
+  {id:'edge',g:'app',n:['Microsoft Edge (18)','Microsoft Edge (18)'],cpu:6.2,mem:2140},
+  {id:'teams',g:'app',n:['Microsoft Teams','Microsoft Teams'],cpu:1.1,mem:520},
+  {id:'game',g:'bg',n:['GameHub Updater','GameHub Updater'],cpu:58.3,mem:310,cul:1},
+  {id:'photo',g:'bg',n:['PhotoFix Helper','PhotoFix Helper'],cpu:9.5,mem:180},
+  {id:'od',g:'bg',n:['Microsoft OneDrive','Microsoft OneDrive'],cpu:2.0,mem:95},
+  {id:'sys',g:'win',n:['System','System'],cpu:1.2,mem:0.1,sys:1},
+  {id:'av',g:'win',n:['Antimalware Service Executable','Antimalware Service Executable'],cpu:3.1,mem:240,sys:1},
+];
+const GRP={app:['Aplikácie','Alkalmazások'],bg:['Procesy na pozadí','Háttérfolyamatok'],win:['Procesy systému Windows','Windows-folyamatok']};
+reg('tm',{sec:'s2',max:4,on(v,a){const s=st('tm');s.end=s.end||[];s.err=s.err||0;
+  if(v==='sel'){s.sel=a;s.msg=null}
+  if(v==='sort'){s.sort=(a==='name'||s.sort===a)?null:a}
+  if(v==='end'&&s.sel&&!s.end.includes('game')){const p=PROCS.find(x=>x.id===s.sel);
+    if(p.cul){s.end.push('game');s.msg='ok';if(!s.e1)s.e1=s.err?0:2}
+    else{s.err++;s.msg=p.sys?'sys':(p.id==='ppt'?'ppt':'notcul')}}
+  if(v==='q2'&&!s.q2){s.q2=a}
+  if(v==='q3'&&!s.q3){s.q3=a;const got=(s.e1||0)+(s.q2==='edge'?1:0)+(a==='tabs'?1:0);award('tm',got);finish('tm')}
+}});
+const BOOTW={h:30,m:12,l:3};
+const STARTUP=[
+  {id:'gh',n:'GameHub Launcher',d:['spúšťač hier','játékindító'],imp:'h',want:0},
+  {id:'pf',n:'PhotoFix Helper',d:['aktualizátor fotoeditora','fotószerkesztő frissítője'],imp:'h',want:0},
+  {id:'tu',n:'Tunely',d:['prehrávač hudby','zenelejátszó'],imp:'m',want:0},
+  {id:'od',n:'Microsoft OneDrive',d:['synchronizácia školských súborov','az iskolai fájlok szinkronizálása'],imp:'m',want:1},
+  {id:'ws',n:['Ikona Zabezpečenia Windows','Windows Biztonság értesítési ikon'],d:['upozornenia ochrany','védelmi értesítések'],imp:'l',want:1},
+  {id:'tp',n:['Ovládač touchpadu','Érintőpad-illesztőprogram'],d:['gestá na touchpade','érintőpad-kézmozdulatok'],imp:'l',want:1},
+  {id:'te',n:'Microsoft Teams',d:['školský chat a hodiny','iskolai csevegés és órák'],imp:'h',want:-1},
+];
+const IMPN={h:['Vysoký','Magas'],m:['Stredný','Közepes'],l:['Nízky','Alacsony']};
+function bootSec(s){return 25+STARTUP.reduce((a,x)=>a+(s.off&&s.off[x.id]?0:BOOTW[x.imp]),0)}
+reg('startup',{sec:'s2',max:6,on(v,a){const s=st('startup');s.off=s.off||{};
+  if(v==='tog'&&!s.checked){s.off[a]=!s.off[a]}
+  if(v==='check'&&!s.checked){s.checked=1;const got=STARTUP.filter(x=>x.want>=0&&(x.want===1?!s.off[x.id]:!!s.off[x.id])).length;award('startup',got);finish('startup')}
+  if(v==='retry'){s.checked=0;s.off={}}
+}});
+SECR.s2=()=>{
+  const s=st('tm');s.end=s.end||[];const fixed=s.end.includes('game');
+  let rows=PROCS.map(p=>Object.assign({},p,{cpuN:fixed&&p.id==='ppt'?3.4:(fixed&&p.cul?0:p.cpu)}));
+  const tot=Math.round(rows.filter(r=>!s.end.includes(r.id)).reduce((a,r)=>a+r.cpuN,0)+(fixed?4:9));
+  const memTot=fixed?62:71;
+  const heat=v=>v>40?'heat3':v>8?'heat2':v>3?'heat1':'';
+  const memHeat=v=>v>1500?'heat3':v>500?'heat2':v>200?'heat1':'';
+  let order=['app','bg','win'];
+  let body='';
+  if(s.sort){const r2=rows.slice().sort((a,b)=>s.sort==='cpu'?b.cpuN-a.cpuN:b.mem-a.mem);body=r2.map(trP).join('')}
+  else body=order.map(g=>`<tr class="grp"><td colspan="4">${esc(tr(GRP[g]))}</td></tr>`+rows.filter(r=>r.g===g).map(trP).join('')).join('');
+  function trP(p){const ended=s.end.includes(p.id);const hang=p.hang&&!fixed;
+    return `<tr class="${s.sel===p.id?'sel':''} ${ended?'ended':''}" data-a="tm:sel:${p.id}" ${ended?'aria-disabled="true"':''} tabindex="0"><td>${esc(tr(p.n))}${p.sys?`<span class="sysb">Windows</span>`:''}${hang?` <span class="stat">${tr(['Nereaguje','Nem válaszol'])}</span>`:''}</td><td class="${ended?'':heat(p.cpuN)}">${ended?'–':fmt(p.cpuN,1)+' %'}</td><td class="${ended?'':memHeat(p.mem)}">${ended?'–':fmt(p.mem,p.mem<1?1:0)+' MB'}</td><td>${ended?'–':fmt(p.cpuN>20?2.4:0.1,1)+' MB/s'}</td></tr>`}
+  const MSG={ok:['Výborne! GameHub Updater bral viac ako polovicu výkonu procesora. Po jeho ukončení sa PowerPoint spamätal – Rékina práca je zachránená.','Szuper! A GameHub Updater a processzor teljesítményének több mint felét elvitte. Leállítása után a PowerPoint magához tért – Réka munkája megmenekült.'],
+    sys:['Pozor! Toto je systémový proces Windows. Jeho ukončenie môže spôsobiť nestabilitu alebo reštart. Systémové procesy nechávame tak.','Vigyázat! Ez Windows-rendszerfolyamat. Leállítása instabilitást vagy újraindulást okozhat. A rendszerfolyamatokat békén hagyjuk.'],
+    ppt:['Ešte nie! Ukončením PowerPointu by Réka stratila neuložené zmeny. Program nereaguje, lebo procesor je preťažený – nájdite príčinu.','Még ne! A PowerPoint leállításával Réka elveszítené a nem mentett módosításokat. Azért nem válaszol, mert túlterhelt a processzor – keressétek meg az okát.'],
+    notcul:['Tento proces nie je hlavný „žrút“ procesora. Pozrite sa na stĺpec CPU (dá sa podľa neho zoradiť).','Nem ez a folyamat a processzor fő „zabálója”. Nézzétek a CPU oszlopot (rendezni is lehet szerinte).']};
+  const q2o=dshuffle([['edge',PROCS[1].n],['ppt',PROCS[0].n],['teams',PROCS[2].n],['game',PROCS[3].n]],'q2');
+  const q3o=dshuffle([['tabs',['Zavrieť karty, ktoré nepotrebuje – uvoľní sa RAM.','Bezárni a felesleges lapokat – felszabadul a RAM.']],['av',['Vypnúť antivírus, aby mal Edge viac pamäte.','Kikapcsolni a vírusirtót, hogy az Edge-nek több memóriája legyen.']],['un',['Odinštalovať Edge a nainštalovať ho znova.','Eltávolítani az Edge-et, és újratelepíteni.']],['mon',['Pripojiť väčší monitor.','Nagyobb monitort csatlakoztatni.']]],'q3');
+  const h=st('hyp');const hn=HYP.find(x=>x.id===h.pick);
+  const u=st('startup');u.off=u.off||{};const bs=bootSec(u);
+  return `<p class="lead">${tr(['Réka: zamrznutý PowerPoint, hučiaci ventilátor, pomalý štart. Otvoríme <b>Správcu úloh</b> a pozrieme sa, kto berie výkon.','Réka: lefagyott PowerPoint, zúgó ventilátor, lassú indulás. Megnyitjuk a <b>Feladatkezelőt</b>, és megnézzük, ki viszi el a teljesítményt.'])}</p>
+  <div class="explain"><h4>${tr(['Program, proces, služba','Program, folyamat, szolgáltatás'])}</h4><ul>
+   <li>${tr(['<span class="term">Program</span> je súbor na disku (napr. <code>POWERPNT.EXE</code>).','A <span class="term">program</span> egy fájl a lemezen (pl. <code>POWERPNT.EXE</code>).'])}</li>
+   <li>${tr(['<span class="term">Proces</span> je spustený program v operačnej pamäti. Jeden program môže mať viac procesov – Edge (18) znamená 18 procesov (karty, rozšírenia).','A <span class="term">folyamat (proces)</span> a memóriában futó program. Egy programnak több folyamata is lehet – az Edge (18) 18 folyamatot jelent (lapok, bővítmények).'])}</li>
+   <li>${tr(['<span class="term">Služba</span> beží na pozadí bez okna (napr. tlač, aktualizácie).','A <span class="term">szolgáltatás (služba)</span> ablak nélkül fut a háttérben (pl. nyomtatás, frissítések).'])}</li></ul>
+   <p>${tr(['Stĺpce: <b>CPU</b> – vyťaženie procesora, <b>Pamäť</b> – koľko RAM proces zaberá, <b>Disk</b> – čítanie a zápis. Tlačidlo <b>Ukončiť úlohu</b> proces násilne zastaví – <b>neuložené zmeny sa stratia</b>.','Oszlopok: <b>CPU</b> – a processzor terhelése, <b>Memória (pamäť)</b> – mennyi RAM-ot foglal a folyamat, <b>Lemez (disk)</b> – olvasás és írás. A <b>Feladat befejezése (Ukončiť úlohu)</b> gomb erőszakkal leállítja a folyamatot – <b>a nem mentett módosítások elvesznek</b>.'])}</p></div>
+  ${actBox('tm','kindSim',['Simulácia: Rékin Správca úloh','Szimuláció: Réka Feladatkezelője'],`
+   <p>${tr(['<b>1.</b> Nájdite proces, ktorý najviac zaťažuje procesor, označte ho a kliknite na <b>Ukončiť úlohu</b>. Na nadpis stĺpca môžete kliknúť a zoradiť podľa neho.','<b>1.</b> Keressétek meg a processzort leginkább terhelő folyamatot, jelöljétek ki, és kattintsatok a <b>Feladat befejezése</b> gombra. Az oszlop fejlécére kattintva rendezhettek.'])}</p>
+   <div class="win"><div class="wbar">${ic('gauge')} ${tr(['Správca úloh','Feladatkezelő'])}<span class="dots"><i></i><i></i><i></i></span></div>
+    <div class="wtabs"><span class="on">${tr(['Procesy','Folyamatok'])}</span><span>${tr(['Výkon','Teljesítmény'])}</span><span>${tr(['Spúšťacie aplikácie','Indítási alkalmazások'])}</span><span>${tr(['Služby','Szolgáltatások'])}</span></div>
+    <div class="tmw"><table class="tm"><thead><tr><th scope="col" data-a="tm:sort:name">${tr(['Názov','Név'])}</th><th scope="col" data-a="tm:sort:cpu">CPU ${s.sort==='cpu'?'▼':''}<br>${tot} %</th><th scope="col" data-a="tm:sort:mem">${tr(['Pamäť','Memória'])} ${s.sort==='mem'?'▼':''}<br>${memTot} %</th><th scope="col">${tr(["Disk","Lemez"])}</th></tr></thead><tbody>${body}</tbody></table></div>
+    <div class="wfoot"><span class="note">${tr(['Zjednodušená simulácia – názvy a čísla sú ilustračné.','Egyszerűsített szimuláció – a nevek és számok szemléltetők.'])}</span><button class="btn small" data-a="tm:end" ${(!s.sel||fixed)?'aria-disabled="true"':''}>${tr(['Ukončiť úlohu','Feladat befejezése'])}</button></div></div>
+   ${s.msg?`<div class="fb ${s.msg==='ok'?'ok':'no'}">${esc(tr(MSG[s.msg]))}</div>`:''}
+   ${fixed?`<p style="margin-top:14px">${tr(['<b>2.</b> Ktorá aplikácia zaberá najviac operačnej pamäte (RAM)?','<b>2.</b> Melyik alkalmazás foglalja a legtöbb operatív memóriát (RAM)?'])}</p>
+    <div class="opts">${q2o.map(o=>{let c='';if(s.q2){if(o[0]==='edge')c='good';else if(o[0]===s.q2)c='badc'}return `<button class="opt ${c}" data-a="tm:q2:${o[0]}" aria-pressed="${s.q2===o[0]}" ${s.q2?'aria-disabled="true"':''}>${esc(tr(o[1]))}</button>`}).join('')}</div>
+    ${s.q2?`<div class="fb ${s.q2==='edge'?'ok':'no'}">${tr(['Edge (18) zaberá vyše 2 GB – každá karta je samostatný proces.','Az Edge (18) több mint 2 GB-ot foglal – minden lap külön folyamat.'])}</div>`:''}`:''}
+   ${s.q2?`<p>${tr(['<b>3.</b> Réka má v Edge otvorených 25 kariet a RAM je skoro plná. Čo jej poradíte?','<b>3.</b> Rékának 25 lap van nyitva az Edge-ben, és majdnem tele a RAM. Mit tanácsolsz neki?'])}</p>
+    <div class="opts">${q3o.map(o=>{let c='';if(s.q3){if(o[0]==='tabs')c='good';else if(o[0]===s.q3)c='badc'}return `<button class="opt ${c}" data-a="tm:q3:${o[0]}" aria-pressed="${s.q3===o[0]}" ${s.q3?'aria-disabled="true"':''}>${esc(tr(o[1]))}</button>`}).join('')}</div>
+    ${s.q3?`<div class="fb ${s.q3==='tabs'?'ok':'no'}">${tr(['Zatvorením kariet sa ukončia ich procesy a OS pamäť uvoľní pre iné programy. Vypínať ochranu nikdy nie je riešenie.','A lapok bezárásával leállnak a folyamataik, és az operációs rendszer felszabadítja a memóriát más programok számára. A védelem kikapcsolása soha nem megoldás.'])} ${S.pts.tm?`<b>${tr(['Body: ','Pontok: '])}${S.pts.tm[0]} / 4</b>`:''}</div>`:''}`:''}
+   ${st('tm').done?`<div class="env" style="margin-top:12px"><b>${tr(['Otvárame obálku zo šanónu 1:','Kinyitjuk az 1. dosszié borítékát:'])}</b> ${tr(['váš tip bol','a tippetek:'])} <b>${hn?esc(tr(hn.n)):'–'}</b>. ${tr(['Vo Windows 11 bežne beží <b>okolo 100 a viac procesov</b> – väčšinu tvoria služby a systémové procesy na pozadí. Presné číslo závisí od počítača; v bonuse 8 ho overíte na skutočnom PC (Správca úloh › Výkon › CPU › Procesy).','A Windows 11-ben általában <b>100 körüli vagy annál több folyamat</b> fut – többségük háttérben futó szolgáltatás és rendszerfolyamat. A pontos szám gépenként más; a 8. bónuszban valódi gépen ellenőrzitek (Feladatkezelő › Teljesítmény › CPU › Folyamatok).'])}</div>`:''}`)}
+  ${actBox('startup','kindCalc',['Spúšťacie aplikácie: zrýchlite štart','Indítási alkalmazások: gyorsítsátok fel az indulást'],`
+   <p>${tr(['Karta <b>Spúšťacie aplikácie</b> ukazuje programy, ktoré sa spustia po prihlásení, a ich <b>vplyv pri spustení</b>. Vypnite tie, ktoré Réka hneď po zapnutí nepotrebuje. <b>OneDrive</b> (synchronizácia školských súborov) a <b>ochranu</b> nechajte zapnuté. <i>Zakázaná aplikácia sa neodinštaluje – len sa nespustí automaticky.</i>','Az <b>Indítási alkalmazások</b> lap azokat a programokat mutatja, amelyek bejelentkezéskor elindulnak, és az <b>indítási hatásukat</b>. Kapcsoljátok ki, amire Rékának bekapcsoláskor nincs szüksége. A <b>OneDrive</b> (az iskolai fájlok szinkronizálása) és a <b>védelem</b> maradjon bekapcsolva. <i>A letiltott alkalmazás nem törlődik – csak nem indul el automatikusan.</i>'])}</p>
+   <div class="boot">${ic('clock')} ${tr(['Odhad štartu:','Becsült indulási idő:'])} <span class="mono">${mmss(bs)}</span><span class="bootbar"><i style="width:${Math.round(bs/145*100)}%"></i></span></div>
+   ${STARTUP.map(x=>{const on=!u.off[x.id];let c='';if(u.checked&&x.want>=0)c=(x.want===1)===on?'good':'badc';
+     return `<div class="sw ${c}"><span class="nm">${esc(tr(x.n))}<small>${esc(tr(x.d))}</small></span><span class="imp ${x.imp}">${esc(tr(IMPN[x.imp]))}</span><button class="tog" role="switch" aria-checked="${on}" aria-label="${esc(tr(x.n))}" data-a="startup:tog:${x.id}" ${u.checked?'aria-disabled="true"':''}></button></div>`}).join('')}
+   <div class="row">${u.checked?`<div class="fb ${S.pts.startup&&S.pts.startup[0]>=5?'ok':'info'}">${tr(['Teams je na vás: ak ho Réka hneď potrebuje na hodinu, nechá ho; inak ho spustí, až keď treba. ','A Teams rajtatok múlik: ha Rékának rögtön kell az órához, maradjon; különben akkor indítja, amikor kell. '])}${S.pts.startup?`<b>${tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])}${S.pts.startup[0]} / 6</b>`:''}</div><button class="btn ghost small" data-a="startup:retry">${esc(t('again'))}</button>`:`<button class="btn" data-a="startup:check">${esc(t('check'))}</button>`}</div>
+   <p class="note">${tr(['To isté nájdete aj v Nastaveniach › Aplikácie › Spustenie. Zmena sa prejaví pri ďalšom spustení počítača.','Ugyanezt megtaláljátok a Gépház › Alkalmazások › Indítás menüben is. A változás a gép következő indításakor érvényesül.'])}</p>`)}
+  ${plBox(2,['Zapíšte názov procesu, ktorý najviac zaťažoval CPU (aj s %), aplikáciu s najväčšou pamäťou (MB) a tri aplikácie, ktoré ste zakázali pri spustení.','Írjátok le a CPU-t leginkább terhelő folyamat nevét (a %-kal együtt), a legtöbb memóriát foglaló alkalmazást (MB) és azt a három alkalmazást, amelyet letiltottatok az indításnál.'])}`;
+};
+/* ================= Šanón 3: Úložisko a aplikácie ================= */
+const DISK={cap:256,free:4,need:20};
+const CLEAN=[
+  {id:'tmp',gb:3.8,ok:1,n:['Dočasné súbory','Ideiglenes fájlok'],d:['súbory, ktoré programy už nepotrebujú','a programoknak már nem kellenek'],ex:['Bezpečné – Windows ich vytvára a vie zmazať sám.','Biztonságos – a Windows hozza létre, és maga is törölheti őket.']},
+  {id:'bin',gb:2.1,ok:1,n:['Kôš','Lomtár (Kôš)'],d:['Dávid ho prezrel – nič dôležité','Dávid átnézte – semmi fontos'],ex:['Bezpečné, keď ste obsah skontrolovali. Vyprázdnenie Koša sa nedá vrátiť.','Biztonságos, ha átnéztétek a tartalmát. A Lomtár ürítése nem vonható vissza.']},
+  {id:'wu',gb:1.2,ok:1,n:['Vyčistenie súborov Windows Update','Windows Update-fájlok tisztítása'],d:['staré súbory z aktualizácií','régi frissítési fájlok'],ex:['Bezpečné – po nainštalovaní aktualizácií ich netreba.','Biztonságos – a frissítések telepítése után nincs rájuk szükség.']},
+  {id:'thumb',gb:0.4,ok:1,n:['Miniatúry','Miniatűrök'],d:['náhľady obrázkov v priečinkoch','a képek előnézetei a mappákban'],ex:['Bezpečné – Windows ich pri potrebe vytvorí znova.','Biztonságos – szükség esetén a Windows újra létrehozza őket.']},
+  {id:'game',gb:14.5,ok:1,n:['Hra Racing X (odinštalovať)','Racing X játék (eltávolítás)'],d:['rok ju nehral; odinštalovanie v Nastavenia › Aplikácie','egy éve nem játszott vele; eltávolítás: Gépház › Alkalmazások'],ex:['Rozumné – nepoužívaná aplikácia sa odinštaluje správne cez Nastavenia, nie mazaním priečinka.','Ésszerű – a nem használt alkalmazást helyesen a Gépházban kell eltávolítani, nem a mappa törlésével.']},
+  {id:'dl',gb:9.6,ok:0,n:['Priečinok Stiahnuté súbory','Letöltések mappa'],d:['je tam aj projekt.zip a certifikát','benne van a projekt.zip és egy tanúsítvány is'],ex:['Riskantné – najprv prezrieť a dôležité presunúť. Senzor úložiska ho maže len, ak to tak nastavíte.','Kockázatos – előbb át kell nézni, és a fontosat áthelyezni. A Tárolóérzékelő csak akkor törli, ha így állítjátok be.']},
+  {id:'foto',gb:12.0,ok:0,n:['Fotky z výletu','Kirándulós fotók'],d:['nemajú zálohu','nincs róluk biztonsági másolat'],ex:['Nemazať! Presunúť na OneDrive alebo externý disk – uvoľní sa miesto a fotky zostanú.','Ne töröljétek! Helyezzétek át a OneDrive-ra vagy külső lemezre – felszabadul a hely, és a fotók megmaradnak.']},
+  {id:'vid',gb:6.3,ok:0,n:['Video na projekt','Projektvideó'],d:['odovzdáva ho budúci týždeň','jövő héten adja le'],ex:['Nemazať – je to aktuálna práca.','Ne töröljétek – ez aktuális munka.']},
+  {id:'win',gb:24.0,ok:0,n:['Priečinok C:\\Windows','C:\\Windows mappa'],d:['najväčší priečinok na disku','a legnagyobb mappa a lemezen'],ex:['Nikdy ručne! Sú v ňom súbory operačného systému – Windows by prestal fungovať.','Soha ne kézzel! Az operációs rendszer fájljai vannak benne – a Windows nem működne.']},
+];
+reg('clean',{sec:'s3',max:9,on(v,a){const s=st('clean');s.sel=s.sel||{};
+  if(v==='tog'&&!s.checked){s.sel[a]=!s.sel[a]}
+  if(v==='check'&&!s.checked){s.checked=1;award('clean',CLEAN.filter(x=>!!s.sel[x.id]===!!x.ok).length);finish('clean')}
+  if(v==='retry'){s.checked=0;s.sel={}}
+}});
+const SMYTH=[
+  {id:'m1',tru:0,s:['SSD disk treba pravidelne ručne defragmentovať.','Az SSD-t rendszeresen kézzel kell töredezettségmentesíteni.'],ex:['Mýtus. SSD nemá pohyblivé časti; Windows ho optimalizuje príkazom TRIM automaticky. Defragmentácia pomáha klasickým HDD.','Tévhit. Az SSD-ben nincsenek mozgó alkatrészek; a Windows automatikusan, TRIM paranccsal optimalizálja. A töredezettségmentesítés (defragmentácia) a hagyományos HDD-knek segít.']},
+  {id:'m2',tru:1,s:['Senzor úložiska vie automaticky mazať dočasné súbory a obsah Koša.','A Tárolóérzékelő (Senzor úložiska) automatikusan törölheti az ideiglenes fájlokat és a Lomtár tartalmát.'],ex:['Pravda. Zapína sa v Nastavenia › Systém › Úložisko; dá sa nastaviť, ako často a čo maže.','Igaz. A Gépház › Rendszer › Tárhely menüben kapcsolható be; beállítható, milyen gyakran és mit töröljön.']},
+  {id:'m3',tru:0,s:['Keď zakážem aplikáciu pri spustení, odinštaluje sa.','Ha letiltok egy alkalmazást az indításnál, eltávolítódik.'],ex:['Mýtus. Zostane nainštalovaná, len sa nespustí sama po prihlásení.','Tévhit. Telepítve marad, csak nem indul el magától bejelentkezéskor.']},
+  {id:'m4',tru:1,s:['Aplikáciu je bezpečnejšie odinštalovať v Nastaveniach než zmazať jej priečinok.','Biztonságosabb a Gépházban eltávolítani az alkalmazást, mint törölni a mappáját.'],ex:['Pravda. Odinštalátor odstráni aj záznamy v systéme a skratky; zmazaný priečinok nechá „trosky“.','Igaz. Az eltávolító a rendszerbejegyzéseket és a parancsikonokat is törli; a törölt mappa „romokat” hagy.']},
+  {id:'m5',tru:0,s:['Plný disk nemá vplyv na rýchlosť ani na aktualizácie.','A tele lemez nincs hatással a sebességre és a frissítésekre.'],ex:['Mýtus. Windows potrebuje voľné miesto na dočasné súbory a aktualizácie; pri plnom disku sa aktualizácia nemusí nainštalovať.','Tévhit. A Windowsnak szabad hely kell az ideiglenes fájlokhoz és a frissítésekhez; tele lemeznél a frissítés nem biztos, hogy feltelepül.']},
+];
+function tfAct(key,list,maxN){reg(key,{sec:key==='myths'?'s6':(key==='smyth'?'s3':'s4'),max:maxN,on(v,a){const s=st(key);s.p=s.p||{};
+  if(v==='pick'){const [id,val]=a.split('|');if(s.p[id]==null){s.p[id]=+val;if(list.every(x=>s.p[x.id]!=null)){award(key,list.filter(x=>s.p[x.id]===x.tru).length);finish(key)}}}}})}
+tfAct('smyth',SMYTH,5);
+function tfRender(key,list){const s=st(key);s.p=s.p||{};
+  return list.map((x,i)=>{const p=s.p[x.id];const c=p==null?'':(p===x.tru?'good':'badc');
+   return `<div class="tf ${c}"><div class="s">${i+1}. ${esc(tr(x.s))}</div><div class="chips">
+    <button class="chip ${p!=null&&x.tru===1?'good':''}" data-a="${key}:pick:${x.id}|1" aria-pressed="${p===1}" ${p!=null?'aria-disabled="true"':''}>${tr(['Pravda','Igaz'])}</button>
+    <button class="chip ${p!=null&&x.tru===0?'good':''}" data-a="${key}:pick:${x.id}|0" aria-pressed="${p===0}" ${p!=null?'aria-disabled="true"':''}>${tr(['Mýtus','Tévhit'])}</button></div>
+    ${p!=null?`<div class="ex"><b>${p===x.tru?esc(t('correct')):esc(t('wrong'))}</b> ${esc(tr(x.ex))}</div>`:''}</div>`}).join('')+(S.pts[key]?`<div class="fb ok">${tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])}<b>${S.pts[key][0]} / ${A[key].max}</b></div>`:'')}
+SECR.s3=()=>{
+  const s=st('clean');s.sel=s.sel||{};
+  const freed=CLEAN.filter(x=>s.sel[x.id]).reduce((a,x)=>a+x.gb,0);
+  const free=DISK.free+freed;const used=DISK.cap-free;
+  const okFree=CLEAN.filter(x=>s.sel[x.id]&&x.ok).reduce((a,x)=>a+x.gb,0);
+  return `<p class="lead">${tr(['Dávid: „Na disku nie je miesto.“ Skôr ako niečo zmažete, zistite, <b>čo miesto zaberá</b> a čo sa dá odstrániť bez straty.','Dávid: „Nincs hely a lemezen.” Mielőtt bármit törölnétek, derítsétek ki, <b>mi foglalja a helyet</b>, és mit lehet veszteség nélkül eltávolítani.'])}</p>
+  <div class="explain"><h4>${tr(['Kde to nájdem','Hol találom'])}</h4><ul>
+   <li>${tr(['<span class="path">Nastavenia › Systém › Úložisko</span> – prehľad, čo zaberá miesto (aplikácie, dočasné súbory, dokumenty…), a <b>Odporúčania na vyčistenie</b>.','<span class="path">Gépház › Rendszer › Tárhely</span> – áttekintés arról, mi foglalja a helyet (alkalmazások, ideiglenes fájlok, dokumentumok…), és <b>Tisztítási javaslatok</b>.'])}</li>
+   <li>${tr(['<span class="term">Senzor úložiska</span> – keď je zapnutý, automaticky maže dočasné súbory a podľa nastavení aj starší obsah Koša či Stiahnutých súborov.','<span class="term">Tárolóérzékelő (Senzor úložiska)</span> – bekapcsolva automatikusan törli az ideiglenes fájlokat, és a beállítások szerint a Lomtár vagy a Letöltések régebbi tartalmát is.'])}</li>
+   <li>${tr(['<span class="path">Nastavenia › Aplikácie › Nainštalované aplikácie</span> – správne <b>odinštalovanie</b> programov.','<span class="path">Gépház › Alkalmazások › Telepített alkalmazások</span> – a programok helyes <b>eltávolítása (odinštalovanie)</b>.'])}</li>
+   <li>${tr(['<b>HDD</b> (magnetický disk) pomáha <span class="term">defragmentácia</span> – uloží časti súborov k sebe. <b>SSD</b> (flash) sa nedefragmentuje; Windows ho optimalizuje príkazom TRIM. Oboje robí nástroj <i>Defragmentácia a optimalizácia jednotiek</i> automaticky podľa plánu.','A <b>HDD</b>-nek (mágneses lemez) a <span class="term">töredezettségmentesítés (defragmentácia)</span> segít – egymás mellé rendezi a fájlok darabjait. Az <b>SSD</b>-t (flash) nem töredezettségmentesítjük; a Windows TRIM paranccsal optimalizálja. Mindkettőt automatikusan, ütemezve végzi a <i>Meghajtók töredezettségmentesítése és optimalizálása</i> eszköz.'])}</li></ul></div>
+  ${actBox('clean','kindCalc',['Upratovanie disku: uvoľnite aspoň 20 GB','Lemezrendrakás: szabadítsatok fel legalább 20 GB-ot'],`
+   <p>${tr(['Dávidov notebook má disk <b>256 GB</b> a voľné sú len <b>4 GB</b>. Na aktualizáciu a export videa potrebuje <b>aspoň 20 GB voľného miesta</b>. Označte, čo vymažete alebo odinštalujete – ale nič, o čo by Dávid prišiel.','Dávid laptopjában <b>256 GB</b>-os lemez van, és csak <b>4 GB</b> szabad. A frissítéshez és a videó exportálásához <b>legalább 20 GB szabad hely</b> kell. Jelöljétek meg, mit töröltök vagy távolítotok el – de semmit, ami Dávidnak hiányozna.'])}</p>
+   <div class="disk" role="img" aria-label="${fmt(free,1)} GB"><i class="used" style="width:${used/DISK.cap*100}%"></i><i class="fr" style="width:${free/DISK.cap*100}%"></i></div>
+   <div class="meter"><span><i style="background:var(--ram)"></i>${tr(['obsadené','foglalt'])} ${fmt(used,1)} GB</span><span><i style="background:var(--go)"></i>${tr(['voľné','szabad'])} <b>${fmt(free,1)} GB</b></span><span>${tr(['cieľ','cél'])}: ≥ ${DISK.need+DISK.free-4} GB</span></div>
+   ${CLEAN.map(x=>{const on=!!s.sel[x.id];let c='';if(s.checked)c=on===!!x.ok?'good':'badc';
+    return `<div class="chk ${c}" role="checkbox" tabindex="0" aria-checked="${on}" data-a="clean:tog:${x.id}" ${s.checked?'aria-disabled="true"':''}><span class="box">${on?ic('check'):''}</span><span class="nm">${esc(tr(x.n))}<small>${esc(tr(x.d))}</small>${s.checked?`<small><b>${esc(tr(x.ex))}</b></small>`:''}</span><span class="gb">${fmt(x.gb,1)} GB</span></div>`}).join('')}
+   <div class="row">${s.checked?`<div class="fb ${S.pts.clean&&S.pts.clean[0]>=8?'ok':'info'}">${free>=DISK.need?tr(['Voľné miesto: ','Szabad hely: '])+fmt(free,1)+' GB ✓ ':tr(['Málo miesta: ','Kevés a hely: '])+fmt(free,1)+' GB. '}${tr(['Bezpečne by sa dalo uvoľniť 22 GB (spolu 26 GB voľných).','Biztonságosan 22 GB-ot lehetne felszabadítani (összesen 26 GB szabad).'])} ${S.pts.clean?`<b>${tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])}${S.pts.clean[0]} / 9</b>`:''}</div><button class="btn ghost small" data-a="clean:retry">${esc(t('again'))}</button>`
+    :`<button class="btn" data-a="clean:check">${esc(t('check'))}</button><span class="note">${tr(['Uvoľnené: ','Felszabadítva: '])}${fmt(freed,1)} GB</span>`}</div>`)}
+  ${actBox('smyth','kindMyth',['Pravda, či mýtus o diskoch?','Igaz vagy tévhit a lemezekről?'],tfRender('smyth',SMYTH))}
+  ${plBox(3,['Zapíšte, koľko GB ste uvoľnili, a dve položky, ktoré ste <b>nevymazali</b>, aj s dôvodom.','Írjátok le, hány GB-ot szabadítottatok fel, és két tételt, amelyet <b>nem töröltetek</b>, az indoklással együtt.'])}`;
+};
+
+/* ================= Šanón 4: Nastavenia a bezpečnosť ================= */
+const CATS=[
+  {id:'sys',n:['Systém','Rendszer'],d:['obrazovka, zvuk, upozornenia, napájanie, úložisko','kijelző, hang, értesítések, energiagazdálkodás, tárhely']},
+  {id:'bt',n:['Bluetooth a zariadenia','Bluetooth és eszközök'],d:['myš, tlačiareň, slúchadlá','egér, nyomtató, fülhallgató']},
+  {id:'net',n:['Sieť a internet','Hálózat és internet'],d:['Wi-Fi, VPN, režim v lietadle','Wi-Fi, VPN, repülőgép üzemmód']},
+  {id:'per',n:['Prispôsobenie','Személyre szabás'],d:['pozadie, farby, tmavý režim, panel úloh','háttér, színek, sötét mód, tálca']},
+  {id:'app',n:['Aplikácie','Alkalmazások'],d:['nainštalované, predvolené, spustenie','telepített, alapértelmezett, indítás']},
+  {id:'acc',n:['Kontá','Fiókok'],d:['prihlásenie, PIN, rodina a ďalší používatelia','bejelentkezés, PIN, család és más felhasználók']},
+  {id:'time',n:['Čas a jazyk','Idő és nyelv'],d:['dátum, jazyk, klávesnica, oblasť','dátum, nyelv, billentyűzet, régió']},
+  {id:'gam',n:['Hry','Játékok'],d:['herný režim, nahrávanie','játék mód, rögzítés']},
+  {id:'axs',n:['Prístupnosť','Akadálymentesség'],d:['veľkosť textu, lupa, titulky, Moderátor','szövegméret, nagyító, feliratok, Narrátor']},
+  {id:'priv',n:['Ochrana osobných údajov a zabezpečenie','Adatvédelem és biztonság'],d:['povolenia aplikácií, Zabezpečenie Windows','alkalmazásengedélyek, Windows Biztonság']},
+  {id:'wu',n:['Windows Update','Windows Update'],d:['aktualizácie, odloženie, história','frissítések, szüneteltetés, előzmények']},
+];
+const PAIRS=[
+  {id:'p1',c:'time',n:['Nóra chce písať ő a ű (maďarská klávesnica).','Nóra ő-t és ű-t akar írni (magyar billentyűzet).']},
+  {id:'p2',c:'per',n:['Zapnúť tmavý režim.','Sötét mód bekapcsolása.']},
+  {id:'p3',c:'sys',n:['Zväčšiť mierku obrazovky na 125 %.','A kijelző méretezése 125 %-ra.']},
+  {id:'p4',c:'app',n:['PDF sa majú otvárať v inom programe.','A PDF-ek más programban nyíljanak meg.']},
+  {id:'p5',c:'bt',n:['Pripojiť bezdrôtovú myš.','Vezeték nélküli egér csatlakoztatása.']},
+  {id:'p6',c:'priv',n:['Zistiť, ktoré aplikácie smú používať kameru.','Megnézni, mely alkalmazások használhatják a kamerát.']},
+  {id:'p7',c:'acc',n:['Nastaviť PIN na prihlásenie.','PIN beállítása a bejelentkezéshez.']},
+];
+reg('pairs',{sec:'s4',max:7,on(v,a){const s=st('pairs');s.l=s.l||{};
+  if(s.checked&&v!=='retry')return;
+  if(v==='L'){s.cur=s.cur===a?null:a}
+  if(v==='R'&&s.cur){for(const k in s.l)if(s.l[k]===a)delete s.l[k];s.l[s.cur]=a;s.cur=null}
+  if(v==='check'&&PAIRS.every(p=>s.l[p.id])){s.checked=1;award('pairs',PAIRS.filter(p=>s.l[p.id]===p.c).length);finish('pairs')}
+  if(v==='retry'){s.checked=0;s.l={};s.cur=null}
+}});
+function drawPairLines(){
+  const box=$('#pairsBox');if(!box)return;const svg=$('#pairsSvg');const s=st('pairs');s.l=s.l||{};
+  const br=box.getBoundingClientRect();let h='';
+  for(const p of PAIRS){const c=s.l[p.id];if(!c)continue;const L=$(`[data-a="pairs:L:${p.id}"]`,box),R=$(`[data-a="pairs:R:${c}"]`,box);if(!L||!R)continue;
+    const a=L.getBoundingClientRect(),b=R.getBoundingClientRect();
+    const cls=s.checked?(c===p.c?'good':'badc'):'';
+    h+=`<line class="${cls}" x1="${a.right-br.left}" y1="${a.top+a.height/2-br.top}" x2="${b.left-br.left}" y2="${b.top+b.height/2-br.top}"/>`}
+  svg.innerHTML=h;
+}
+AFTER.push(drawPairLines);window.addEventListener('resize',drawPairLines);
+const SEMA=[
+  {id:'e1',ok:'g',s:['Aktualizácie mám zapnuté a reštart si naplánujem na večer.','A frissítések be vannak kapcsolva, az újraindítást estére ütemezem.'],ex:['Ideálne – opravy chýb aj bezpečnostné záplaty, a nevyruší vás to pri práci.','Ideális – hibajavítások és biztonsági javítások, és munka közben sem zavar.']},
+  {id:'e2',ok:'o',s:['Aktualizácie pozastavím na týždeň, lebo zajtra prezentujem.','Egy hétre szüneteltetem a frissítéseket, mert holnap prezentálok.'],ex:['Krátkodobo prijateľné – ale po prezentácii ich treba hneď nainštalovať.','Rövid távon elfogadható – de a prezentáció után azonnal telepíteni kell őket.']},
+  {id:'e3',ok:'r',s:['Vypnem Zabezpečenie Windows, lebo hra beží pomalšie.','Kikapcsolom a Windows Biztonságot, mert lassabban fut a játék.'],ex:['Nebezpečné – počítač ostane bez antivírusu. Výkon riešte inak (Správca úloh, spúšťacie aplikácie).','Veszélyes – a gép vírusvédelem nélkül marad. A teljesítményt másképp kell megoldani (Feladatkezelő, indítási alkalmazások).']},
+  {id:'e4',ok:'r',s:['Pracujem stále pod kontom správcu a okná Kontroly používateľských kont odklikám bez čítania.','Mindig rendszergazdai fiókkal dolgozom, és a Felhasználói fiókok felügyelete ablakait olvasás nélkül leokézom.'],ex:['Riskantné – škodlivý program tak ľahko získa práva meniť systém. Na bežnú prácu stačí štandardné konto a výzvy treba čítať.','Kockázatos – így egy kártevő könnyen jogot kap a rendszer módosítására. A mindennapi munkához elég a korlátozott jogú (standard) fiók, és a kérdéseket el kell olvasni.']},
+  {id:'e5',ok:'g',s:['Na školskom PC niektoré nastavenia nemôžem meniť.','Az iskolai gépen néhány beállítást nem módosíthatok.'],ex:['V poriadku – správca siete to obmedzil zámerne, aby počítače fungovali všetkým rovnako a bezpečne.','Rendben van – a rendszergazda szándékosan korlátozta, hogy a gépek mindenkinek egyformán és biztonságosan működjenek.']},
+  {id:'e6',ok:'r',s:['Stiahnem „čistič“ z reklamy, ktorý sľubuje 300 % rýchlejší počítač.','Letöltök egy hirdetésből egy „tisztítót”, amely 300 %-kal gyorsabb gépet ígér.'],ex:['Nebezpečné – takéto programy často obsahujú reklamný alebo škodlivý softvér. Windows má vlastné nástroje.','Veszélyes – az ilyen programok gyakran reklám- vagy kártevő programot tartalmaznak. A Windowsnak saját eszközei vannak.']},
+  {id:'e7',ok:'r',s:['Používam na internete Windows 10 bez aktualizácií.','Frissítések nélküli Windows 10-et használok az interneten.'],ex:['Riskantné – bežná podpora Windows 10 skončila 14. 10. 2025, nové chyby už neopravujú. Ak to počítač zvládne, prejsť na Windows 11.','Kockázatos – a Windows 10 általános támogatása 2025. 10. 14-én véget ért, az új hibákat már nem javítják. Ha a gép bírja, át kell állni Windows 11-re.']},
+];
+const LIGHTS=[['g','var(--go)',['bezpečné','biztonságos']],['o','var(--mid)',['opatrne','óvatosan']],['r','var(--stop)',['riskantné','kockázatos']]];
+reg('sema',{sec:'s4',max:7,on(v,a){const s=st('sema');s.p=s.p||{};
+  if(v==='pick'){const [id,val]=a.split('|');if(!s.p[id]){s.p[id]=val;if(SEMA.every(x=>s.p[x.id])){award('sema',SEMA.filter(x=>s.p[x.id]===x.ok).length);finish('sema')}}}
+}});
+SECR.s4=()=>{
+  const s=st('pairs');s.l=s.l||{};const all=PAIRS.every(p=>s.l[p.id]);
+  const rights=dshuffle(PAIRS.map(p=>p.c),'pairsR');
+  const e=st('sema');e.p=e.p||{};
+  return `<p class="lead">${tr(['Nóra má nový notebook a Bence by najradšej všetko vypol. Zistite, <b>kde sa čo nastavuje</b> a ktoré rozhodnutia sú bezpečné.','Nórának új laptopja van, Bence pedig legszívesebben mindent kikapcsolna. Derítsétek ki, <b>mit hol lehet beállítani</b>, és mely döntések biztonságosak.'])}</p>
+  <div class="explain"><h4>${tr(['Nastavenia (Win + I) – kategórie vo Windows 11','Gépház (Win + I) – kategóriák a Windows 11-ben'])}</h4>
+   <div class="cards3 catg">${CATS.map(c=>`<div class="mini"><b>${esc(tr(c.n))}</b><br><span class="note">${esc(tr(c.d))}</span></div>`).join('')}</div>
+   <h4>${tr(['Bezpečnosť v skratke','A biztonság röviden'])}</h4><ul>
+   <li>${tr(['<span class="term">Windows Update</span> inštaluje opravy chýb a bezpečnostné záplaty. Aktuálna verzia je Windows 11 <b>26H2</b> (vydaná 29. 9. 2026).','A <span class="term">Windows Update</span> hibajavításokat és biztonsági javításokat (záplatákat) telepít. A jelenlegi verzió a Windows 11 <b>26H2</b> (megjelent 2026. 9. 29-én).'])}</li>
+   <li>${tr(['<span class="term">Zabezpečenie Windows</span> zahŕňa antivírus Microsoft Defender a firewall.','A <span class="term">Windows Biztonság (Zabezpečenie Windows)</span> tartalmazza a Microsoft Defender vírusvédelmet és a tűzfalat (firewall).'])}</li>
+   <li>${tr(['<span class="term">Konto správcu</span> smie meniť systém; <span class="term">štandardné konto</span> nie. Keď program chce zmeniť systém, <b>Kontrola používateľských kont</b> sa opýta na povolenie.','A <span class="term">rendszergazdai fiók (konto správcu)</span> módosíthatja a rendszert, a <span class="term">korlátozott jogú, standard fiók (štandardné konto)</span> nem. Ha egy program a rendszert akarja módosítani, a <b>Felhasználói fiókok felügyelete (Kontrola používateľských kont)</b> engedélyt kér.'])}</li></ul></div>
+  ${actBox('pairs','kindPair',['Úloha → kategória Nastavení','Feladat → Gépház-kategória'],`
+   <p>${tr(['Ťuknite na úlohu vľavo a potom na kategóriu vpravo – spojí ich čiara. Keď spojíte všetko, skontrolujte.','Koppintsatok egy feladatra balra, majd egy kategóriára jobbra – vonal köti össze őket. Ha mindent összekötöttetek, ellenőrizzétek.'])}</p>
+   <div class="pairs" id="pairsBox"><svg class="plines" id="pairsSvg" aria-hidden="true"></svg>
+    <div class="pcol">${PAIRS.map(p=>{let c=s.l[p.id]?'linked':'';if(s.checked)c=s.l[p.id]===p.c?'good':'badc';return `<button class="pitem ${c}" data-a="pairs:L:${p.id}" aria-pressed="${s.cur===p.id}" ${s.checked?'aria-disabled="true"':''}>${esc(tr(p.n))}</button>`}).join('')}</div>
+    <div class="pcol">${rights.map(cid=>{const c=CATS.find(x=>x.id===cid);const used=Object.values(s.l).includes(cid);return `<button class="pitem ${used?'linked':''}" data-a="pairs:R:${cid}" ${s.checked?'aria-disabled="true"':''}>${esc(tr(c.n))}</button>`}).join('')}</div>
+   </div>
+   <div class="row">${s.checked?`<div class="fb ${S.pts.pairs&&S.pts.pairs[0]>=6?'ok':'info'}">${PAIRS.filter(p=>s.l[p.id]!==p.c).map(p=>`${esc(tr(p.n))} → <b>${esc(tr(CATS.find(c=>c.id===p.c).n))}</b>`).join('<br>')||tr(['Všetko správne!','Minden helyes!'])} ${S.pts.pairs?`<br><b>${tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])}${S.pts.pairs[0]} / 7</b>`:''}</div><button class="btn ghost small" data-a="pairs:retry">${esc(t('again'))}</button>`
+     :`<button class="btn" data-a="pairs:check" ${all?'':'aria-disabled="true"'}>${esc(t('check'))}</button>`}</div>`)}
+  ${actBox('sema','kindLight',['Bezpečnostný semafor','Biztonsági lámpa'],`
+   <p>${tr(['Pri každom rozhodnutí rozsvieťte farbu: <b>zelená</b> = bezpečné, <b>oranžová</b> = dá sa, ale opatrne a krátko, <b>červená</b> = riskantné.','Minden döntésnél gyújtsatok fel egy színt: <b>zöld</b> = biztonságos, <b>narancs</b> = lehet, de óvatosan és rövid ideig, <b>piros</b> = kockázatos.'])}</p>
+   ${SEMA.map((x,i)=>{const p=e.p[x.id];const c=p?(p===x.ok?'good':'badc'):'';
+    return `<div class="tf ${c}"><div class="s">${i+1}. ${esc(tr(x.s))}</div><div class="lights">${LIGHTS.map(l=>`<button class="light" data-a="sema:pick:${x.id}|${l[0]}" aria-pressed="${p===l[0]}" ${p?'aria-disabled="true"':''}><i style="background:${l[1]}"></i>${esc(tr(l[2]))}</button>`).join('')}</div>
+    ${p?`<div class="ex"><b>${p===x.ok?esc(t('correct')):esc(t('wrong'))+' '+tr(['Správne:','Helyesen:'])+' '+esc(tr(LIGHTS.find(l=>l[0]===x.ok)[2]))+'.'}</b> ${esc(tr(x.ex))}</div>`:''}</div>`}).join('')}
+   ${S.pts.sema?`<div class="fb ok">${tr(['Body za prvý pokus: ','Pontok az első próbálkozásért: '])}<b>${S.pts.sema[0]} / 7</b></div>`:''}`)}
+  ${plBox(4,['Doplňte do tabuľky na pracovnom liste kategóriu Nastavení pre päť úloh a pri jednom „červenom“ rozhodnutí napíšte, čo by ste urobili namiesto toho.','Írjátok be a feladatlap táblázatába öt feladathoz a Gépház kategóriáját, és egy „piros” döntésnél írjátok le, mit tennétek helyette.'])}`;
+};
+/* ================= Šanón 5: test, výsledok, certifikát ================= */
+const TOPIC={os:['Operačný systém','Operációs rendszer'],tm:['Správca úloh','Feladatkezelő'],disk:['Úložisko','Tárhely'],set:['Nastavenia a bezpečnosť','Gépház és biztonság']};
+const TQ=[
+  {tp:'os',q:['Čo robí operačný systém?','Mit csinál az operációs rendszer?'],o:[['Spravuje procesor, pamäť, disk a zariadenia a poskytuje služby aplikáciám.','Kezeli a processzort, a memóriát, a lemezt és az eszközöket, és szolgáltatásokat nyújt az alkalmazásoknak.'],['Je to iba grafické prostredie s pozadím a ikonami.','Csak egy grafikus felület háttérrel és ikonokkal.'],['Je to antivírusový program.','Ez egy vírusirtó program.'],['Slúži len na pripojenie k internetu.','Csak az internetkapcsolatra szolgál.']],ex:['OS je správca prostriedkov počítača; grafické prostredie je len jeho časť.','Az OR a gép erőforrásainak kezelője; a grafikus felület csak egy része.']},
+  {tp:'tm',q:['Ktorou klávesovou skratkou otvoríte priamo Správcu úloh?','Melyik billentyűparanccsal nyitjátok meg közvetlenül a Feladatkezelőt?'],o:[['Ctrl + Shift + Esc','Ctrl + Shift + Esc'],['Win + I','Win + I'],['Alt + Tab','Alt + Tab'],['Ctrl + Alt + F4','Ctrl + Alt + F4']],ex:['Win + I otvorí Nastavenia, Alt + Tab prepína okná.','A Win + I a Gépházat nyitja meg, az Alt + Tab ablakot vált.']},
+  {tp:'tm',q:['Aký je rozdiel medzi programom a procesom?','Mi a különbség a program és a folyamat között?'],o:[['Proces je program spustený v operačnej pamäti.','A folyamat az operatív memóriában futó program.'],['Proces je starší názov pre program.','A folyamat a program régebbi neve.'],['Program beží vždy na pozadí, proces v okne.','A program mindig a háttérben fut, a folyamat ablakban.'],['Nie je medzi nimi rozdiel.','Nincs köztük különbség.']],ex:['Program je súbor na disku; po spustení z neho vznikne jeden alebo viac procesov.','A program fájl a lemezen; elindítva egy vagy több folyamat lesz belőle.']},
+  {tp:'tm',q:['Čo sa stane, keď v Správcovi úloh ukončíte úlohu programu s neuloženou prácou?','Mi történik, ha a Feladatkezelőben befejezitek egy nem mentett munkát tartalmazó program feladatát?'],o:[['Program sa zavrie a neuložené zmeny sa môžu stratiť.','A program bezárul, és a nem mentett módosítások elveszhetnek.'],['Program si prácu automaticky uloží na plochu.','A program automatikusan menti a munkát az asztalra.'],['Program sa odinštaluje.','A program eltávolítódik.'],['Počítač sa reštartuje.','A gép újraindul.']],ex:['Ukončenie úlohy je núdzové riešenie – najprv skúste chvíľu počkať alebo uvoľniť procesor.','A feladat befejezése vészmegoldás – előbb próbáljatok várni, vagy tehermentesíteni a processzort.']},
+  {tp:'tm',q:['Čo znamená zakázať aplikáciu v Spúšťacích aplikáciách?','Mit jelent letiltani egy alkalmazást az Indítási alkalmazásokban?'],o:[['Nespustí sa automaticky po prihlásení, ale zostane nainštalovaná.','Nem indul el automatikusan bejelentkezéskor, de telepítve marad.'],['Aplikácia sa odinštaluje.','Az alkalmazás eltávolítódik.'],['Aplikácia sa už nebude dať spustiť.','Az alkalmazást többé nem lehet elindítani.'],['Aplikácia sa presunie na iný disk.','Az alkalmazás másik lemezre kerül.']],ex:['Spustiť ju môžete kedykoľvek ručne.','Bármikor elindíthatjátok kézzel.']},
+  {tp:'disk',q:['Čo robí Senzor úložiska?','Mit csinál a Tárolóérzékelő?'],o:[['Automaticky maže dočasné súbory a podľa nastavení obsah Koša.','Automatikusan törli az ideiglenes fájlokat, és a beállítások szerint a Lomtár tartalmát.'],['Meria teplotu disku.','A lemez hőmérsékletét méri.'],['Zálohuje fotky na externý disk.','Külső lemezre menti a fotókat.'],['Zrýchľuje internet.','Gyorsítja az internetet.']],ex:['Nájdete ho v Nastavenia › Systém › Úložisko.','A Gépház › Rendszer › Tárhely menüben találjátok.']},
+  {tp:'disk',q:['Ako Windows udržiava SSD disk?','Hogyan tartja karban a Windows az SSD-t?'],o:[['Optimalizuje ho príkazom TRIM; ručná defragmentácia nie je potrebná.','TRIM paranccsal optimalizálja; kézi töredezettségmentesítés nem kell.'],['Treba ho každý týždeň ručne defragmentovať.','Minden héten kézzel kell töredezettségmentesíteni.'],['SSD sa nedá nijako optimalizovať.','Az SSD-t semmilyen módon nem lehet optimalizálni.'],['Formátovaním každý mesiac.','Havonta formázással.']],ex:['Defragmentácia pomáha klasickému HDD, nie SSD.','A töredezettségmentesítés a hagyományos HDD-nek segít, nem az SSD-nek.']},
+  {tp:'disk',q:['Dávid potrebuje miesto, ale fotky z výletu nemá zálohované. Čo je najlepšie?','Dávidnak hely kell, de a kirándulós fotókról nincs másolata. Mi a legjobb?'],o:[['Presunúť ich na OneDrive alebo externý disk.','Áthelyezni őket a OneDrive-ra vagy külső lemezre.'],['Zmazať ich a vyprázdniť Kôš.','Törölni őket, és üríteni a Lomtárt.'],['Zmazať priečinok C:\\Windows.','Törölni a C:\\Windows mappát.'],['Zakázať ich pri spustení.','Letiltani őket az indításnál.']],ex:['Presunutím sa uvoľní miesto a fotky zostanú zachované.','Áthelyezéssel felszabadul a hely, és a fotók megmaradnak.']},
+  {tp:'set',q:['V ktorej kategórii Nastavení pridáte maďarskú klávesnicu?','A Gépház melyik kategóriájában adjátok hozzá a magyar billentyűzetet?'],o:[['Čas a jazyk','Idő és nyelv'],['Prispôsobenie','Személyre szabás'],['Bluetooth a zariadenia','Bluetooth és eszközök'],['Prístupnosť','Akadálymentesség']],ex:['Jazyk a rozloženie klávesnice patria do kategórie Čas a jazyk.','A nyelv és a billentyűzetkiosztás az Idő és nyelv kategóriába tartozik.']},
+  {tp:'set',q:['Prečo je rozumné na bežnú prácu používať štandardné (nie správcovské) konto?','Miért ésszerű a mindennapi munkához korlátozott jogú (nem rendszergazdai) fiókot használni?'],o:[['Škodlivý program nemôže bez povolenia meniť systém.','Egy kártevő engedély nélkül nem módosíthatja a rendszert.'],['Počítač je potom rýchlejší.','Így gyorsabb a gép.'],['Nemusí sa inštalovať Windows Update.','Nem kell Windows Update-et telepíteni.'],['Zväčší sa voľné miesto na disku.','Több lesz a szabad hely a lemezen.']],ex:['Zmeny systému potom vyžadujú povolenie správcu (Kontrola používateľských kont).','A rendszer módosításához ilyenkor rendszergazdai engedély kell (Felhasználói fiókok felügyelete).']},
+];
+const gradeTxt=p=>tr(gradeOf(p)[1]);
+reg('test',{sec:'s5',max:0,on(v,a){const s=S.test;
+  if(v==='pick'&&s.ans[s.i]==null){s.ans[s.i]=+a}
+  if(v==='next'&&s.ans[s.i]!=null){if(s.i<TQ.length-1)s.i++;else{s.fin=true;const c=TQ.filter((q,i)=>s.ans[i]===0).length;if(s.first==null){s.first=c;finish('test')}}}
+  if(v==='again'){s.i=0;s.ans=[];s.fin=false;s.round=(s.round||1)+1}
+  if(v==='dl'){downloadResult()}
+  if(v==='print'){printCert()}
+}});
+function resultObj(){
+  const r=results();
+  const o={lesson:LID,name:(S.name||'').trim(),cls:(S.cls||'').trim(),date:new Date().toISOString().slice(0,10),active:S.act.t,secs:SECS.filter(s=>S.done[s.id]).map(s=>s.id),
+    tasks:r.tasks,tasksPts:r.tasksGot+'/'+r.tasksMax,test:r.testRaw==null?null:r.testRaw,testMax:TQ.length,time:r.time,total:r.total,grade:r.grade,per:S.act.per,doneAt:S.act.doneAt};
+  o.code=signRes(o);return o;
+}
+function signRes(o){return hashStr([o.lesson,o.name,o.cls,o.active,o.secs.join(','),o.tasks,o.test,o.time,o.total,o.grade,'IIC#sys'].join('|')).toString(36).toUpperCase()}
+const slug=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'')||'ziak';
+function dlFile(name,text,type){
+  if(INFRAME){toast(tr(['V náhľade sa súbor stiahnuť nedá – otvorte žiacky súbor.','Az előnézetben nem lehet letölteni – nyissátok meg a diákfájlt.']));return}
+  const b=new Blob([text],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove()},500);
+}
+function downloadResult(){
+  if(!(S.name||'').trim()){toast(tr(['Najprv vyplňte meno.','Előbb írjátok be a nevet.']));return}
+  const o=resultObj();dlFile(`systemove-nastroje_${slug(o.cls)}_${slug(o.name)}.json`,JSON.stringify(o,null,1),'application/json');
+}
+function certHTML(){const r=results();return `<div class="cert"><div>${LOGO.replace('<svg','<svg width="56" height="56"')}</div><h3>${tr(['Osvedčenie','Oklevél'])}</h3>
+ <p>${tr(['Potvrdzujeme, že','Igazoljuk, hogy'])}</p><div class="nm" id="certName">${esc(S.name||'…')}</div>
+ <p>${tr(['úspešne slúžil(a) na študentskej IT pomoci a zvládol(a) misiu','sikeresen ügyeletes volt a diák IT-segítségnél, és teljesítette a küldetést:'])}<br><b>${esc(t('title'))}</b></p>
+ <p>${tr(['Výsledok','Eredmény'])}: <b>${r.total} %</b> · ${esc(gradeTxt(r.total))}</p><p class="note">${esc(t('author'))} · ${new Date().toLocaleDateString(loc())}</p></div>`}
+function printCert(){if(INFRAME){toast(tr(['V náhľade sa nedá tlačiť – certifikát si odfoťte.','Az előnézetben nem lehet nyomtatni – fényképezzétek le az oklevelet.']));return}$('#certPrint').innerHTML=certHTML();window.print()}
+SECR.s5=()=>{
+  const s=S.test;const q=TQ[s.i];const order=dshuffle([0,1,2,3],'q'+s.i);
+  let html=`<p class="lead">${tr(['Desať otázok, vždy jedna. Do známky sa počíta <b>prvý pokus</b>; potom môžete test precvičovať znova.','Tíz kérdés, egyszerre egy. Az érdemjegybe az <b>első próbálkozás</b> számít; utána újra gyakorolhatjátok.'])}</p>`;
+  let inner='';
+  if(!s.fin){const p=s.ans[s.i];
+    inner=`<div class="qcard"><div class="qmeta"><span>${tr(['Otázka','Kérdés'])} ${s.i+1} / ${TQ.length}</span><span>${esc(tr(TOPIC[q.tp]))}${s.first!=null?' · '+tr(['precvičovanie','gyakorlás']):''}</span></div><div class="qbar"><i style="width:${(s.i)/TQ.length*100}%"></i></div>
+     <h3>${esc(tr(q.q))}</h3><div class="opts one">${order.map(oi=>{let c='';if(p!=null){if(oi===0)c='good';else if(oi===p)c='badc'}return `<button class="opt ${c}" data-a="test:pick:${oi}" aria-pressed="${p===oi}" ${p!=null?'aria-disabled="true"':''}>${esc(tr(q.o[oi]))}</button>`}).join('')}</div>
+     ${p!=null?`<div class="fb ${p===0?'ok':'no'}"><b>${p===0?esc(t('correct')):esc(t('wrong'))}</b> ${esc(tr(q.ex))}</div><div class="row"><button class="btn" data-a="test:next">${s.i<TQ.length-1?esc(t('next')):tr(['Vyhodnotiť','Kiértékelés'])}</button></div>`:''}</div>`;
+  }else{const c=TQ.filter((x,i)=>s.ans[i]===0).length;
+    const by={};TQ.forEach((x,i)=>{by[x.tp]=by[x.tp]||[0,0];by[x.tp][1]++;if(s.ans[i]===0)by[x.tp][0]++});
+    inner=`<div class="res"><h3>${tr(['Test: ','Teszt: '])}${c} / ${TQ.length}${s.round>1?' '+tr(['(precvičovanie)','(gyakorlás)']):''}</h3>
+     <p>${tr(['Do známky sa počíta prvý pokus: ','Az érdemjegybe az első próbálkozás számít: '])}<b>${s.first} / ${TQ.length}</b> → ${esc(gradeTxt(Math.round(s.first/TQ.length*100)))}</p>
+     <div class="topics">${Object.keys(by).map(k=>`<div><span>${esc(tr(TOPIC[k]))}</span><b>${by[k][0]} / ${by[k][1]}</b></div>`).join('')}</div>
+     <div class="row"><button class="btn ghost small" data-a="test:again">${tr(['Precvičiť znova','Újra gyakorlom'])}</button></div></div>`;
+  }
+  html+=actBox('test','kindTest',['Záverečný test','Záró teszt'],inner);
+  const r=results();
+  html+=`<div class="act" id="a-result"><div class="ahead"><span class="kind">${tr(['Výsledok','Eredmény'])}</span><h3>${tr(['Meno, výsledok a odovzdanie','Név, eredmény és leadás'])}</h3></div>
+   <div class="cards2"><div class="field"><label for="meName">${tr(['Meno a priezvisko','Név'])}</label><input class="inp" id="meName" data-in="me:name" value="${esc(S.name)}" autocomplete="name"></div>
+   <div class="field"><label for="meCls">${tr(['Trieda','Osztály'])}</label><input class="inp" id="meCls" data-in="me:cls" value="${esc(S.cls)}"></div></div>
+   <div class="resg"><div class="rbox"><b>${r.tasks} %</b><small>${tr(['úlohy (40 %)','feladatok (40 %)'])}</small></div><div class="rbox"><b>${r.testRaw==null?'–':r.test+' %'}</b><small>${tr(['test (40 %)','teszt (40 %)'])}</small></div><div class="rbox"><b>${mmss(S.act.t)}</b><small>${tr(['aktívny čas','aktív idő'])} · ${r.time} % (20 %)</small></div><div class="rbox"><b>${r.total} %</b><small>${tr(['spolu','összesen'])}</small></div></div>
+   <p class="grade">${tr(['Známka zo stránky: ','Érdemjegy az oldal alapján: '])}${esc(gradeTxt(r.total))}</p>
+   <p class="note">${tr(['Aktívny čas sa počíta, len keď je stránka otvorená a pracujete (klikanie, písanie, posúvanie). 18 minút = 100 %.','Az aktív idő csak akkor számít, ha az oldal nyitva van és dolgoztok (kattintás, írás, görgetés). 18 perc = 100 %.'])} ${r.testRaw==null?tr(['Test ešte nie je dokončený.','A teszt még nincs befejezve.']):''}</p>
+   <div class="row"><button class="btn" data-a="test:dl">${ic('download')}${tr(['Stiahnuť výsledok (.json)','Eredmény letöltése (.json)'])}</button></div>
+   <p class="note">${tr(['Súbor odovzdajte podľa pokynov učiteľa (napr. úloha v EduPage). Stránka nič neposiela na internet.','A fájlt a tanár útmutatása szerint adjátok le (pl. EduPage-feladatként). Az oldal semmit nem küld az internetre.'])}${INFRAME?' '+tr(['V tomto náhľade sa sťahovanie nedá – slúži na to žiacky súbor.','Ebben az előnézetben nem lehet letölteni – erre a diákfájl szolgál.']):''}</p>
+   ${certHTML()}
+   <div class="row"><button class="btn ghost" data-a="test:print">${ic('print')}${tr(['Vytlačiť osvedčenie','Oklevél nyomtatása'])}</button>${INFRAME?`<span class="note">${tr(['Tip: osvedčenie si odfoťte.','Tipp: fényképezzétek le az oklevelet.'])}</span>`:''}</div></div>
+   <div class="act"><div class="ahead"><span class="kind">${esc(t('kindHome'))}</span><h3>${tr(['Domáca úloha','Házi feladat'])}</h3></div>
+   <p>${tr(['Na svojom počítači otvorte <span class="path">Nastavenia › Systém › Informácie</span> a zapíšte: procesor, nainštalovanú RAM, typ systému a edíciu a verziu Windows. V <span class="path">Systém › Úložisko</span> zistite, koľko miesta máte voľného. (Kto nemá PC: na telefóne Nastavenia › Informácie o telefóne.)','A saját gépeteken nyissátok meg a <span class="path">Gépház › Rendszer › Névjegy</span> oldalt, és írjátok le: processzor, telepített RAM, rendszertípus, a Windows kiadása és verziója. A <span class="path">Rendszer › Tárhely</span> részben nézzétek meg, mennyi szabad helyetek van. (Akinek nincs gépe: a telefonon Beállítások › A telefonról.)'])}</p></div>`;
+  return html;
+};
+
+/* ================= Bonus 6: mýty ================= */
+const MYTHS=[
+  {id:'b1',tru:1,s:['Reštart počítača vyrieši veľa „záhadných“ problémov.','A gép újraindítása sok „rejtélyes” problémát megold.'],ex:['Pravda. Reštart vyčistí pamäť a ukončí zaseknuté procesy; dokončí aj inštaláciu aktualizácií.','Igaz. Az újraindítás kiüríti a memóriát, leállítja a beragadt folyamatokat, és befejezi a frissítések telepítését is.']},
+  {id:'b2',tru:0,s:['Viac RAM znamená rýchlejšie internetové pripojenie.','Több RAM gyorsabb internetkapcsolatot jelent.'],ex:['Mýtus. RAM pomáha pri viacerých otvorených programoch; rýchlosť pripojenia určuje sieť.','Tévhit. A RAM sok nyitott programnál segít; a kapcsolat sebességét a hálózat határozza meg.']},
+  {id:'b3',tru:0,s:['Vypnutie dlhým podržaním tlačidla je to isté ako Vypnúť v ponuke Štart.','A bekapcsológomb hosszú nyomva tartása ugyanaz, mint a Start menü Leállítás parancsa.'],ex:['Mýtus. Násilné vypnutie neuloží prácu a môže poškodiť otvorené súbory – len v núdzi.','Tévhit. A kényszerített leállítás nem menti a munkát, és megsértheti a nyitott fájlokat – csak vészhelyzetben.']},
+  {id:'b4',tru:1,s:['Nastavenia a Ovládací panel sú dva rôzne nástroje; niektoré staršie voľby sú len v Ovládacom paneli.','A Gépház és a Vezérlőpult két különböző eszköz; néhány régebbi beállítás csak a Vezérlőpultban van.'],ex:['Pravda. Microsoft voľby postupne presúva do Nastavení, no Ovládací panel zatiaľ existuje.','Igaz. A Microsoft fokozatosan a Gépházba költözteti a beállításokat, de a Vezérlőpult még létezik.']},
+  {id:'b5',tru:1,s:['Režim úspory energie môže znížiť výkon, ale predĺži výdrž batérie.','Az energiatakarékos mód csökkentheti a teljesítményt, de meghosszabbítja az akkumulátor üzemidejét.'],ex:['Pravda. Nájdete ho v Nastavenia › Systém › Napájanie a batéria.','Igaz. A Gépház › Rendszer › Energiagazdálkodás és akkumulátor menüben találjátok.']},
+  {id:'b6',tru:0,s:['Čím viac antivírusov naraz, tým lepšia ochrana.','Minél több vírusirtó fut egyszerre, annál jobb a védelem.'],ex:['Mýtus. Viac antivírusov naraz si prekáža a spomaľuje systém. Stačí jeden aktívny.','Tévhit. Több egyszerre futó vírusirtó zavarja egymást, és lassítja a rendszert. Egy aktív elég.']},
+];
+tfAct('myths',MYTHS,6);
+SECR.s6=()=>`<p class="lead">${tr(['Pre rýchlych: overte si, či rozoznáte pravdu od mýtu.','A gyorsaknak: ellenőrizzétek, meg tudjátok-e különböztetni az igazat a tévhittől.'])}</p>${actBox('myths','kindMyth',['Pravda, či mýtus?','Igaz vagy tévhit?'],tfRender('myths',MYTHS))}`;
+
+/* ================= Bonus 7: Informácie o systéme ================= */
+const ABOUTQ=[
+  {id:'ram',ans:v=>Math.abs(pnum(v)-16)<.01,q:['Koľko GB RAM je nainštalovaných?','Hány GB RAM van telepítve?'],sol:'16'},
+  {id:'bit',ans:v=>/64/.test(v),q:['Koľkobitový je operačný systém?','Hány bites az operációs rendszer?'],sol:'64'},
+  {id:'ed',ans:v=>/educ/i.test(v),q:['Aká je edícia Windows? (jedno slovo)','Melyik Windows-kiadás? (egy szó)'],sol:'Education'},
+  {id:'ver',ans:v=>/25\s*h\s*2/i.test(v),q:['Aká je verzia Windows?','Melyik Windows-verzió?'],sol:'25H2'},
+];
+reg('about',{sec:'s7',max:5,on(v,a){const s=st('about');
+  if(v==='check'&&!s.checked){s.checked=1;s.res={};ABOUTQ.forEach(x=>s.res[x.id]=x.ans(s[x.id]||''));}
+  if(v==='upd'&&s.checked&&!s.upd){s.upd=a;award('about',ABOUTQ.filter(x=>s.res[x.id]).length+(a==='yes'?1:0));finish('about')}
+}});
+SECR.s7=()=>{const s=st('about');
+  return `<p class="lead">${tr(['Ešte jeden notebook na stole IT pomoci. Pred opravou vždy zistite, <b>čo je to za počítač</b>. Údaje nájdete v <span class="path">Nastavenia › Systém › Informácie</span> (verziu ukáže aj príkaz <code>winver</code>).','Még egy laptop az IT-ügyelet asztalán. Javítás előtt mindig derítsétek ki, <b>milyen gépről van szó</b>. Az adatokat a <span class="path">Gépház › Rendszer › Névjegy</span> oldalon találjátok (a verziót a <code>winver</code> parancs is megmutatja).'])}</p>
+  ${actBox('about','kindRead',['Prečítajte údaje o zariadení','Olvassátok le az eszköz adatait'],`
+   <div class="win"><div class="wbar">${ic('gear')} ${tr(['Nastavenia','Gépház'])}<span class="dots"><i></i><i></i><i></i></span></div>
+   <div class="setw"><div class="side">${CATS.map(c=>`<span class="${c.id==='sys'?'on':''}">${esc(tr(c.n))}</span>`).join('')}</div>
+   <div><div style="padding:10px 12px 0"><b>${tr(['Systém › Informácie','Rendszer › Névjegy'])}</b></div>
+   <dl class="kv"><dt>${tr(['Názov zariadenia','Eszköz neve'])}</dt><dd>IT-POMOC-07</dd><dt>${tr(['Procesor','Processzor'])}</dt><dd>Intel(R) Core(TM) i5-1235U 1.30 GHz</dd><dt>${tr(['Nainštalovaná pamäť RAM','Telepített RAM'])}</dt><dd>16,0 GB (15,7 GB ${tr(['použiteľné','használható'])})</dd><dt>${tr(['Typ systému','Rendszertípus'])}</dt><dd>${tr(['64-bitový operačný systém, procesor x64','64 bites operációs rendszer, x64-alapú processzor'])}</dd>
+   <dt>${tr(['Edícia','Kiadás'])}</dt><dd>Windows 11 Education</dd><dt>${tr(['Verzia','Verzió'])}</dt><dd>25H2</dd></dl></div></div></div>
+   <p class="note">${tr(['Ilustračná obrazovka – na vašom počítači môžu byť údaje usporiadané trochu inak.','Szemléltető képernyő – a saját gépeteken kissé másképp lehetnek elrendezve az adatok.'])}</p>
+   ${ABOUTQ.map(x=>{const c=s.checked?(s.res[x.id]?'good':'badc'):'';return `<div class="field ${c}"><label for="ab-${x.id}">${esc(tr(x.q))}</label><input class="inp" id="ab-${x.id}" data-in="about:${x.id}" value="${esc(s[x.id]||'')}" ${s.checked?'readonly':''}>${s.checked&&!s.res[x.id]?`<span class="note">${tr(['Správne: ','Helyesen: '])}<b>${x.sol}</b></span>`:''}</div>`}).join('')}
+   ${s.checked?`<p><b>${tr(['Treba tento počítač aktualizovať na novšiu verziu Windows 11?','Frissíteni kell ezt a gépet a Windows 11 újabb verziójára?'])}</b></p>
+    <div class="opts">${[['yes',['Áno – aktuálna je 26H2; aktualizácia je zadarmo cez Windows Update.','Igen – a jelenlegi a 26H2; a frissítés ingyenes a Windows Update-en keresztül.']],['no',['Nie – verzia 25H2 sa už nikdy nemení.','Nem – a 25H2 verzió már soha nem változik.']]].map(o=>{let c='';if(s.upd){if(o[0]==='yes')c='good';else if(s.upd===o[0])c='badc'}return `<button class="opt ${c}" data-a="about:upd:${o[0]}" aria-pressed="${s.upd===o[0]}" ${s.upd?'aria-disabled="true"':''}>${esc(tr(o[1]))}</button>`}).join('')}</div>
+    ${s.upd?`<div class="fb ok">${tr(['Windows 11 26H2 vyšiel 29. 9. 2026 ako malý balík cez Windows Update a predĺži podporu. ','A Windows 11 26H2 2026. 9. 29-én jelent meg kis csomagként a Windows Update-en keresztül, és meghosszabbítja a támogatást. '])}${S.pts.about?`<b>${tr(['Body: ','Pontok: '])}${S.pts.about[0]} / 5</b>`:''}</div>`:''}`
+   :`<div class="row"><button class="btn" data-a="about:check">${esc(t('check'))}</button></div>`}`)}`;
+};
+
+/* ================= Bonus 8: na skutočnom PC ================= */
+const REAL=[
+  {id:'r1',q:['Otvorte Správcu úloh (Ctrl + Shift + Esc) › Výkon › Pamäť. Koľko % pamäte je využitých?','Nyissátok meg a Feladatkezelőt (Ctrl + Shift + Esc) › Teljesítmény › Memória. Hány %-os a memória kihasználtsága?']},
+  {id:'r2',q:['Výkon › CPU: koľko procesov beží? (Porovnajte s tipom z obálky.)','Teljesítmény › CPU: hány folyamat fut? (Hasonlítsátok össze a borítékba zárt tippel.)']},
+  {id:'r3',q:['Nastavenia (Win + I) › Systém › Úložisko: koľko GB je voľných na disku C:?','Gépház (Win + I) › Rendszer › Tárhely: hány GB szabad a C: meghajtón?']},
+  {id:'r4',q:['Win + R, napíšte winver a Enter: aká verzia Windows je na školskom PC?','Win + R, írjátok be: winver, majd Enter: melyik Windows-verzió van az iskolai gépen?']},
+];
+reg('real',{sec:'s8',max:4,on(v){const s=st('real');if(v==='save'&&!s.saved){const n=REAL.filter(x=>(s[x.id]||'').trim()).length;if(n){s.saved=1;award('real',n);finish('real')}else toast(tr(['Vyplňte aspoň jednu hodnotu.','Töltsetek ki legalább egy értéket.']))}}});
+SECR.s8=()=>{const s=st('real');
+  return `<p class="lead">${tr(['Teraz na skutočnom počítači v učebni. Nič nemeňte ani nevypínajte – iba čítajte a zapisujte.','Most a tanterem valódi gépén. Semmit ne módosítsatok és ne kapcsoljatok ki – csak olvassatok és jegyezzetek.'])}</p>
+  ${actBox('real','kindReal',['Štyri čísla zo skutočného PC','Négy szám a valódi gépről'],`
+   ${REAL.map((x,i)=>`<div class="field"><label for="re-${x.id}">${i+1}. ${esc(tr(x.q))}</label><input class="inp" id="re-${x.id}" data-in="real:${x.id}" value="${esc(s[x.id]||'')}" ${s.saved?'readonly':''}></div>`).join('')}
+   <p class="note">${tr(['Na školských počítačoch môžu byť niektoré nastavenia zamknuté správcom – to je v poriadku.','Az iskolai gépeken a rendszergazda egyes beállításokat zárolhatott – ez rendben van.'])}</p>
+   <div class="row">${s.saved?`<div class="fb ok">${tr(['Uložené. ','Mentve. '])}${S.pts.real?`<b>${tr(['Body: ','Pontok: '])}${S.pts.real[0]} / 4</b>`:''}</div>`:`<button class="btn" data-a="real:save">${tr(['Uložiť','Mentés'])}</button>`}</div>`)}`;
+};
+/* ================= Panel Pre učiteľa (po slovensky), výsledky triedy, init ================= */
+let CLASS=[];let resetArm=0;
+const SRC=[
+  ['Microsoft: Systémové konfiguračné nástroje vo Windowse (SK)','https://support.microsoft.com/sk-sk/help/4028437/windows-open-control-panel-in-windows'],
+  ['Microsoft: Rendszerkonfigurációs eszközök a Windowsban (HU)','https://support.microsoft.com/hu-hu/help/4028437/windows-open-control-panel-in-windows'],
+  ['Microsoft: Uvoľnenie miesta pre aktualizácie Windowsu (Senzor úložiska)','https://support.microsoft.com/sk-SK/Windows/Deployment/Updates-Lifecycle/free-up-space-for-windows-updates'],
+  ['Microsoft: Windows-beállítások áttekintése (kategórie Gépház, HU)','https://support.microsoft.com/hu-hu/Accessibility/windows/understand-and-explore-windows-settings'],
+  ['Microsoft: Koniec podpory Windowsu 10 (SK)','https://www.microsoft.com/sk-SK/windows/end-of-support'],
+  ['Windows Experience Blog: How to get the Windows 11 2026 Update (26H2), 29. 9. 2026','https://blogs.windows.com/windowsexperience/?p=180462'],
+  ['ŠPÚ: ŠVP Informatika – gymnázium so 4-ročným programom (2015)','https://www.gymparnr.edu.sk//obsah/predmety/subory/informatika/svp4god2015.pdf'],
+];
+function teacherHTML(){
+  const rows=CLASS.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.cls)}</td><td>${mmss(c.active||0)}</td><td>${(c.secs||[]).length}</td><td>${c.tasks??'–'} %</td><td>${c.test==null?'–':c.test+'/'+(c.testMax||10)}</td><td>${c.time??'–'} %</td><td><b>${c.total??'–'} %</b></td><td>${c.grade??'–'}</td><td class="${c.chk==='OK'?'ok-t':c.chk==='upravený'?'bad-t':'warn-t'}">${esc(c.chk)}</td></tr>`).join('');
+  return `<div class="dh"><h2 id="tdlgT">Pre učiteľa</h2><button class="btn small ghost" data-a="tp:close">Zavrieť</button></div><div class="db">
+  <h3>Ciele hodiny</h3><ul><li>Žiak vysvetlí úlohu OS ako správcu prostriedkov (procesor, pamäť, disk, zariadenia) a pojem systémový nástroj.</li><li>V Správcovi úloh rozlíši program, proces a službu, prečíta CPU a pamäť, rozumne ukončí úlohu a spravuje spúšťacie aplikácie.</li><li>Uvoľní miesto na disku bez straty údajov (Úložisko, Senzor úložiska, odinštalovanie aplikácií), rozlíši HDD a SSD pri optimalizácii.</li><li>Nájde správnu kategóriu v Nastaveniach a posúdi bezpečnosť rozhodnutí (aktualizácie, antivírus, konto správcu, UAC).</li></ul>
+  <h3>Súvis so štandardom (ŠVP gymnázium, 4-ročné štúdium, 2015)</h3>
+  <p><b>Softvér a hardvér – práca v operačnom systéme.</b> Výkonový štandard: spravovať aplikácie (inštalovať, odinštalovať), používať nástroje na prispôsobenie pracovného prostredia, skúmať nové možnosti OS. Obsahový štandard: operačný systém spravuje prostriedky (procesor, pamäť) a poskytuje služby aplikáciám; pojem aplikácia.<br>
+  <b>Softvér a hardvér – práca so súbormi a priečinkami:</b> získavať informácie o súboroch, priečinkoch a pamäťových zariadeniach (šanón 3, bonus 7). <b>Počítač a prídavné zariadenia:</b> kapacita, pamäťové zariadenia (HDD/SSD).<br>
+  <span class="warn-t">Overte</span> zaradenie podľa vášho ŠkVP/TVVP. Nad rámec štandardu (iba ako súvislosti): TRIM pri SSD, konto správcu a UAC, životný cyklus verzií Windows.</p>
+  <h3>Priebeh (30 min)</h3><div class="tblw"><table><tr><th>Čas</th><th>Šanón</th><th>Čo robia žiaci</th></tr>
+   <tr><td>0 – 3</td><td>1 Hlásenia</td><td>úvod (OS = správca prostriedkov), tip do obálky, triedenie 8 hlásení k nástrojom; PL 1</td></tr>
+   <tr><td>3 – 10</td><td>2 Správca úloh</td><td>simulácia: nájsť a ukončiť „žrúta“ CPU, pamäť, rada pre Réku; spúšťacie aplikácie; otvorenie obálky; PL 2</td></tr>
+   <tr><td>10 – 17</td><td>3 Úložisko</td><td>upratovanie disku (cieľ ≥ 20 GB bez straty), pravda/mýtus o diskoch; PL 3</td></tr>
+   <tr><td>17 – 24</td><td>4 Nastavenia</td><td>spájanie úloha → kategória, bezpečnostný semafor; PL 4</td></tr>
+   <tr><td>24 – 29</td><td>5 Test</td><td>10 otázok, meno, stiahnutie výsledku (.json), osvedčenie</td></tr>
+   <tr><td>rýchli</td><td>6 – 8 bonus</td><td>mýty o rýchlom PC, čítanie údajov o systéme, merania na skutočnom PC</td></tr></table></div>
+  <h3>Čo povedať pri výklade</h3><ul>
+   <li><b>Šanón 1:</b> OS je „správca hotela“ – izby (pamäť), personál (procesor), sklad (disk). Aplikácie si o všetko žiadajú OS. Systémové nástroje sú jeho „kontrolná miestnosť“. Ukážte <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd> a <kbd>Win</kbd>+<kbd>I</kbd> na projektore.</li>
+   <li><b>Šanón 2:</b> program = recept, proces = varenie podľa receptu. Ukončiť úlohu = vypnúť sporák uprostred varenia – neuložené sa stratí. Vždy najprv hľadať príčinu (stĺpec CPU, zoradenie). Systémové procesy nechávame tak. Zakázané pri spustení ≠ odinštalované.</li>
+   <li><b>Šanón 3:</b> skôr než mazať, zistiť, čo miesto zaberá. Bezpečné: dočasné súbory, Kôš po kontrole, staré súbory aktualizácií, nepoužívané aplikácie cez Nastavenia. Nebezpečné: Stiahnuté bez kontroly, nezálohované fotky, C:\\Windows. HDD × SSD: defragmentácia vs. TRIM, Windows to robí sám.</li>
+   <li><b>Šanón 4:</b> 11 kategórií Nastavení – stačí vedieť logiku, nie naspamäť. Bezpečnosť: aktualizácie (Win 10 bez bežnej podpory od 14. 10. 2025), antivírus nevypínať, štandardné konto, výzvy UAC čítať. Na školskom PC sú obmedzenia zámerné.</li></ul>
+  <h3>5-minútová rozcvička na začiatok ďalšej hodiny</h3><ol>
+   <li>Ukážte skratku, ktorá otvorí Správcu úloh. (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd>)</li>
+   <li>Program vs. proces jednou vetou. (proces = spustený program v pamäti)</li>
+   <li>Čo sa stane po zakázaní aplikácie pri spustení? (nespustí sa sama, zostane nainštalovaná)</li>
+   <li>Dve veci, ktoré môžem z disku zmazať bez obáv, a jedna, ktorú nikdy. (dočasné súbory, Kôš po kontrole / C:\\Windows)</li>
+   <li>V ktorej kategórii Nastavení pridám maďarskú klávesnicu? (Čas a jazyk / Idő és nyelv)</li></ol>
+   <p class="note">Bonus na 1 min: každý otvorí Správcu úloh › Výkon a nahlas povie využitie pamäte v %.</p>
+  <h3>Hodnotenie a pracovný list</h3>
+  <p><b>Stránka:</b> test 40 % (prvý pokus, 10 otázok) + úlohy povinných šanónov 40 % (body na prvý pokus, spolu 47 b.) + aktívny čas 20 % (18 min = 100 %).<br>
+  <b>Stupnica INF:</b> výborný 100 – 90 %, chválitebný 89 – 75 %, dobrý 74 – 50 %, dostatočný 49 – 25 %, nedostatočný 24 – 0 %.<br>
+  <b>Pracovný list:</b> 25 b. (1: 5 b., 2: 6 b., 3: 6 b., 4: 8 b.), stupnica 25 – 23 / 22 – 19 / 18 – 13 / 12 – 7 / 6 – 0 b. Kľúč je v samostatnom súbore.</p>
+  <h3>Výsledky triedy</h3>
+  <p>Načítajte súbory <code>.json</code>, ktoré žiaci stiahli v šanóne 5 (naraz aj viac).${INFRAME?' <span class="warn-t">V tomto náhľade (artifact) súbory načítate, ale export CSV sa stiahnuť nedá – na export otvorte žiacky súbor s adresou končiacou #ucitel.</span>':''}</p>
+  <div class="row"><input type="file" id="tpFiles" accept=".json,application/json" multiple><button class="btn small" data-a="tp:csv" ${CLASS.length?'':'aria-disabled="true"'}>${ic('download')}Export CSV (Excel)</button><button class="btn small ghost" data-a="tp:clear" ${CLASS.length?'':'aria-disabled="true"'}>Vyprázdniť tabuľku</button></div>
+  ${CLASS.length?`<div class="tblw"><table><tr><th>Meno</th><th>Trieda</th><th>Aktívny čas</th><th>Šanóny</th><th>Úlohy</th><th>Test</th><th>Čas</th><th>Spolu</th><th>Známka</th><th>Kontrola</th></tr>${rows}</table></div>`:'<p class="note">Zatiaľ nič nenačítané.</p>'}
+  <h3>Tipy</h3><ul>
+   <li><b>Žiacky súbor</b> nemá tlačidlo Pre učiteľa. Panel otvoríte <b>piatimi rýchlymi kliknutiami na logo</b> vľavo hore alebo adresou končiacou <code>#ucitel</code>.</li>
+   <li><b>Aktívny čas</b> sa počíta len vtedy, keď je stránka viditeľná, okno má fokus a žiak za poslednú minútu klikol, písal alebo posúval.</li>
+   <li>Postup sa ukladá len v prehliadači. Na spoločných počítačoch ho medzi triedami vymažte (nižšie) alebo nech žiaci pracujú v súkromnom okne.</li>
+   <li><b>Termíny na overenie na školskom PC</b> (Windows sa mení s verziami): SK „Prístupnosť“, „Kontá“, „Aplikácie › Spustenie“, „Vplyv pri spustení“; HU „Akadálymentesség“, „Alkalmazások › Indítás“, „Tisztítási javaslatok“, „Feladat befejezése“, „Windows Biztonság“. Názvy procesov v simulácii sú ilustračné (GameHub, PhotoFix, Tunely, Racing X sú vymyslené).</li>
+   <li>Maďarské názvy známok sú podľa slovenskej stupnice: jeles (1), dicséretes (2), jó (3), elégséges (4), elégtelen (5).</li></ul>
+  <h3>Režim tabule a vymazanie postupu</h3>
+  <div class="row"><button class="btn small ghost" data-a="tp:board">${document.documentElement.classList.contains('board')?'Vypnúť':'Zapnúť'} režim tabule (väčšie písmo)</button>
+   <button class="btn small ${resetArm?'':'ghost'}" data-a="tp:reset">${resetArm?'Naozaj vymazať? Kliknite znova':'Vymazať postup v tomto prehliadači'}</button></div>
+  <h3>Zdroje (overené november 2026)</h3><ul>${SRC.map(s=>`<li><a href="${s[1]}" target="_blank" rel="noopener">${esc(s[0])}</a></li>`).join('')}</ul>
+  <p class="note">${esc(T.author[0])}</p></div>`;
+}
+function openTeacher(){const d=$('#tdlg');d.innerHTML=teacherHTML();if(!d.open){try{d.showModal()}catch(e){d.setAttribute('open','')}}}
+function onTeacher(v){
+  if(v==='close'){$('#tdlg').close();return}
+  if(v==='board'){document.documentElement.classList.toggle('board');openTeacher();requestAnimationFrame(afterRender);return}
+  if(v==='reset'){if(!resetArm){resetArm=1;openTeacher();setTimeout(()=>{if(resetArm){resetArm=0;if($('#tdlg').open)openTeacher()}},5000);return}
+    resetArm=0;store.del(SKEY);S=S0();renderAll();openTeacher();toast('Postup vymazaný.');return}
+  if(v==='clear'){CLASS=[];openTeacher();return}
+  if(v==='csv'){const h=['Meno','Trieda','Dátum','Aktívny čas (min)','Hotové šanóny','Úlohy %','Body úloh','Test (z 10)','Čas %','Spolu %','Známka','Kontrola'];
+    const lines=[h].concat(CLASS.map(c=>[c.name,c.cls,c.date,(c.active/60).toFixed(1).replace('.',','),(c.secs||[]).length,c.tasks,c.tasksPts,c.test??'',c.time,c.total,c.grade,c.chk]))
+      .map(r=>r.map(x=>{x=String(x??'');return /[;"\n]/.test(x)?'"'+x.replace(/"/g,'""')+'"':x}).join(';'));
+    dlFile('vysledky_systemove-nastroje.csv','\uFEFF'+lines.join('\r\n'),'text/csv;charset=utf-8');return}
+}
+document.addEventListener('change',e=>{
+  if(e.target.id!=='tpFiles')return;const fs=[...e.target.files];let left=fs.length;
+  fs.forEach(f=>{const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);let chk='OK';
+      if(o.lesson!==LID)chk='iná hodina';else if(signRes(o)!==o.code)chk='upravený';
+      o.chk=chk;CLASS=CLASS.filter(c=>!(c.name===o.name&&c.cls===o.cls&&c.code===o.code));CLASS.push(o)}catch(err){CLASS.push({name:f.name,cls:'',chk:'chybný súbor'})}
+      if(--left===0){CLASS.sort((a,b)=>String(a.name).localeCompare(String(b.name),'sk'));openTeacher()}};r.readAsText(f)});
+});
+/* Enter/medzerník na prvkoch s data-a, ktoré nie sú tlačidlá */
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('[data-a]:not(button):not(a)')){e.preventDefault();e.target.click()}});
+function checkHash(){if(false){showTeacher=true;renderTop();openTeacher()}}
+window.addEventListener('hashchange',checkHash);
+
+/* ---------- init ---------- */
+(function init(){
+  load();
+  const l=store.get(LKEY);if(l==='0'||l==='1')LI=+l;document.documentElement.lang=LI?'hu':'sk';
+  const th=store.get(THKEY);if(th==='dark'||th==='light')document.documentElement.dataset.theme=th;
+  renderAll();checkHash();
+  window.addEventListener('beforeunload',()=>store.set(SKEY,JSON.stringify(S)));
+})();
+</script>
+</body></html>

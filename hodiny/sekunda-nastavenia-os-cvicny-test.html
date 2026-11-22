@@ -1,0 +1,1766 @@
+<!doctype html>
+<html lang="sk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interaktívna vyučovacia hodina pre Sekundu: dokončenie nastavení Windows a cvičný test z programových manažérov, operačných systémov a nastavení.">
+  <meta name="author" content="Gymnázium – informatika">
+  <meta name="color-scheme" content="light">
+  <title>Nastavenia operačného systému a cvičný test – Sekunda</title>
+  <style>
+    :root {
+      --ink: #17243a;
+      --muted: #5d6b7e;
+      --paper: #f4f7fb;
+      --panel: #ffffff;
+      --line: #d8e0ea;
+      --navy: #173b66;
+      --navy-2: #0e2b4d;
+      --blue: #246fa8;
+      --blue-soft: #eaf4fc;
+      --teal: #0d7b72;
+      --teal-soft: #e7f7f4;
+      --violet: #6d50a4;
+      --violet-soft: #f1ecfa;
+      --coral: #b75543;
+      --coral-soft: #fceeea;
+      --gold: #946b0d;
+      --gold-soft: #fff6d9;
+      --green: #247148;
+      --green-soft: #eaf7ef;
+      --red: #a53838;
+      --red-soft: #fff0ef;
+      --shadow: 0 14px 35px rgba(22, 47, 80, .09);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0, rgba(36, 111, 168, .10), transparent 30rem),
+        radial-gradient(circle at 95% 12%, rgba(109, 80, 164, .08), transparent 26rem),
+        var(--paper);
+      font-family: Inter, Aptos, "Segoe UI", Arial, sans-serif;
+      font-size: 17px;
+      line-height: 1.58;
+    }
+    button, input { font: inherit; }
+    button { touch-action: manipulation; }
+    button:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 4px solid rgba(36, 111, 168, .28);
+      outline-offset: 3px;
+    }
+    .skip-link {
+      position: fixed;
+      left: 12px;
+      top: -80px;
+      z-index: 100;
+      padding: 10px 16px;
+      color: #fff;
+      background: var(--navy-2);
+      border-radius: 0 0 10px 10px;
+    }
+    .skip-link:focus { top: 0; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      color: #fff;
+      background: rgba(14, 43, 77, .97);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, .17);
+      backdrop-filter: blur(10px);
+    }
+    .topbar-inner {
+      max-width: 1180px;
+      min-height: 66px;
+      margin: auto;
+      padding: 9px 22px;
+      display: grid;
+      grid-template-columns: minmax(190px, 1fr) minmax(220px, 1.2fr) auto;
+      gap: 22px;
+      align-items: center;
+    }
+    .brand { font-weight: 850; letter-spacing: .01em; }
+    .brand small { display: block; color: #bfd4e8; font-weight: 600; font-size: .76rem; }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: #d7e6f4;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .progress-track {
+      height: 8px;
+      margin-top: 5px;
+      overflow: hidden;
+      background: rgba(255,255,255,.18);
+      border-radius: 99px;
+    }
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      background: #66d4c9;
+      border-radius: inherit;
+      transition: width .35s ease;
+    }
+    .score-chip {
+      min-width: 150px;
+      padding: 7px 12px;
+      color: var(--navy-2);
+      background: #fff;
+      border-radius: 12px;
+      text-align: center;
+      font-size: .88rem;
+      font-weight: 850;
+    }
+
+    main { max-width: 1120px; margin: 0 auto; padding: 30px 22px 64px; }
+    .hero, .section {
+      margin: 0 0 26px;
+      overflow: hidden;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .hero {
+      position: relative;
+      padding: clamp(28px, 5vw, 58px);
+      color: #fff;
+      background:
+        linear-gradient(125deg, rgba(14, 43, 77, .98), rgba(29, 82, 127, .95)),
+        var(--navy-2);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 330px;
+      height: 330px;
+      right: -125px;
+      top: -150px;
+      border: 48px solid rgba(255,255,255,.07);
+      border-radius: 50%;
+    }
+    .eyebrow, .section-kicker {
+      margin: 0 0 8px;
+      color: #73ded3;
+      font-size: .78rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 860px;
+      margin: 0;
+      font-size: clamp(2.15rem, 5.8vw, 4rem);
+      line-height: 1.04;
+      letter-spacing: -.045em;
+    }
+    .hero h1 span { color: #79ded5; }
+    .lead {
+      position: relative;
+      z-index: 1;
+      max-width: 820px;
+      margin: 18px 0 22px;
+      color: #deebf7;
+      font-size: clamp(1.02rem, 2vw, 1.22rem);
+    }
+    .goal-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 22px 0;
+    }
+    .goal {
+      padding: 14px 16px;
+      background: rgba(255,255,255,.09);
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 14px;
+    }
+    .goal strong { display: block; color: #fff; }
+    .goal span { display: block; margin-top: 3px; color: #d8e7f4; font-size: .88rem; }
+    .timeline {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 20px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .timeline li {
+      padding: 7px 10px;
+      color: #e8f3fc;
+      background: rgba(255,255,255,.09);
+      border-radius: 9px;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .timeline b { color: #75ded4; }
+
+    .section-head {
+      padding: 25px 28px 18px;
+      background: linear-gradient(180deg, #fff, #f9fbfd);
+      border-bottom: 1px solid var(--line);
+    }
+    .section-kicker { color: var(--blue); }
+    .section h2 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3.2vw, 2.25rem);
+      line-height: 1.15;
+      letter-spacing: -.025em;
+    }
+    .section-head p { max-width: 820px; margin: 9px 0 0; color: var(--muted); }
+    .section-body { padding: 26px 28px 30px; }
+    h3 { line-height: 1.25; }
+    .callout {
+      padding: 14px 16px;
+      background: var(--blue-soft);
+      border-left: 5px solid var(--blue);
+      border-radius: 10px;
+    }
+    .callout.warning { background: var(--gold-soft); border-color: #d39b1b; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .btn {
+      min-height: 44px;
+      padding: 9px 15px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #bfcbd9;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(17, 43, 71, .06);
+      cursor: pointer;
+      font-weight: 780;
+    }
+    .btn:hover:not(:disabled) { border-color: var(--blue); transform: translateY(-1px); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-primary { color: #fff; background: var(--blue); border-color: var(--blue); }
+    .btn-teal { color: #fff; background: var(--teal); border-color: var(--teal); }
+    .btn-small { min-height: 38px; padding: 7px 12px; font-size: .88rem; }
+    .feedback {
+      min-height: 1.6em;
+      margin: 12px 0 0;
+      font-weight: 750;
+    }
+    .feedback.ok { color: var(--green); }
+    .feedback.bad { color: var(--red); }
+
+    /* Rýchly štart */
+    .warmup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .warmup-card {
+      padding: 18px;
+      background: #fbfcfe;
+      border: 2px solid var(--line);
+      border-radius: 15px;
+    }
+    .warmup-card.correct { background: var(--green-soft); border-color: #76b58f; }
+    .warmup-card.wrong { background: var(--red-soft); border-color: #da8c88; }
+    .warmup-card h3 { margin: 0 0 8px; font-size: 1.02rem; }
+    .warmup-card p { margin: 0 0 12px; color: var(--muted); }
+    .choice-stack { display: grid; gap: 7px; }
+    .choice-stack button {
+      min-height: 42px;
+      padding: 8px 10px;
+      text-align: left;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #c8d3df;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .choice-stack button:hover:not(:disabled) { border-color: var(--blue); background: var(--blue-soft); }
+    .mini-note { margin: 10px 0 0; font-size: .86rem; font-weight: 720; }
+
+    .agreement {
+      margin-top: 22px;
+      padding: 18px;
+      background: linear-gradient(135deg, var(--violet-soft), #fff);
+      border: 1px solid #d6c9ec;
+      border-radius: 15px;
+    }
+    .agreement h3 { margin: 0 0 7px; }
+    .agreement ul { margin: 8px 0 14px; }
+    .agreement-form {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 10px;
+    }
+    .agreement-form label { display: grid; gap: 4px; color: var(--muted); font-size: .85rem; font-weight: 800; }
+    .agreement-form input {
+      min-height: 44px;
+      min-width: 220px;
+      padding: 8px 11px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #afa1ca;
+      border-radius: 9px;
+    }
+
+    /* Simulátor nastavení */
+    .mission-banner {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 14px;
+      color: #fff;
+      background: linear-gradient(120deg, var(--navy), var(--blue));
+      border-radius: 15px;
+    }
+    .mission-number {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      background: rgba(255,255,255,.16);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 50%;
+      font-size: 1.3rem;
+      font-weight: 900;
+    }
+    .mission-banner h3 { margin: 0; }
+    .mission-banner p { margin: 2px 0 0; color: #deedf8; font-size: .92rem; }
+    .mission-score { white-space: nowrap; color: #fff; font-weight: 850; }
+    .settings-window {
+      overflow: hidden;
+      background: #f3f5f8;
+      border: 1px solid #b9c5d2;
+      border-radius: 15px;
+      box-shadow: 0 12px 30px rgba(17, 43, 71, .13);
+      transition: background .2s, color .2s;
+    }
+    .window-bar {
+      display: flex;
+      justify-content: space-between;
+      padding: 9px 14px;
+      color: #fff;
+      background: var(--navy-2);
+      font-size: .88rem;
+      font-weight: 800;
+    }
+    .settings-shell { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 470px; }
+    .settings-nav {
+      padding: 14px;
+      background: #e9eef4;
+      border-right: 1px solid #c8d2dd;
+    }
+    .settings-user {
+      margin-bottom: 10px;
+      padding: 6px 8px 10px;
+      border-bottom: 1px solid #c7d1dc;
+    }
+    .settings-user small { display: block; color: var(--muted); }
+    .settings-search {
+      width: 100%;
+      min-height: 40px;
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border: 1px solid #aebdcc;
+      border-radius: 8px;
+    }
+    .settings-nav-list { display: grid; gap: 4px; }
+    .settings-nav-btn {
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 8px;
+      align-items: center;
+      width: 100%;
+      min-height: 41px;
+      padding: 6px 8px;
+      color: var(--ink);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      font-size: .83rem;
+      font-weight: 730;
+    }
+    .settings-nav-btn:hover, .settings-nav-btn.active { background: #fff; border-color: #c5d0db; }
+    .settings-nav-btn b {
+      display: grid;
+      width: 28px;
+      height: 28px;
+      place-items: center;
+      color: #fff;
+      background: var(--blue);
+      border-radius: 8px;
+      font-size: .7rem;
+    }
+    .settings-main { padding: 22px; }
+    .settings-title { margin: 0 0 16px; font-size: 1.55rem; }
+    .setting-panel { display: none; }
+    .setting-panel.active { display: grid; gap: 10px; }
+    .setting-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      padding: 14px;
+      background: #fff;
+      border: 1px solid #d0d8e1;
+      border-radius: 11px;
+    }
+    .setting-row small { display: block; margin-top: 2px; color: var(--muted); }
+    .range-wrap { min-width: 180px; text-align: right; }
+    .range-wrap input { width: 100%; accent-color: var(--blue); }
+    .toggle input { position: absolute; opacity: 0; }
+    .toggle span {
+      position: relative;
+      display: block;
+      width: 52px;
+      height: 28px;
+      background: #8794a4;
+      border-radius: 99px;
+      cursor: pointer;
+    }
+    .toggle span::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 5px rgba(0,0,0,.25);
+      transition: transform .2s;
+    }
+    .toggle input:checked + span { background: var(--blue); }
+    .toggle input:checked + span::after { transform: translateX(24px); }
+    .theme-choice { display: flex; gap: 7px; }
+    .theme-swatch {
+      min-height: 40px;
+      padding: 7px 11px;
+      background: #fff;
+      border: 2px solid #bbc7d3;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .theme-swatch.dark { color: #fff; background: #263342; }
+    .theme-swatch.selected { border-color: #2d8fc9; box-shadow: 0 0 0 3px rgba(45,143,201,.18); }
+    .settings-window.sim-dark { background: #17202c; color: #eef4fa; }
+    .settings-window.sim-dark .settings-nav { background: #202c3a; border-color: #425063; }
+    .settings-window.sim-dark .settings-nav-btn { color: #eef4fa; }
+    .settings-window.sim-dark .settings-nav-btn:hover,
+    .settings-window.sim-dark .settings-nav-btn.active { background: #314054; border-color: #55647a; }
+    .settings-window.sim-dark .settings-user small { color: #c1cfdb; }
+    .settings-window.sim-dark .settings-main .setting-row { color: #eef4fa; background: #253244; border-color: #46566c; }
+    .settings-window.sim-dark .setting-row small { color: #c8d4df; }
+    .sim-actions { margin-top: 16px; }
+    .mission-feedback {
+      min-height: 48px;
+      margin: 12px 0 0;
+      padding: 11px 14px;
+      background: #f7f9fc;
+      border: 1px dashed #bdcad8;
+      border-radius: 10px;
+      font-weight: 730;
+    }
+    .mission-feedback.ok { color: var(--green); background: var(--green-soft); border-color: #7fb496; }
+    .mission-feedback.bad { color: var(--red); background: var(--red-soft); border-color: #d68f8a; }
+
+    /* Prepojenie tém */
+    .topic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .topic-card { padding: 18px; border: 2px solid var(--line); border-radius: 15px; }
+    .topic-card.managers { background: var(--coral-soft); border-color: #edc3ba; }
+    .topic-card.os { background: var(--violet-soft); border-color: #d8caee; }
+    .topic-card.settings { background: var(--teal-soft); border-color: #bde5df; }
+    .topic-label {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 7px;
+      font-size: .74rem;
+      font-weight: 900;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .managers .topic-label { color: #873727; background: #fff; }
+    .os .topic-label { color: #50347f; background: #fff; }
+    .settings .topic-label { color: #075f58; background: #fff; }
+    .topic-card h3 { margin: 10px 0 8px; }
+    .topic-card ul { margin: 0; padding-left: 20px; }
+    .bridge-list { display: grid; gap: 10px; margin-top: 18px; }
+    .bridge-item {
+      display: grid;
+      grid-template-columns: minmax(210px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 13px 14px;
+      background: #fbfcfe;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+    }
+    .bridge-item.correct { background: var(--green-soft); border-color: #7bb18f; }
+    .bridge-item.wrong { background: var(--red-soft); border-color: #d3908b; }
+    .bridge-choices { display: flex; flex-wrap: wrap; gap: 6px; }
+    .bridge-choices button {
+      min-height: 38px;
+      padding: 6px 9px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #bdc9d6;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: .82rem;
+      font-weight: 760;
+    }
+    .bridge-why { grid-column: 1 / -1; margin: 0; font-size: .86rem; font-weight: 720; }
+
+    /* Test */
+    .test-toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: center;
+      margin-bottom: 18px;
+      padding: 14px;
+      background: #f7f9fc;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+    }
+    .test-toolbar p { margin: 0; color: var(--muted); font-size: .91rem; }
+    .timer-box { display: flex; gap: 8px; align-items: center; }
+    .timer {
+      min-width: 88px;
+      padding: 7px 10px;
+      color: #fff;
+      background: var(--navy-2);
+      border-radius: 9px;
+      text-align: center;
+      font: 850 1.18rem/1.2 Consolas, "Courier New", monospace;
+    }
+    .timer.urgent { background: var(--red); }
+    .quiz-list { display: grid; gap: 15px; }
+    .quiz-item {
+      min-width: 0;
+      margin: 0;
+      padding: 17px;
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: 14px;
+    }
+    .quiz-item.correct { background: var(--green-soft); border-color: #72af89; }
+    .quiz-item.wrong { background: var(--red-soft); border-color: #d48681; }
+    .quiz-item legend { max-width: 100%; padding: 0 5px; font-weight: 850; }
+    .quiz-tag {
+      display: inline-block;
+      margin-right: 6px;
+      padding: 3px 7px;
+      vertical-align: .08em;
+      border-radius: 6px;
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .quiz-tag.managers { color: #873727; background: var(--coral-soft); }
+    .quiz-tag.os { color: #50347f; background: var(--violet-soft); }
+    .quiz-tag.settings { color: #075f58; background: var(--teal-soft); }
+    .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 11px; }
+    .quiz-option {
+      display: flex;
+      gap: 9px;
+      align-items: flex-start;
+      min-height: 48px;
+      padding: 10px;
+      background: #fbfcfe;
+      border: 1px solid #cbd5df;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+    .quiz-option:hover { background: var(--blue-soft); border-color: #77add3; }
+    .quiz-option input { margin-top: 5px; accent-color: var(--blue); }
+    .quiz-option.selected { background: var(--blue-soft); border-color: #6da7d0; }
+    .quiz-option.reveal-correct { background: #dff3e7; border-color: #4e9d6c; }
+    .quiz-option.reveal-wrong { background: #fbe1df; border-color: #c45d56; }
+    .answer-note { min-height: 1.3em; margin: 9px 0 0; color: var(--muted); font-size: .88rem; font-weight: 700; }
+    .result-panel {
+      margin-top: 18px;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--blue-soft), #fff);
+      border: 2px solid #a7cbe6;
+      border-radius: 16px;
+    }
+    .result-top { display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: center; }
+    .result-score {
+      display: grid;
+      min-width: 120px;
+      min-height: 92px;
+      place-items: center;
+      padding: 12px;
+      color: #fff;
+      background: var(--blue);
+      border-radius: 15px;
+      font-size: 1.65rem;
+      font-weight: 900;
+    }
+    .result-top h3 { margin: 0 0 4px; font-size: 1.35rem; }
+    .result-top p { margin: 0; }
+    .breakdown-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+    .breakdown-card { padding: 12px; background: #fff; border: 1px solid #c7d5e2; border-radius: 11px; }
+    .breakdown-card strong { display: flex; justify-content: space-between; gap: 8px; }
+    .breakdown-bar { height: 8px; margin: 8px 0 5px; overflow: hidden; background: #e6ebf0; border-radius: 99px; }
+    .breakdown-bar span { display: block; height: 100%; border-radius: inherit; }
+    .breakdown-card.managers .breakdown-bar span { background: var(--coral); }
+    .breakdown-card.os .breakdown-bar span { background: var(--violet); }
+    .breakdown-card.settings .breakdown-bar span { background: var(--teal); }
+    .breakdown-card small { color: var(--muted); }
+
+    /* Záver */
+    .homework-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .homework-card { padding: 18px; background: #fbfcfe; border: 1px solid var(--line); border-radius: 13px; }
+    .homework-card h3 { margin: 0 0 8px; }
+    .homework-card p, .homework-card ul { margin-top: 7px; }
+    .teacher-details { margin-top: 22px; }
+    .teacher-details details {
+      background: #f6f1e8;
+      border: 1px solid #ddcfb8;
+      border-radius: 14px;
+    }
+    .teacher-details summary {
+      padding: 15px 17px;
+      cursor: pointer;
+      font-weight: 850;
+    }
+    .teacher-content { padding: 0 18px 18px; }
+    .teacher-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .teacher-box { padding: 14px; background: rgba(255,255,255,.68); border-radius: 10px; }
+    .teacher-box h3 { margin: 0 0 6px; }
+    .teacher-box ul, .teacher-box ol { margin: 6px 0; padding-left: 21px; }
+    footer {
+      max-width: 1120px;
+      margin: -35px auto 30px;
+      padding: 0 22px;
+      color: var(--muted);
+      font-size: .82rem;
+      text-align: center;
+    }
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 80;
+      max-width: min(420px, calc(100vw - 36px));
+      padding: 12px 16px;
+      color: #fff;
+      background: var(--navy-2);
+      border-radius: 11px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.22);
+      opacity: 0;
+      transform: translateY(14px);
+      pointer-events: none;
+      transition: .2s;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      .topbar-inner { grid-template-columns: 1fr auto; }
+      .top-progress { grid-column: 1 / -1; grid-row: 2; }
+      .goal-grid, .topic-grid, .warmup-grid { grid-template-columns: 1fr; }
+      .settings-shell { grid-template-columns: 1fr; }
+      .settings-nav { border-right: 0; border-bottom: 1px solid #c8d2dd; }
+      .settings-nav-list { grid-template-columns: repeat(2, 1fr); }
+      .settings-shell { min-height: 0; }
+    }
+    @media (max-width: 680px) {
+      body { font-size: 16px; }
+      main { padding: 18px 12px 50px; }
+      .topbar-inner { padding: 8px 12px; gap: 8px; }
+      .brand small { display: none; }
+      .score-chip { min-width: 126px; font-size: .76rem; }
+      .hero, .section { border-radius: 15px; }
+      .hero { padding: 28px 20px; }
+      .section-head, .section-body { padding-left: 18px; padding-right: 18px; }
+      .timeline li { width: 100%; }
+      .mission-banner { grid-template-columns: 44px 1fr; }
+      .mission-score { grid-column: 1 / -1; }
+      .settings-nav-list { grid-template-columns: 1fr; }
+      .settings-main { padding: 14px; }
+      .setting-row { align-items: flex-start; flex-direction: column; }
+      .range-wrap { width: 100%; min-width: 0; text-align: left; }
+      .bridge-item { grid-template-columns: 1fr; }
+      .bridge-why { grid-column: auto; }
+      .test-toolbar { align-items: stretch; flex-direction: column; }
+      .timer-box { flex-wrap: wrap; }
+      .quiz-options, .homework-grid, .teacher-grid, .breakdown-grid { grid-template-columns: 1fr; }
+      .result-top { grid-template-columns: 1fr; }
+      .result-score { min-height: 70px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+    @media print {
+      body { background: #fff; font-size: 11pt; }
+      .topbar, .btn, .sim-actions, .timer-box, .toast, .teacher-details, .agreement-form { display: none !important; }
+      main { max-width: none; padding: 0; }
+      .hero, .section { break-inside: avoid; box-shadow: none; }
+      .hero { color: #000; background: #fff; border: 2px solid #555; }
+      .hero h1, .hero .lead, .hero .eyebrow { color: #000; }
+      .goal, .timeline li { color: #000; background: #f1f1f1; border-color: #bbb; }
+      .settings-window { display: none; }
+      .quiz-item { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#obsah">Preskočiť na obsah</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">Informatika · Sekunda<small>Pokračovanie a cvičný test</small></div>
+      <div class="top-progress">
+        <div class="progress-meta"><span>Postup hodinou</span><span id="progressText">0 zo 4 aktivít</span></div>
+        <div class="progress-track" role="progressbar" aria-label="Postup hodinou" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+      <div class="score-chip" id="scoreChip">Cvičný test: — / 15</div>
+    </div>
+  </header>
+
+  <main id="obsah">
+    <section class="hero" aria-labelledby="mainTitle">
+      <p class="eyebrow">45-minútová interaktívna hodina</p>
+      <h1 id="mainTitle">Dokončíme <span>Nastavenia Windows</span> a otestujeme sa nanečisto</h1>
+      <p class="lead">Najprv vyriešime praktické servisné misie. Potom si spojíme tri prebraté učivá a absolvujeme cvičný test bez známky.</p>
+
+      <div class="goal-grid" aria-label="Ciele hodiny">
+        <div class="goal"><strong>Dokončiť nastavenia</strong><span>Vedieť nájsť a bezpečne zmeniť bežné voľby.</span></div>
+        <div class="goal"><strong>Prepojiť tri témy</strong><span>Rozlíšiť OS, programový manažér a Nastavenia.</span></div>
+        <div class="goal"><strong>Zistiť pripravenosť</strong><span>Podľa výsledku vieme, čo ešte treba zopakovať.</span></div>
+      </div>
+
+      <ul class="timeline" aria-label="Časový plán">
+        <li><b>4 min</b> rýchly štart a dohoda</li>
+        <li><b>17 min</b> servisné misie</li>
+        <li><b>5 min</b> prepojenie tém</li>
+        <li><b>15 min</b> cvičný test</li>
+        <li><b>3 min</b> vyhodnotenie</li>
+        <li><b>1 min</b> domáca príprava</li>
+      </ul>
+    </section>
+
+    <section class="section" id="start" aria-labelledby="startTitle">
+      <div class="section-head">
+        <p class="section-kicker">1 · Rýchly štart a dohoda · 4 minúty</p>
+        <h2 id="startTitle">Kto zachráni situáciu?</h2>
+        <p>Pri každej situácii rozhodni, ktorá z troch tém ponúka riešenie. Pracujte rýchlo – trieda môže hlasovať zdvihnutím ruky.</p>
+      </div>
+      <div class="section-body">
+        <div class="warmup-grid" id="warmupGrid"></div>
+        <div class="button-row" style="margin-top:14px">
+          <button class="btn btn-small" type="button" id="resetWarmup">Zopakovať rozcvičku</button>
+          <span class="feedback" id="warmupFeedback" aria-live="polite"></span>
+        </div>
+
+        <div class="agreement">
+          <h3>Návrh dohody o ostrom teste</h3>
+          <ul>
+            <li>test bude z tém <b>Programové manažéry</b>, <b>Operačné systémy</b> a <b>Nastavenia Windows</b>,</li>
+            <li>dnešný test je iba cvičný a jeho výsledok slúži na prípravu,</li>
+            <li>otázky v ostrom teste budú podobného typu, nie však totožné.</li>
+          </ul>
+          <div class="agreement-form">
+            <label for="testDate">Dohodnutý termín ostrého testu
+              <input id="testDate" type="text" maxlength="40" placeholder="napr. budúci pondelok">
+            </label>
+            <button class="btn btn-primary" type="button" id="saveAgreement">Zapísať dohodu</button>
+            <span class="feedback" id="agreementFeedback" aria-live="polite"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="nastavenia" aria-labelledby="settingsTitle">
+      <div class="section-head">
+        <p class="section-kicker">2 · Dokončenie témy · 17 minút · 7 misií</p>
+        <h2 id="settingsTitle">Servisný technik: Nastavenia Windows</h2>
+        <p>Splň sedem praktických misií. Simulátor napodobňuje Windows 11, ale v skutočnom počítači nič nemení.</p>
+      </div>
+      <div class="section-body">
+        <div class="mission-banner">
+          <div class="mission-number" id="missionNumber">1</div>
+          <div>
+            <h3 id="missionTitle">Príliš jasná obrazovka</h3>
+            <p id="missionText">V kategórii Systém nastav jas približne na 60 %.</p>
+          </div>
+          <div class="mission-score" id="missionScore">0 / 7 hotovo</div>
+        </div>
+
+        <div class="settings-window" id="settingsWindow">
+          <div class="window-bar"><span>⚙ Nastavenia</span><span aria-hidden="true">— □ ×</span></div>
+          <div class="settings-shell">
+            <nav class="settings-nav" aria-label="Kategórie Nastavení">
+              <div class="settings-user"><strong>Žiak Sekundy</strong><small>Miestne konto · bežný používateľ</small></div>
+              <input class="settings-search" id="settingsSearch" type="search" placeholder="Hľadať kategóriu" aria-label="Hľadať kategóriu">
+              <div class="settings-nav-list" id="settingsNav"></div>
+            </nav>
+
+            <div class="settings-main">
+              <h3 class="settings-title" id="panelTitle">Systém</h3>
+
+              <div class="setting-panel active" data-panel="system">
+                <div class="setting-row">
+                  <div><strong>Jas</strong><small>Uprav jas vstavaného displeja</small></div>
+                  <div class="range-wrap"><output id="brightnessOut">85 %</output><input id="brightness" type="range" min="0" max="100" value="85" aria-label="Jas displeja"></div>
+                </div>
+                <div class="setting-row">
+                  <div><strong>Nočné osvetlenie</strong><small>Teplejšie farby znižujú množstvo modrého svetla</small></div>
+                  <label class="toggle" aria-label="Nočné osvetlenie"><input id="nightLight" type="checkbox"><span></span></label>
+                </div>
+                <div class="setting-row">
+                  <div><strong>Hlasitosť</strong><small>Výstupný zvuk zariadenia</small></div>
+                  <div class="range-wrap"><output id="volumeOut">70 %</output><input id="volume" type="range" min="0" max="100" value="70" aria-label="Hlasitosť"></div>
+                </div>
+              </div>
+
+              <div class="setting-panel" data-panel="devices">
+                <div class="setting-row"><div><strong>Bluetooth</strong><small>Slúchadlá, myš a ďalšie zariadenia</small></div><label class="toggle" aria-label="Bluetooth"><input type="checkbox" checked><span></span></label></div>
+                <div class="setting-row"><div><strong>Tlačiarne a skenery</strong><small>Pridanie a správa tlačiarní</small></div><button class="btn btn-small" type="button">Otvoriť</button></div>
+              </div>
+
+              <div class="setting-panel" data-panel="network">
+                <div class="setting-row"><div><strong>Wi-Fi</strong><small>Bezdrôtové pripojenie k internetu</small></div><label class="toggle" aria-label="Wi-Fi"><input id="wifi" type="checkbox"><span></span></label></div>
+                <div class="setting-row"><div><strong>Mobilný hotspot</strong><small>Zdieľanie internetového pripojenia</small></div><label class="toggle" aria-label="Mobilný hotspot"><input type="checkbox"><span></span></label></div>
+              </div>
+
+              <div class="setting-panel" data-panel="personalization">
+                <div class="setting-row"><div><strong>Režim</strong><small>Vyber svetlý alebo tmavý vzhľad</small></div><div class="theme-choice"><button class="theme-swatch light selected" type="button" data-theme-choice="light">Svetlý</button><button class="theme-swatch dark" type="button" data-theme-choice="dark">Tmavý</button></div></div>
+                <div class="setting-row"><div><strong>Pozadie</strong><small>Obrázok, farba alebo prezentácia</small></div><button class="btn btn-small" type="button">Vybrať</button></div>
+              </div>
+
+              <div class="setting-panel" data-panel="apps">
+                <div class="setting-row"><div><strong>Nainštalované aplikácie</strong><small>Oprava a odinštalovanie aplikácií</small></div><button class="btn btn-small" type="button">Otvoriť</button></div>
+                <div class="setting-row"><div><strong>Predvolené aplikácie</strong><small>Ktorý program otvára súbory a odkazy</small></div><button class="btn btn-small" type="button">Otvoriť</button></div>
+              </div>
+
+              <div class="setting-panel" data-panel="accounts">
+                <div class="setting-row"><div><strong>Možnosti prihlásenia</strong><small>Heslo, PIN a Windows Hello</small></div><button class="btn btn-small" type="button">Otvoriť</button></div>
+                <div class="setting-row"><div><strong>Pracovné alebo školské konto</strong><small>Kontá pripojené k organizácii</small></div><button class="btn btn-small" type="button">Zobraziť</button></div>
+              </div>
+
+              <div class="setting-panel" data-panel="time">
+                <div class="setting-row"><div><strong>Dátum a čas</strong><small>Časové pásmo a automatické nastavenie času</small></div><button class="btn btn-small" type="button">Otvoriť</button></div>
+                <div class="setting-row"><div><strong>Jazyk a oblasť</strong><small>Jazyk systému, región a formáty</small></div><button class="btn btn-small" type="button">Otvoriť</button></div>
+              </div>
+
+              <div class="setting-panel" data-panel="accessibility">
+                <div class="setting-row">
+                  <div><strong>Veľkosť textu</strong><small>Zväčší text v ponukách, titulkoch a ikonách</small></div>
+                  <div class="range-wrap"><output id="textSizeOut">100 %</output><input id="textSize" type="range" min="100" max="150" step="5" value="100" aria-label="Veľkosť textu"></div>
+                </div>
+                <div class="setting-row"><div><strong>Moderátor</strong><small>Číta prvky zobrazené na obrazovke</small></div><label class="toggle" aria-label="Moderátor"><input type="checkbox"><span></span></label></div>
+              </div>
+
+              <div class="setting-panel" data-panel="privacy">
+                <div class="setting-row"><div><strong>Prístup k mikrofónu</strong><small>Povoľ aplikáciám používať mikrofón</small></div><label class="toggle" aria-label="Prístup k mikrofónu"><input id="microphone" type="checkbox" checked><span></span></label></div>
+                <div class="setting-row"><div><strong>Prístup ku kamere</strong><small>Povoľ aplikáciám používať kameru</small></div><label class="toggle" aria-label="Prístup ku kamere"><input type="checkbox" checked><span></span></label></div>
+              </div>
+
+              <div class="setting-panel" data-panel="update">
+                <div class="setting-row"><div><strong>Windows Update</strong><small id="updateText">Posledná kontrola: pred 7 dňami</small></div><button class="btn btn-primary btn-small" type="button" id="updateBtn">Vyhľadať aktualizácie</button></div>
+                <p id="updateStatus" aria-live="polite"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-row sim-actions">
+          <button class="btn btn-primary" type="button" id="checkMission">Skontrolovať misiu</button>
+          <button class="btn" type="button" id="hintMission">Nápoveda</button>
+          <button class="btn" type="button" id="resetSimulator">Začať misie odznova</button>
+        </div>
+        <p class="mission-feedback" id="missionFeedback" aria-live="polite">Otvor správnu kategóriu, vykonaj zmenu a klikni na „Skontrolovať misiu“.</p>
+      </div>
+    </section>
+
+    <section class="section" id="prepojenie" aria-labelledby="bridgeTitle">
+      <div class="section-head">
+        <p class="section-kicker">3 · Tri učivá v jednej mape · 5 minút</p>
+        <h2 id="bridgeTitle">Čo riadi čo?</h2>
+        <p>Tri témy spolu súvisia, ale nie sú totožné. Najprv si pozri mapu, potom priraď šesť situácií.</p>
+      </div>
+      <div class="section-body">
+        <div class="topic-grid">
+          <article class="topic-card managers">
+            <span class="topic-label">Téma 1</span>
+            <h3>Programové manažéry</h3>
+            <ul>
+              <li><b>program</b> je uložený, <b>proces</b> práve beží,</li>
+              <li>Správca úloh ukáže a ukončí proces,</li>
+              <li>aplikáciu odinštalujeme v Nastaveniach,</li>
+              <li>bezpečný zdroj, aktualizácie a <code>winget</code>.</li>
+            </ul>
+          </article>
+          <article class="topic-card os">
+            <span class="topic-label">Téma 2</span>
+            <h3>Operačné systémy</h3>
+            <ul>
+              <li>OS je základný program riadiaci počítač,</li>
+              <li>spravuje procesy, pamäť, súbory a zariadenia,</li>
+              <li>komunikuje s používateľom,</li>
+              <li>Windows, macOS, Linux, Android a iOS.</li>
+            </ul>
+          </article>
+          <article class="topic-card settings">
+            <span class="topic-label">Téma 3</span>
+            <h3>Nastavenia Windows</h3>
+            <ul>
+              <li>otvoríme ich skratkou <b>Win + I</b>,</li>
+              <li>voľby sú usporiadané do kategórií,</li>
+              <li>meníme vzhľad, zariadenia a oprávnenia,</li>
+              <li>dôležité zásahy rieši správca.</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="bridge-list" id="bridgeList"></div>
+        <div class="button-row" style="margin-top:14px">
+          <button class="btn btn-small" type="button" id="resetBridge">Zopakovať priraďovanie</button>
+          <span class="feedback" id="bridgeFeedback" aria-live="polite"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cvicnyTest" aria-labelledby="testTitle">
+      <div class="section-head">
+        <p class="section-kicker">4 · Cvičný test · 15 minút · 15 bodov</p>
+        <h2 id="testTitle">Test nanečisto</h2>
+        <p>V každej otázke je jedna správna odpoveď. Test obsahuje päť otázok z každej témy a pri novom variante sa otázky zmenia.</p>
+      </div>
+      <div class="section-body">
+        <div class="test-toolbar">
+          <p><b>Pravidlá:</b> pracuj samostatne, odpovedz na všetko a až potom test vyhodnoť. Dnešný výsledok nie je známka.</p>
+          <div class="timer-box">
+            <span class="timer" id="timer" role="timer" aria-live="polite">15:00</span>
+            <button class="btn btn-small" type="button" id="timerToggle">Spustiť čas</button>
+            <button class="btn btn-small" type="button" id="timerReset">Vynulovať čas</button>
+          </div>
+        </div>
+
+        <form id="practiceForm">
+          <div class="quiz-list" id="quizList"></div>
+          <div class="button-row" style="margin-top:17px">
+            <button class="btn btn-primary" type="submit">Vyhodnotiť test</button>
+            <button class="btn" type="button" id="retryVariant">Zopakovať rovnaký variant</button>
+            <button class="btn btn-teal" type="button" id="newVariant">Vytvoriť nový variant</button>
+          </div>
+        </form>
+
+        <div class="result-panel" id="resultPanel" hidden aria-live="polite">
+          <div class="result-top">
+            <div class="result-score" id="resultScore">0 / 15</div>
+            <div>
+              <h3 id="resultTitle">Výsledok</h3>
+              <p id="resultText"></p>
+            </div>
+          </div>
+          <div class="breakdown-grid" id="breakdownGrid"></div>
+          <p id="resultAdvice" style="margin-bottom:0"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="zaver" aria-labelledby="endTitle">
+      <div class="section-head">
+        <p class="section-kicker">5 · Vyhodnotenie a domáca príprava · 4 minúty</p>
+        <h2 id="endTitle">Teraz vieme, čo ešte potrénovať</h2>
+        <p>Najdôležitejší nie je iba celkový počet bodov. Pozri sa najmä na výsledok pri každej z troch tém.</p>
+      </div>
+      <div class="section-body">
+        <div class="homework-grid">
+          <article class="homework-card">
+            <h3>Domáca príprava</h3>
+            <ol>
+              <li>Otvor výsledok dnešného testu a nájdi svoju najslabšiu tému.</li>
+              <li>Z príslušnej hodiny si zopakuj pojmy a vysvetlenia.</li>
+              <li>Vyber dve chybné odpovede a vlastnými slovami napíš, prečo je správna odpoveď správna.</li>
+            </ol>
+          </article>
+          <article class="homework-card">
+            <h3>Pre záujemcov</h3>
+            <p>Vytvor tri vlastné testové otázky – jednu z každej témy. Pri každej priprav jednu správnu a tri vierohodné nesprávne odpovede.</p>
+            <p class="callout"><b>Tip:</b> Dobrá nesprávna odpoveď nevyzerá smiešne; preverí, či spolužiak pojmu naozaj rozumie.</p>
+          </article>
+        </div>
+
+        <p class="callout warning" style="margin-top:16px"><b>Pred ostrým testom treba vedieť:</b> vysvetliť rozdiel program – proces; pomenovať hlavné úlohy OS; priradiť bežnú činnosť ku kategórii Nastavení; bezpečne reagovať pri zamrznutom programe, inštalácii a systémovej zmene.</p>
+
+        
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Stránka funguje bez internetu. Simulátor nič nemení v skutočnom systéme; názvy kategórií vychádzajú z Windows 11 a na spravovaných školských zariadeniach sa môžu mierne líšiť.
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    "use strict";
+
+    var topics = {
+      managers: { label: "Programové manažéry", short: "Manažéry" },
+      os: { label: "Operačné systémy", short: "OS" },
+      settings: { label: "Nastavenia Windows", short: "Nastavenia" }
+    };
+
+    var state = {
+      warmupDone: false,
+      settingsDone: false,
+      bridgeDone: false,
+      testDone: false,
+      missionIndex: 0,
+      missionScore: 0,
+      updateChecked: false,
+      currentTest: [],
+      testScore: null,
+      timerSeconds: 900,
+      timerRunning: false,
+      timerId: null
+    };
+
+    function byId(id) { return document.getElementById(id); }
+    function value(id) { return Number(byId(id).value); }
+    function checked(id) { return byId(id).checked; }
+    function inRange(number, minimum, maximum) { return number >= minimum && number <= maximum; }
+
+    var toastTimer;
+    function toast(message) {
+      var element = byId("toast");
+      element.textContent = message;
+      element.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function () { element.classList.remove("show"); }, 2600);
+    }
+
+    function shuffle(items) {
+      var copy = items.slice();
+      for (var i = copy.length - 1; i > 0; i -= 1) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temporary = copy[i];
+        copy[i] = copy[j];
+        copy[j] = temporary;
+      }
+      return copy;
+    }
+
+    function updateProgress() {
+      var completed = [state.warmupDone, state.settingsDone, state.bridgeDone, state.testDone].filter(Boolean).length;
+      byId("progressText").textContent = completed + " zo 4 aktivít";
+      byId("progressFill").style.width = (completed / 4 * 100) + "%";
+      var track = document.querySelector(".progress-track");
+      track.setAttribute("aria-valuenow", String(completed));
+      byId("scoreChip").textContent = state.testScore === null ? "Cvičný test: — / 15" : "Cvičný test: " + state.testScore + " / 15";
+    }
+
+    /* Rýchly štart */
+    var warmups = [
+      {
+        title: "Hra zamrzla",
+        text: "Proces hry neodpovedá a veľmi zaťažuje procesor.",
+        answer: "managers",
+        why: "Správca úloh je programový manažér. Ukáže proces a umožní ho ukončiť."
+      },
+      {
+        title: "Program potrebuje RAM",
+        text: "Niekto musí prideliť programu miesto v operačnej pamäti.",
+        answer: "os",
+        why: "Prideľovanie a ochrana pamäte je úloha operačného systému."
+      },
+      {
+        title: "Písmená sú primalé",
+        text: "Používateľ potrebuje zväčšiť text na obrazovke.",
+        answer: "settings",
+        why: "Veľkosť textu nájdeme v Nastaveniach, v kategórii Zjednodušenie ovládania."
+      }
+    ];
+
+    function buildWarmup() {
+      var grid = byId("warmupGrid");
+      grid.innerHTML = "";
+      warmups.forEach(function (item, index) {
+        var card = document.createElement("article");
+        card.className = "warmup-card";
+        card.setAttribute("data-warmup-index", String(index));
+        var buttons = Object.keys(topics).map(function (key) {
+          return '<button type="button" data-warmup-choice="' + key + '">' + topics[key].short + '</button>';
+        }).join("");
+        card.innerHTML = '<h3>' + (index + 1) + '. ' + item.title + '</h3><p>' + item.text + '</p><div class="choice-stack">' + buttons + '</div><div class="mini-note" aria-live="polite"></div>';
+        grid.appendChild(card);
+      });
+      byId("warmupFeedback").textContent = "";
+      state.warmupDone = false;
+      updateProgress();
+    }
+
+    byId("warmupGrid").addEventListener("click", function (event) {
+      var button = event.target.closest("button[data-warmup-choice]");
+      if (!button) return;
+      var card = button.closest(".warmup-card");
+      if (card.getAttribute("data-answered") === "true") return;
+      var index = Number(card.getAttribute("data-warmup-index"));
+      var item = warmups[index];
+      var correct = button.getAttribute("data-warmup-choice") === item.answer;
+      card.setAttribute("data-answered", "true");
+      card.classList.add(correct ? "correct" : "wrong");
+      card.querySelectorAll("button").forEach(function (one) { one.disabled = true; });
+      card.querySelector(".mini-note").textContent = (correct ? "Správne. " : "Nie. ") + item.why;
+      var answered = document.querySelectorAll(".warmup-card[data-answered='true']").length;
+      if (answered === warmups.length) {
+        var correctCount = document.querySelectorAll(".warmup-card.correct").length;
+        state.warmupDone = true;
+        byId("warmupFeedback").className = "feedback " + (correctCount === warmups.length ? "ok" : "");
+        byId("warmupFeedback").textContent = "Rozcvička: " + correctCount + " / " + warmups.length + ".";
+        updateProgress();
+      }
+    });
+
+    byId("resetWarmup").addEventListener("click", buildWarmup);
+
+    byId("saveAgreement").addEventListener("click", function () {
+      var date = byId("testDate").value.trim();
+      var feedback = byId("agreementFeedback");
+      if (!date) {
+        feedback.className = "feedback bad";
+        feedback.textContent = "Najprv doplňte dohodnutý termín.";
+        return;
+      }
+      feedback.className = "feedback ok";
+      feedback.textContent = "Dohodnuté: ostrý test bude " + date + ".";
+      try { localStorage.setItem("sekundaTestDate", date); } catch (error) { /* Uloženie nie je nevyhnutné. */ }
+    });
+
+    /* Nastavenia */
+    var categories = [
+      { id: "system", short: "SY", name: "Systém" },
+      { id: "devices", short: "BT", name: "Bluetooth a zariadenia" },
+      { id: "network", short: "SI", name: "Sieť a internet" },
+      { id: "personalization", short: "PR", name: "Prispôsobenie" },
+      { id: "apps", short: "AP", name: "Aplikácie" },
+      { id: "accounts", short: "KO", name: "Kontá" },
+      { id: "time", short: "ČJ", name: "Čas a jazyk" },
+      { id: "accessibility", short: "ZO", name: "Zjednodušenie ovládania" },
+      { id: "privacy", short: "OZ", name: "Ochrana osobných údajov" },
+      { id: "update", short: "WU", name: "Windows Update" }
+    ];
+
+    var missions = [
+      {
+        title: "Príliš jasná obrazovka",
+        text: "V kategórii Systém nastav jas približne na 60 %.",
+        hint: "Systém → Jas. Prijateľná je hodnota od 55 do 65 %.",
+        panel: "system",
+        check: function () { return inRange(value("brightness"), 55, 65); }
+      },
+      {
+        title: "Menej modrého svetla",
+        text: "V kategórii Systém zapni Nočné osvetlenie.",
+        hint: "Hľadaj prepínač pod nastavením jasu.",
+        panel: "system",
+        check: function () { return checked("nightLight"); }
+      },
+      {
+        title: "Návrat na internet",
+        text: "V kategórii Sieť a internet zapni Wi-Fi.",
+        hint: "Sieť a internet → Wi-Fi → zapnúť.",
+        panel: "network",
+        check: function () { return checked("wifi"); }
+      },
+      {
+        title: "Tmavý vzhľad",
+        text: "V kategórii Prispôsobenie vyber tmavý režim.",
+        hint: "Prispôsobenie → Režim → Tmavý.",
+        panel: "personalization",
+        check: function () { return document.querySelector("[data-theme-choice='dark']").classList.contains("selected"); }
+      },
+      {
+        title: "Text je príliš malý",
+        text: "V Zjednodušení ovládania nastav veľkosť textu na 125 %.",
+        hint: "Zjednodušenie ovládania → Veľkosť textu → 125 %.",
+        panel: "accessibility",
+        check: function () { return value("textSize") === 125; }
+      },
+      {
+        title: "Mikrofón pod kontrolou",
+        text: "V Ochrane osobných údajov vypni prístup k mikrofónu.",
+        hint: "Ochrana osobných údajov → Prístup k mikrofónu → vypnúť.",
+        panel: "privacy",
+        check: function () { return !checked("microphone"); }
+      },
+      {
+        title: "Je systém aktuálny?",
+        text: "Otvor Windows Update a spusti kontrolu aktualizácií.",
+        hint: "Windows Update je samostatná kategória naspodku.",
+        panel: "update",
+        check: function () { return state.updateChecked; }
+      }
+    ];
+
+    function buildSettingsNav() {
+      var nav = byId("settingsNav");
+      nav.innerHTML = categories.map(function (category, index) {
+        return '<button class="settings-nav-btn' + (index === 0 ? " active" : "") + '" type="button" data-panel-target="' + category.id + '"><b>' + category.short + '</b><span>' + category.name + '</span></button>';
+      }).join("");
+    }
+
+    function openPanel(id) {
+      document.querySelectorAll(".settings-nav-btn").forEach(function (button) {
+        button.classList.toggle("active", button.getAttribute("data-panel-target") === id);
+      });
+      document.querySelectorAll(".setting-panel").forEach(function (panel) {
+        panel.classList.toggle("active", panel.getAttribute("data-panel") === id);
+      });
+      var category = categories.find(function (one) { return one.id === id; });
+      byId("panelTitle").textContent = category ? category.name : "Nastavenia";
+    }
+
+    byId("settingsNav").addEventListener("click", function (event) {
+      var button = event.target.closest("[data-panel-target]");
+      if (button) openPanel(button.getAttribute("data-panel-target"));
+    });
+
+    byId("settingsWindow").addEventListener("click", function (event) {
+      var button = event.target.closest("button");
+      if (!button || button.id === "updateBtn" || button.hasAttribute("data-theme-choice") || button.hasAttribute("data-panel-target")) return;
+      toast("Ukážková položka je otvorená. V tejto misii ju netreba meniť.");
+    });
+
+    byId("settingsSearch").addEventListener("input", function (event) {
+      var query = event.target.value.trim().toLowerCase();
+      document.querySelectorAll(".settings-nav-btn").forEach(function (button) {
+        button.hidden = query && !button.textContent.toLowerCase().includes(query);
+      });
+    });
+
+    ["brightness", "volume", "textSize"].forEach(function (id) {
+      byId(id).addEventListener("input", function () { byId(id + "Out").textContent = byId(id).value + " %"; });
+    });
+
+    document.querySelectorAll("[data-theme-choice]").forEach(function (button) {
+      button.addEventListener("click", function () {
+        document.querySelectorAll("[data-theme-choice]").forEach(function (one) { one.classList.toggle("selected", one === button); });
+        byId("settingsWindow").classList.toggle("sim-dark", button.getAttribute("data-theme-choice") === "dark");
+      });
+    });
+
+    byId("updateBtn").addEventListener("click", function () {
+      state.updateChecked = true;
+      byId("updateText").textContent = "Posledná kontrola: práve teraz";
+      byId("updateStatus").textContent = "✓ Systém je aktuálny. Na školskom PC by prípadnú inštaláciu a reštart schválil učiteľ alebo správca.";
+      byId("updateStatus").style.color = "var(--green)";
+    });
+
+    function showMission() {
+      if (state.missionIndex >= missions.length) {
+        byId("missionNumber").textContent = "✓";
+        byId("missionTitle").textContent = "Všetky misie sú splnené";
+        byId("missionText").textContent = "Vieš sa zorientovať v základných Nastaveniach Windows.";
+        byId("missionScore").textContent = "7 / 7 hotovo";
+        byId("checkMission").disabled = true;
+        byId("hintMission").disabled = true;
+        state.settingsDone = true;
+        updateProgress();
+        return;
+      }
+      var mission = missions[state.missionIndex];
+      byId("missionNumber").textContent = String(state.missionIndex + 1);
+      byId("missionTitle").textContent = mission.title;
+      byId("missionText").textContent = mission.text;
+      byId("missionScore").textContent = state.missionScore + " / 7 hotovo";
+      byId("checkMission").disabled = false;
+      byId("hintMission").disabled = false;
+      openPanel(mission.panel);
+    }
+
+    byId("checkMission").addEventListener("click", function () {
+      var feedback = byId("missionFeedback");
+      var mission = missions[state.missionIndex];
+      if (!mission) return;
+      if (!mission.check()) {
+        feedback.className = "mission-feedback bad";
+        feedback.textContent = "Ešte nie. Skontroluj zadanie, otvor správnu kategóriu a uprav požadovanú voľbu.";
+        return;
+      }
+      state.missionScore += 1;
+      state.missionIndex += 1;
+      feedback.className = "mission-feedback ok";
+      feedback.textContent = state.missionIndex === missions.length ? "Výborne! Splnil si všetkých sedem servisných misií." : "Správne! Pokračuj ďalšou misiou.";
+      showMission();
+    });
+
+    byId("hintMission").addEventListener("click", function () {
+      var mission = missions[state.missionIndex];
+      if (!mission) return;
+      var feedback = byId("missionFeedback");
+      feedback.className = "mission-feedback";
+      feedback.textContent = "Nápoveda: " + mission.hint;
+      openPanel(mission.panel);
+    });
+
+    function resetSimulator() {
+      state.missionIndex = 0;
+      state.missionScore = 0;
+      state.updateChecked = false;
+      state.settingsDone = false;
+      byId("brightness").value = "85";
+      byId("brightnessOut").textContent = "85 %";
+      byId("volume").value = "70";
+      byId("volumeOut").textContent = "70 %";
+      byId("textSize").value = "100";
+      byId("textSizeOut").textContent = "100 %";
+      document.querySelectorAll(".setting-panel input[type='checkbox']").forEach(function (input) {
+        input.checked = input.defaultChecked;
+      });
+      byId("updateText").textContent = "Posledná kontrola: pred 7 dňami";
+      byId("updateStatus").textContent = "";
+      byId("settingsSearch").value = "";
+      document.querySelectorAll(".settings-nav-btn").forEach(function (button) { button.hidden = false; });
+      document.querySelectorAll("[data-theme-choice]").forEach(function (button) {
+        button.classList.toggle("selected", button.getAttribute("data-theme-choice") === "light");
+      });
+      byId("settingsWindow").classList.remove("sim-dark");
+      byId("missionFeedback").className = "mission-feedback";
+      byId("missionFeedback").textContent = "Otvor správnu kategóriu, vykonaj zmenu a klikni na „Skontrolovať misiu“.";
+      showMission();
+      updateProgress();
+    }
+
+    byId("resetSimulator").addEventListener("click", resetSimulator);
+
+    /* Prepojenie tém */
+    var bridgeTasks = [
+      { text: "Ukončí zamrznutý proces hry.", answer: "managers", why: "Procesy vidíme a ukončujeme v Správcovi úloh." },
+      { text: "Cez ovládač zabezpečí komunikáciu s tlačiarňou.", answer: "os", why: "Správa zariadení je jednou z hlavných úloh OS." },
+      { text: "Zmení pozadie pracovnej plochy.", answer: "settings", why: "Pozadie patrí do kategórie Prispôsobenie." },
+      { text: "Príkazom winget nainštaluje program.", answer: "managers", why: "winget je správca balíkov – druh programového manažéra." },
+      { text: "Uloží dokument do priečinka na disku.", answer: "os", why: "Ukladanie a organizovanie súborov zabezpečuje správa súborov OS." },
+      { text: "Určí, či aplikácia smie používať mikrofón.", answer: "settings", why: "Povolenia mikrofónu nastavujeme v Ochrane osobných údajov." }
+    ];
+
+    function buildBridge() {
+      var list = byId("bridgeList");
+      list.innerHTML = "";
+      bridgeTasks.forEach(function (item, index) {
+        var row = document.createElement("div");
+        row.className = "bridge-item";
+        row.setAttribute("data-bridge-index", String(index));
+        row.innerHTML = '<strong>' + (index + 1) + '. ' + item.text + '</strong><div class="bridge-choices">' +
+          Object.keys(topics).map(function (key) { return '<button type="button" data-bridge-choice="' + key + '">' + topics[key].short + '</button>'; }).join("") +
+          '</div><p class="bridge-why" aria-live="polite"></p>';
+        list.appendChild(row);
+      });
+      byId("bridgeFeedback").textContent = "";
+      state.bridgeDone = false;
+      updateProgress();
+    }
+
+    byId("bridgeList").addEventListener("click", function (event) {
+      var button = event.target.closest("button[data-bridge-choice]");
+      if (!button) return;
+      var row = button.closest(".bridge-item");
+      if (row.getAttribute("data-answered") === "true") return;
+      var item = bridgeTasks[Number(row.getAttribute("data-bridge-index"))];
+      var correct = button.getAttribute("data-bridge-choice") === item.answer;
+      row.setAttribute("data-answered", "true");
+      row.classList.add(correct ? "correct" : "wrong");
+      row.querySelectorAll("button").forEach(function (one) { one.disabled = true; });
+      row.querySelector(".bridge-why").textContent = (correct ? "Správne. " : "Nie. ") + item.why;
+      var answered = document.querySelectorAll(".bridge-item[data-answered='true']").length;
+      if (answered === bridgeTasks.length) {
+        var count = document.querySelectorAll(".bridge-item.correct").length;
+        state.bridgeDone = true;
+        byId("bridgeFeedback").className = "feedback " + (count === bridgeTasks.length ? "ok" : "");
+        byId("bridgeFeedback").textContent = "Priradenie: " + count + " / " + bridgeTasks.length + ".";
+        updateProgress();
+      }
+    });
+    byId("resetBridge").addEventListener("click", buildBridge);
+
+    /* Databáza cvičného testu – 8 otázok z každej témy, variant vyberie 5. */
+    var questionBank = {
+      managers: [
+        {
+          q: "Ktorá veta správne vysvetľuje rozdiel medzi programom a procesom?",
+          options: ["Program je uložený na disku, proces je spustený program.", "Proces je uložený súbor, program je iba ikona.", "Program je hardvér a proces je softvér.", "Nie je medzi nimi žiadny rozdiel."],
+          answer: 0,
+          note: "Program môže byť uložený a nečinný. Po spustení z neho vznikne jeden alebo viac procesov."
+        },
+        {
+          q: "Hra zamrzla a hlási „Neodpovedá“. Aký je najvhodnejší prvý krok?",
+          options: ["Otvoriť Správcu úloh a ukončiť proces hry.", "Vytiahnuť počítač zo zásuvky.", "Vymazať ikonu hry z plochy.", "Vypnúť antivírus."],
+          answer: 0,
+          note: "Správca úloh ukončí problémový proces bez násilného vypnutia celého počítača."
+        },
+        {
+          q: "Ktorá skratka otvorí Správcu úloh priamo?",
+          options: ["Ctrl + Shift + Esc", "Win + I", "Ctrl + P", "Alt + Tab"],
+          answer: 0,
+          note: "Ctrl + Shift + Esc otvorí Správcu úloh."
+        },
+        {
+          q: "Čo sa stane, keď ukončíš proces programu v Správcovi úloh?",
+          options: ["Program prestane bežať, ale ostane nainštalovaný.", "Program sa natrvalo vymaže z disku.", "Program sa automaticky aktualizuje.", "Vymaže sa používateľské konto."],
+          answer: 0,
+          note: "Ukončenie procesu zastaví beh programu. Odinštalovanie je iná činnosť."
+        },
+        {
+          q: "Kde vo Windows bežne natrvalo odinštaluješ aplikáciu?",
+          options: ["Nastavenia → Aplikácie → Nainštalované aplikácie", "Správca úloh → Procesy", "Prieskumník → Pracovná plocha", "Windows Update → História"],
+          answer: 0,
+          note: "Aplikáciu odstráni odinštalovanie, nie vymazanie ikony ani ukončenie procesu."
+        },
+        {
+          q: "Ktorý zdroj nového programu je najbezpečnejší?",
+          options: ["Oficiálny obchod alebo stránka výrobcu", "Príloha od neznámeho odosielateľa", "Stránka s crackami", "Náhodné vyskakovacie okno"],
+          answer: 0,
+          note: "Uprednostňujeme oficiálny obchod, oficiálnu stránku výrobcu alebo overený správca balíkov."
+        },
+        {
+          q: "Prečo je dôležité programy aktualizovať?",
+          options: ["Aktualizácie opravujú chyby a bezpečnostné zraniteľnosti.", "Aby sa vymazali všetky súbory.", "Aby program vždy zaberal viac miesta.", "Iba kvôli zmene ikony."],
+          answer: 0,
+          note: "Aktualizácie prinášajú opravy, bezpečnostné záplaty a často aj vylepšenia."
+        },
+        {
+          q: "Čo urobí príkaz „winget install vlc“?",
+          options: ["Vyhľadá a nainštaluje VLC.", "Ukončí proces VLC.", "Odinštaluje VLC.", "Zobrazí využitie procesora."],
+          answer: 0,
+          note: "winget je správca balíkov; príkaz install slúži na inštaláciu."
+        }
+      ],
+      os: [
+        {
+          q: "Čo je operačný systém?",
+          options: ["Základný program, ktorý riadi počítač.", "Súčiastka vnútri procesora.", "Program iba na písanie textu.", "Iný názov pre internet."],
+          answer: 0,
+          note: "OS riadi hardvér, programy, súbory aj komunikáciu s používateľom."
+        },
+        {
+          q: "Odkiaľ a kam sa pri zapnutí načíta operačný systém?",
+          options: ["Z disku do operačnej pamäte.", "Z monitora do klávesnice.", "Z internetu do tlačiarne.", "Z procesora na pracovnú plochu."],
+          answer: 0,
+          note: "OS je uložený na disku a počas práce beží v operačnej pamäti."
+        },
+        {
+          q: "Spustená je hudba, hra aj prehliadač. Ktorá úloha OS rozhoduje, kto dostane procesor?",
+          options: ["Správa procesov", "Správa súborov", "Správa zariadení", "Prispôsobenie vzhľadu"],
+          answer: 0,
+          note: "Správa procesov rozdeľuje čas procesora medzi spustené programy."
+        },
+        {
+          q: "OS prideľuje hre 2 GB RAM a chráni jej priestor pred inými programami. O akú úlohu ide?",
+          options: ["Správa pamäte", "Správa súborov", "Správa používateľov", "Aktualizácia aplikácie"],
+          answer: 0,
+          note: "Operačný systém prideľuje a chráni priestor v operačnej pamäti."
+        },
+        {
+          q: "Čo je ovládač zariadenia?",
+          options: ["Program, cez ktorý OS komunikuje s hardvérom.", "Kábel vedúci k zariadeniu.", "Človek, ktorý používa počítač.", "Priečinok s dokumentmi."],
+          answer: 0,
+          note: "Ovládač, po anglicky driver, sprostredkuje komunikáciu OS so zariadením."
+        },
+        {
+          q: "Ktorá dvojica operačný systém – zariadenie je správna?",
+          options: ["iOS – iPhone", "macOS – telefón Samsung", "Android – iba notebook Apple", "Windows – iba televízory"],
+          answer: 0,
+          note: "iOS je operačný systém telefónov iPhone; tablety iPad používajú príbuzný systém iPadOS."
+        },
+        {
+          q: "Ktoré tvrdenie o Linuxe je správne?",
+          options: ["Má otvorený zdrojový kód a možno ho používať bezplatne.", "Je určený iba pre iPhone.", "Je to názov procesora.", "Vznikol ako aktualizácia Windowsu."],
+          answer: 0,
+          note: "Linux je slobodný systém s otvoreným zdrojovým kódom."
+        },
+        {
+          q: "Ktorá činnosť NEPATRÍ medzi hlavné úlohy operačného systému?",
+          options: ["Napísať za žiaka slohovú prácu.", "Spravovať súbory.", "Riadiť zariadenia cez ovládače.", "Prideľovať programom pamäť."],
+          answer: 0,
+          note: "OS poskytuje prostredie a zdroje, ale obsah práce za používateľa nevytvorí."
+        }
+      ],
+      settings: [
+        {
+          q: "Ktorá klávesová skratka otvorí Nastavenia Windows?",
+          options: ["Win + I", "Ctrl + Shift + Esc", "Alt + F4", "Win + D"],
+          answer: 0,
+          note: "Win + I otvorí aplikáciu Nastavenia."
+        },
+        {
+          q: "Kde najčastejšie upravíš jas displeja?",
+          options: ["Systém → Obrazovka", "Kontá → Rodina", "Aplikácie → Spustenie", "Windows Update → História"],
+          answer: 0,
+          note: "Jas patrí do nastavení obrazovky v kategórii Systém."
+        },
+        {
+          q: "Do ktorej kategórie pôjdeš pridať tlačiareň?",
+          options: ["Bluetooth a zariadenia", "Prispôsobenie", "Čas a jazyk", "Kontá"],
+          answer: 0,
+          note: "Tlačiarne a skenery patria medzi pripojené zariadenia."
+        },
+        {
+          q: "Kde zmeníš pozadie, farby alebo tmavý režim?",
+          options: ["Prispôsobenie", "Sieť a internet", "Systém → Zvuk", "Windows Update"],
+          answer: 0,
+          note: "Vzhľad Windowsu upravujeme v kategórii Prispôsobenie."
+        },
+        {
+          q: "Písmená na obrazovke sú primalé. Ktorá kategória pomôže?",
+          options: ["Zjednodušenie ovládania", "Aplikácie", "Bluetooth a zariadenia", "Čas a jazyk"],
+          answer: 0,
+          note: "Veľkosť textu a ďalšie pomôcky sú v Zjednodušení ovládania."
+        },
+        {
+          q: "Kde skontroluješ, či aplikácia smie používať mikrofón?",
+          options: ["Ochrana osobných údajov a zabezpečenie", "Prispôsobenie", "Systém → Napájanie", "Kontá"],
+          answer: 0,
+          note: "Prístupy ku kamere, mikrofónu a polohe sú povolenia osobných údajov."
+        },
+        {
+          q: "Na čo slúži Windows Update?",
+          options: ["Na kontrolu a inštalovanie systémových opráv.", "Na zmenu pozadia.", "Na párovanie slúchadiel.", "Na úpravu hlasitosti."],
+          answer: 0,
+          note: "Windows Update spravuje aktualizácie systému a bezpečnostné opravy."
+        },
+        {
+          q: "Zmena na školskom počítači vyžaduje práva správcu a reštart. Čo urobíš?",
+          options: ["Najprv sa spýtam učiteľa alebo správcu.", "Skúsim uhádnuť heslo správcu.", "Vypnem ochranu počítača.", "Odpojím počítač zo siete."],
+          answer: 0,
+          note: "Na spravovanom zariadení dôležité zmeny schvaľuje poverená osoba."
+        }
+      ]
+    };
+
+    function prepareQuestion(topic, source) {
+      var options = source.options.map(function (text, index) {
+        return { text: text, correct: index === source.answer };
+      });
+      var mixedOptions = shuffle(options);
+      return {
+        topic: topic,
+        q: source.q,
+        options: mixedOptions.map(function (option) { return option.text; }),
+        answer: mixedOptions.findIndex(function (option) { return option.correct; }),
+        note: source.note
+      };
+    }
+
+    function createVariant() {
+      var chosen = [];
+      Object.keys(questionBank).forEach(function (topic) {
+        shuffle(questionBank[topic]).slice(0, 5).forEach(function (source) {
+          chosen.push(prepareQuestion(topic, source));
+        });
+      });
+      state.currentTest = shuffle(chosen);
+      state.testScore = null;
+      state.testDone = false;
+      renderTest();
+      byId("resultPanel").hidden = true;
+      updateProgress();
+    }
+
+    function renderTest() {
+      var list = byId("quizList");
+      list.innerHTML = "";
+      state.currentTest.forEach(function (question, qIndex) {
+        var fieldset = document.createElement("fieldset");
+        fieldset.className = "quiz-item";
+        fieldset.setAttribute("data-question-index", String(qIndex));
+        var options = question.options.map(function (option, oIndex) {
+          return '<label class="quiz-option"><input type="radio" name="q' + qIndex + '" value="' + oIndex + '"><span>' + option + '</span></label>';
+        }).join("");
+        fieldset.innerHTML = '<legend><span class="quiz-tag ' + question.topic + '">' + topics[question.topic].short + '</span>' + (qIndex + 1) + '. ' + question.q + '</legend><div class="quiz-options">' + options + '</div><p class="answer-note" aria-live="polite"></p>';
+        list.appendChild(fieldset);
+      });
+    }
+
+    byId("quizList").addEventListener("change", function (event) {
+      if (!event.target.matches("input[type='radio']")) return;
+      var fieldset = event.target.closest(".quiz-item");
+      fieldset.querySelectorAll(".quiz-option").forEach(function (label) {
+        label.classList.toggle("selected", label.contains(event.target));
+      });
+    });
+
+    function topicMessage(score) {
+      if (score >= 4) return "pripravené";
+      if (score === 3) return "ešte krátko zopakovať";
+      return "treba zopakovať základy";
+    }
+
+    function evaluateTest(event) {
+      event.preventDefault();
+      var total = 0;
+      var unanswered = 0;
+      var topicScores = { managers: 0, os: 0, settings: 0 };
+
+      state.currentTest.forEach(function (question, index) {
+        var fieldset = document.querySelector("[data-question-index='" + index + "']");
+        var selected = fieldset.querySelector("input[name='q" + index + "']:checked");
+        var selectedIndex = selected ? Number(selected.value) : -1;
+        var correct = selectedIndex === question.answer;
+        if (correct) {
+          total += 1;
+          topicScores[question.topic] += 1;
+        }
+        if (!selected) unanswered += 1;
+        fieldset.classList.remove("correct", "wrong");
+        fieldset.classList.add(correct ? "correct" : "wrong");
+        fieldset.querySelectorAll(".quiz-option").forEach(function (label, optionIndex) {
+          label.classList.remove("reveal-correct", "reveal-wrong");
+          if (optionIndex === question.answer) label.classList.add("reveal-correct");
+          if (selectedIndex === optionIndex && !correct) label.classList.add("reveal-wrong");
+        });
+        fieldset.querySelectorAll("input").forEach(function (input) { input.disabled = true; });
+        var prefix = correct ? "Správne. " : selected ? "Nesprávne. " : "Bez odpovede. ";
+        fieldset.querySelector(".answer-note").textContent = prefix + question.note;
+      });
+
+      state.testScore = total;
+      state.testDone = true;
+      updateProgress();
+      stopTimer();
+
+      var title;
+      var text;
+      if (total >= 13) {
+        title = "Výborne – na test si pripravený";
+        text = "Základné pojmy aj praktické situácie ovládaš veľmi dobre.";
+      } else if (total >= 10) {
+        title = "Dobrý základ";
+        text = "Väčšinu učiva ovládaš. Oprav si chyby a zopakuj najslabšiu tému.";
+      } else if (total >= 7) {
+        title = "Ešte jedno cielené opakovanie";
+        text = "Niečo už vieš, ale pred ostrým testom potrebuješ doplniť medzery.";
+      } else {
+        title = "Vráť sa k základným pojmom";
+        text = "Prejdi si zhrnutia troch hodín a potom si vytvor nový variant.";
+      }
+      if (unanswered) text += " Nevyplnené otázky: " + unanswered + ".";
+      byId("resultScore").textContent = total + " / 15";
+      byId("resultTitle").textContent = title;
+      byId("resultText").textContent = text;
+
+      byId("breakdownGrid").innerHTML = Object.keys(topics).map(function (topic) {
+        var score = topicScores[topic];
+        return '<div class="breakdown-card ' + topic + '"><strong><span>' + topics[topic].label + '</span><span>' + score + ' / 5</span></strong><div class="breakdown-bar"><span style="width:' + (score / 5 * 100) + '%"></span></div><small>' + topicMessage(score) + '</small></div>';
+      }).join("");
+
+      var weak = Object.keys(topicScores).filter(function (topic) { return topicScores[topic] <= 2; });
+      byId("resultAdvice").innerHTML = weak.length ?
+        "<b>Odporúčanie:</b> Pred ostrým testom si zopakuj najmä: " + weak.map(function (topic) { return topics[topic].label; }).join(", ") + "." :
+        "<b>Odporúčanie:</b> Prečítaj si vysvetlenia pri chybných odpovediach. Žiadna téma nemá kriticky slabý výsledok.";
+      byId("resultPanel").hidden = false;
+      byId("resultPanel").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function retrySameVariant() {
+      renderTest();
+      state.testDone = false;
+      state.testScore = null;
+      byId("resultPanel").hidden = true;
+      resetTimer();
+      updateProgress();
+      toast("Rovnaký variant je pripravený na nový pokus.");
+    }
+
+    byId("practiceForm").addEventListener("submit", evaluateTest);
+    byId("retryVariant").addEventListener("click", retrySameVariant);
+    byId("newVariant").addEventListener("click", function () {
+      createVariant();
+      resetTimer();
+      toast("Vytvorený nový vyvážený variant testu.");
+    });
+
+    /* Časovač */
+    function drawTimer() {
+      var minutes = Math.floor(state.timerSeconds / 60);
+      var seconds = state.timerSeconds % 60;
+      byId("timer").textContent = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+      byId("timer").classList.toggle("urgent", state.timerSeconds <= 120);
+    }
+
+    function stopTimer() {
+      if (state.timerId) clearInterval(state.timerId);
+      state.timerId = null;
+      state.timerRunning = false;
+      byId("timerToggle").textContent = state.timerSeconds === 0 ? "Čas vypršal" : "Pokračovať";
+      byId("timerToggle").disabled = state.timerSeconds === 0;
+    }
+
+    function startTimer() {
+      if (state.timerRunning || state.timerSeconds === 0) return;
+      state.timerRunning = true;
+      byId("timerToggle").textContent = "Pozastaviť";
+      state.timerId = setInterval(function () {
+        state.timerSeconds -= 1;
+        drawTimer();
+        if (state.timerSeconds <= 0) {
+          stopTimer();
+          toast("Čas vypršal. Dokonči rozpracovanú odpoveď a test vyhodnoť.");
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      if (state.timerId) clearInterval(state.timerId);
+      state.timerId = null;
+      state.timerRunning = false;
+      state.timerSeconds = 900;
+      byId("timerToggle").disabled = false;
+      byId("timerToggle").textContent = "Spustiť čas";
+      drawTimer();
+    }
+
+    byId("timerToggle").addEventListener("click", function () {
+      if (state.timerRunning) stopTimer();
+      else startTimer();
+    });
+    byId("timerReset").addEventListener("click", resetTimer);
+
+    /* Záverečné ovládanie */
+    byId("printBtn").addEventListener("click", function () { window.print(); });
+    byId("resetAll").addEventListener("click", function () {
+      if (!window.confirm("Naozaj chceš vynulovať všetky aktivity a výsledok testu?")) return;
+      buildWarmup();
+      resetSimulator();
+      buildBridge();
+      createVariant();
+      resetTimer();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      toast("Celá hodina bola vynulovaná.");
+    });
+
+    function initialize() {
+      buildSettingsNav();
+      buildWarmup();
+      resetSimulator();
+      buildBridge();
+      createVariant();
+      resetTimer();
+      try {
+        var savedDate = localStorage.getItem("sekundaTestDate");
+        if (savedDate) byId("testDate").value = savedDate;
+      } catch (error) { /* Stránka funguje aj bez úložiska. */ }
+      updateProgress();
+    }
+
+    initialize();
+  </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Informatika – interaktívne hodiny | Miroslav Lajgút</title>
+<meta name="description" content="Interaktívne hodiny informatiky pre sekundu a 2. ročník – Gymnázium Ivana Kraska, Rimavská Sobota.">
+<meta name="author" content="Miroslav Lajgút">
+<style>
+  :root{
+    --bg:#f6f7fb; --card:#fff; --ink:#1d2233; --mut:#5b6275; --line:#e3e6ef;
+    --sek:#1f8a70; --sek-s:#e3f4ee; --iic:#3b5bdb; --iic-s:#e7ecff;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#141722;--card:#1d2130;--ink:#e9ecf5;--mut:#a3aabd;--line:#2d3346;
+      --sek:#4cc9a4;--sek-s:#16342c;--iic:#8ea6ff;--iic-s:#222a4a;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  header{max-width:980px;margin:0 auto;padding:48px 20px 16px}
+  h1{font-size:clamp(1.7rem,4vw,2.4rem);margin:0 0 6px}
+  header p{margin:0;color:var(--mut)}
+  main{max-width:980px;margin:0 auto;padding:8px 20px 40px}
+  .filter{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0 8px}
+  .filter button{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 16px;border-radius:999px;font:inherit;cursor:pointer}
+  .filter button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  section{margin-top:28px}
+  h2{font-size:1.2rem;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  h2 .tag{font-size:.8rem;font-weight:600;padding:2px 10px;border-radius:999px}
+  .sek .tag{background:var(--sek-s);color:var(--sek)}
+  .iic .tag{background:var(--iic-s);color:var(--iic)}
+  .sub{color:var(--mut);margin:0 0 14px;font-size:.95rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  a.card{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;border-top:4px solid var(--c);transition:transform .15s,box-shadow .15s}
+  a.card:hover,a.card:focus-visible{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08);outline:none}
+  .sek a.card{--c:var(--sek)} .iic a.card{--c:var(--iic)}
+  .card b{font-size:1.05rem}
+  .card span{color:var(--mut);font-size:.92rem}
+  .card small{margin-top:auto;padding-top:8px;color:var(--c);font-weight:600}
+  footer{max-width:980px;margin:0 auto;padding:20px;color:var(--mut);font-size:.85rem;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Informatika – interaktívne hodiny</h1>
+  <p>Miroslav Lajgút · Gymnázium Ivana Kraska, Rimavská Sobota</p>
+</header>
+
+<main>
+  <div class="filter" role="group" aria-label="Filter podľa triedy">
+    <button type="button" data-f="all" aria-pressed="true">Všetko</button>
+    <button type="button" data-f="sek" aria-pressed="false">Sekunda</button>
+    <button type="button" data-f="iic" aria-pressed="false">2. ročník (II.C)</button>
+  </div>
+
+  <section class="sek" data-g="sek">
+    <h2>Sekunda <span class="tag">osemročné štúdium</span></h2>
+    <p class="sub">Práca s počítačom, operačný systém a kancelárske programy.</p>
+    <div class="grid">
+      <a class="card" href="hodiny/sekunda-operacne-systemy.html"><b>Operačné systémy</b><span>Základná charakteristika operačného systému.</span><small>Otvoriť hodinu →</small></a>
+      <a class="card" href="hodiny/sekunda-nastavenia-os-cvicny-test.html"><b>Nastavenia OS a cvičný test</b><span>Nastavenia Windows a cvičný test z programových manažérov, operačných systémov a nastavení.</span><small>Otvoriť hodinu →</small></a>
+      <a class="card" href="hodiny/sekunda-kancelarske-baliky.html"><b>Kancelárske balíky</b><span>Programy na text, tabuľky a prezentácie.</span><small>Otvoriť hodinu →</small></a>
+      <a class="card" href="hodiny/sekunda-popis-prostredia-ms-word.html"><b>Popis prostredia MS Word</b><span>Časti okna textového editora a práca s nimi.</span><small>Otvoriť hodinu →</small></a>
+    </div>
+  </section>
+
+  <section class="iic" data-g="iic">
+    <h2>2. ročník <span class="tag">II.C · SK / HU</span></h2>
+    <p class="sub">Hodiny majú prepínač jazyka slovenčina / maďarčina.</p>
+    <div class="grid">
+      <a class="card" href="hodiny/iic-prostredie-windows.html"><b>Prostredie Windows</b><span>Pracovná plocha, okná a ovládanie systému.</span><small>Otvoriť hodinu →</small></a>
+      <a class="card" href="hodiny/iic-subory-a-priecinky.html"><b>Súbory a priečinky</b><span>Organizácia súborov, prípony a práca s priečinkami.</span><small>Otvoriť hodinu →</small></a>
+      <a class="card" href="hodiny/iic-systemove-nastroje.html"><b>Systémové nástroje a nastavenie OS</b><span>Systémové nástroje a bezpečné nastavenia operačného systému.</span><small>Otvoriť hodinu →</small></a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Materiály sú určené na vyučovanie informatiky. Pri ich tvorbe bola použitá umelá inteligencia (Claude, Anthropic); obsah pripravil, upravil a overil autor.
+  Hodiny nezbierajú ani neodosielajú odpovede žiakov – postup sa ukladá len v prehliadači žiaka.
+</footer>
+
+<script>
+  const btns=[...document.querySelectorAll('.filter button')];
+  btns.forEach(b=>b.addEventListener('click',()=>{
+    btns.forEach(x=>x.setAttribute('aria-pressed',x===b));
+    document.querySelectorAll('section[data-g]').forEach(s=>{
+      s.hidden = b.dataset.f!=='all' && s.dataset.g!==b.dataset.f;
+    });
+  }));
+</script>
+</body>
+</html>

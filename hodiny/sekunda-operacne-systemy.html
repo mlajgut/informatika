@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Operačné systémy – základná charakteristika</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F7FF; --panel:#FFFFFF; --ink:#26193F; --muted:#6B6285; --line:#D9DEF0;
+  --grape:#6D3BE4; --pink:#FF3D8B; --mint:#00B07C; --sun:#FFB020; --sky:#1FA9F0;
+  --grape-s:#EDE5FF; --pink-s:#FFE3EE; --mint-s:#D8F5EB; --sun-s:#FFF0D2; --sky-s:#DEF0FD;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#171230; --panel:#221A42; --ink:#F2EEFF; --muted:#B4AAD4; --line:#3A2F63;
+  --grape:#B79BFF; --pink:#FF7FB4; --mint:#3FD9A8; --sun:#FFC44D; --sky:#62C6FF;
+  --grape-s:#332657; --pink-s:#4A2340; --mint-s:#123F33; --sun-s:#453318; --sky-s:#12354B;
+}}
+:root[data-theme="dark"]{
+  --bg:#171230; --panel:#221A42; --ink:#F2EEFF; --muted:#B4AAD4; --line:#3A2F63;
+  --grape:#B79BFF; --pink:#FF7FB4; --mint:#3FD9A8; --sun:#FFC44D; --sky:#62C6FF;
+  --grape-s:#332657; --pink-s:#4A2340; --mint-s:#123F33; --sun-s:#453318; --sky-s:#12354B;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,sans-serif;font-size:1.05rem;line-height:1.6}
+main{max-width:880px;margin:0 auto;padding:1.4rem 1.1rem 3rem}
+h1,h2,h3{font-family:"Baloo 2",system-ui,sans-serif;font-weight:800;line-height:1.1;margin:0}
+h1{font-size:clamp(2.1rem,7vw,3.4rem);margin:.4rem 0 .6rem}
+h2{font-size:1.7rem;margin:.2rem 0 .5rem}
+h3{font-size:1.15rem;font-weight:600;margin:0 0 .3rem}
+p{margin:.5rem 0;max-width:68ch}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.hero{background:linear-gradient(135deg,var(--grape) 0%,var(--pink) 55%,var(--sun) 100%);color:#fff;border-radius:22px;padding:1.6rem 1.3rem;margin-bottom:1.4rem}
+.hero p{color:#fff;opacity:.95}
+.hero .kicker{font-weight:800;letter-spacing:.04em}
+.plan{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.9rem}
+.plan span{background:rgba(255,255,255,.22);border-radius:999px;padding:.25rem .75rem;font-size:.85rem;font-weight:600}
+section{margin:2.4rem 0}
+.head{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.min{background:var(--sun-s);color:var(--ink);border-radius:999px;padding:.15rem .7rem;font-size:.82rem;font-weight:800;white-space:nowrap}
+.card{background:var(--panel);border-radius:16px;padding:1.1rem;margin:1rem 0;box-shadow:0 3px 0 var(--line)}
+.task{background:var(--sky-s);border-left:6px solid var(--sky);border-radius:0 12px 12px 0;padding:.7rem 1rem;margin:1rem 0}
+.task b{display:block}
+.btn{background:var(--grape);color:#fff;border:0;border-radius:999px;padding:.55rem 1.2rem;font-weight:800}
+.btn.pink{background:var(--pink)} .btn.mint{background:var(--mint)}
+.btn.ghost{background:transparent;color:var(--grape);border:2px solid var(--grape)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.fb{min-height:1.5em;font-weight:600;margin:.6rem 0}
+.ok{color:var(--mint)} .bad{color:var(--pink)}
+
+/* dramatizácia */
+.roles{display:flex;flex-wrap:wrap;gap:.45rem;margin:.6rem 0}
+.role{border-radius:999px;padding:.25rem .8rem;font-size:.88rem;font-weight:800}
+.r0{background:var(--grape-s);color:var(--grape)} .r1{background:var(--pink-s);color:var(--pink)}
+.r2{background:var(--mint-s);color:var(--mint)} .r3{background:var(--sun-s);color:#9A6200}
+.r4{background:var(--sky-s);color:var(--sky)} .r5{background:var(--grape);color:#fff}
+.stage{background:var(--panel);border:3px dashed var(--grape);border-radius:16px;padding:1rem;min-height:210px}
+.line{display:flex;gap:.6rem;align-items:flex-start;margin:.55rem 0}
+.line .who{flex:none;font-weight:800;min-width:9.5rem}
+.line .txt{flex:1}
+.act{font-weight:800;color:var(--muted);margin:.8rem 0 .2rem}
+.stage .narr{font-style:italic;color:var(--muted)}
+
+/* dirigent */
+.jobs{display:grid;gap:.7rem}
+.job{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:.8rem}
+.job .opts{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+.job .opts button{border:2px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:.25rem .75rem;font-size:.88rem;font-weight:600}
+.job.right{border-color:var(--mint);background:var(--mint-s)}
+.job.wrong{border-color:var(--pink);background:var(--pink-s)}
+.job .why{font-size:.92rem;color:var(--muted);margin-top:.4rem;display:none}
+.job.right .why,.job.wrong .why{display:block}
+
+/* časová os */
+.tl{display:grid;gap:.6rem;position:relative;padding-left:1.4rem}
+.tl::before{content:"";position:absolute;left:.35rem;top:.4rem;bottom:.4rem;width:4px;border-radius:2px;background:linear-gradient(var(--grape),var(--sky),var(--mint))}
+.tl button{position:relative;text-align:left;background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:.7rem .9rem;width:100%}
+.tl button::before{content:"";position:absolute;left:-1.22rem;top:1rem;width:.85rem;height:.85rem;border-radius:50%;background:var(--grape);border:3px solid var(--bg)}
+.tl .yr{font-family:"Baloo 2",sans-serif;font-weight:800;font-size:1.2rem;color:var(--grape)}
+.tl .ttl{font-weight:800}
+.tl .more{display:none;margin-top:.4rem;font-size:.95rem;color:var(--muted)}
+.tl button.open{border-color:var(--grape);background:var(--grape-s)}
+.tl button.open .more{display:block}
+
+/* typy OS */
+.os-tab{overflow-x:auto;margin:1rem 0}
+table{border-collapse:collapse;width:100%;min-width:520px;background:var(--panel);border-radius:12px;overflow:hidden}
+th,td{padding:.55rem .8rem;text-align:left;border-bottom:1px solid var(--line);font-size:.95rem}
+th{background:var(--grape-s);font-weight:800}
+.guess{display:grid;gap:.6rem}
+.guess .g{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:.8rem}
+.guess .g .opts{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+.guess .g .opts button{border:2px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:.25rem .8rem;font-weight:600;font-size:.88rem}
+.guess .g.right{border-color:var(--mint);background:var(--mint-s)}
+.guess .g.wrong{border-color:var(--pink);background:var(--pink-s)}
+.guess .why{display:none;font-size:.92rem;color:var(--muted);margin-top:.4rem}
+.guess .g.right .why,.guess .g.wrong .why{display:block}
+
+/* pravda-nepravda */
+.tf{display:grid;gap:.6rem}
+.tf .t{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:.75rem;display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+.tf .t span.q{flex:1 1 260px}
+.tf .t button{border:2px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:.25rem .9rem;font-weight:700}
+.tf .t.right{border-color:var(--mint);background:var(--mint-s)}
+.tf .t.wrong{border-color:var(--pink);background:var(--pink-s)}
+.tf .why{flex-basis:100%;font-size:.92rem;color:var(--muted);display:none}
+.tf .t.right .why,.tf .t.wrong .why{display:block}
+
+/* kvíz */
+.quiz fieldset{border:2px solid var(--line);border-radius:16px;background:var(--panel);padding:1rem;margin:0 0 1rem}
+.quiz legend{font-weight:800;padding:0 .4rem}
+.quiz label{display:flex;gap:.6rem;align-items:flex-start;padding:.3rem .4rem;border-radius:10px;cursor:pointer}
+.quiz label:hover{background:var(--grape-s)}
+.quiz input{margin-top:.4rem;accent-color:var(--grape)}
+.qf{font-size:.92rem;margin-top:.4rem}
+.score{font-family:"Baloo 2",sans-serif;font-size:1.5rem;font-weight:800}
+
+/* domáca úloha */
+.hw{background:var(--sun-s);border-radius:18px;padding:1.1rem}
+.hw ol{padding-left:1.2rem}
+.hw li{margin:.45rem 0}
+
+/* spätná väzba */
+.mood{display:flex;flex-wrap:wrap;gap:.6rem;margin:.8rem 0}
+.mood button{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:.6rem 1rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:.2rem;min-width:6.5rem}
+.mood button .em{font-size:1.7rem}
+.mood button.pick{border-color:var(--grape);background:var(--grape-s)}
+.sign{margin-top:3rem;padding-top:1rem;border-top:2px solid var(--line);color:var(--muted);text-align:right;font-weight:600}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+
+<header class="hero">
+  <p class="kicker">Informatika · sekunda · 45 minút</p>
+  <h1>Operačné systémy</h1>
+  <p>Zapneš počítač a o pár sekúnd sa objaví plocha. Medzitým sa zobudil neviditeľný šéf, ktorý riadi všetko ostatné. Dnes zistíme, kto to je a čo celý čas robí.</p>
+  <div class="plan"><span>Scénka 8 min</span><span>Čo robí OS 10 min</span><span>História 7 min</span><span>Typy 6 min</span><span>Pravda či nepravda 4 min</span><span>Opakovanie 7 min</span><span>Úloha a hodnotenie 3 min</span></div>
+</header>
+
+<section aria-labelledby="h1s">
+  <div class="head"><h2 id="h1s">Scénka: Ráno v počítači</h2><span class="min">8 min</span></div>
+  <p>Rozdeľte si role a zahrajte scénku pred triedou. Šesť hercov, dva akty. Kliknutím na tlačidlo sa objaví ďalšia replika – herec ju prečíta a zahrá.</p>
+  <div class="roles">
+    <span class="role r0">Procesor</span><span class="role r1">Operačná pamäť</span><span class="role r2">Disk</span>
+    <span class="role r3">Klávesnica</span><span class="role r4">Monitor</span><span class="role r5">Operačný systém</span>
+  </div>
+  <div class="stage" id="stage"></div>
+  <p><button class="btn" id="playBtn">Začať scénku</button> <button class="btn ghost" id="resetPlay">Od začiatku</button></p>
+  <p class="fb" id="playFb" role="status" aria-live="polite"></p>
+</section>
+
+<section aria-labelledby="h2s">
+  <div class="head"><h2 id="h2s">Operačný systém ako dirigent</h2><span class="min">10 min</span></div>
+  <p><strong>Operačný systém (OS)</strong> je základný program, ktorý ovláda celý počítač. Spustí sa hneď po zapnutí, načíta sa z disku do operačnej pamäte a beží, kým počítač nevypneš. Ostatné programy s hardvérom nekomunikujú priamo – vždy cez neho.</p>
+  <div class="card">
+    <h3>Päť hlavných úloh operačného systému</h3>
+    <p><strong>Správa procesov</strong> – rozhoduje, ktorý spustený program práve dostane procesor.<br>
+    <strong>Správa pamäte</strong> – prideľuje programom miesto v operačnej pamäti a stráži, aby si nelozili do cudzieho.<br>
+    <strong>Správa súborov</strong> – vytvára priečinky, ukladá, premenúva a maže súbory na disku.<br>
+    <strong>Správa zariadení</strong> – cez ovládače riadi klávesnicu, myš, tlačiareň, reproduktory.<br>
+    <strong>Komunikácia s používateľom</strong> – kreslí plochu, okná a ikony, prihlasuje používateľov a stráži ich heslá.</p>
+  </div>
+  <div class="task"><b>Úloha</b>Ku každej situácii vyber, ktorá úloha operačného systému sa práve deje.</div>
+  <div class="jobs" id="jobs"></div>
+  <p class="fb" id="jobsFb" role="status" aria-live="polite"></p>
+</section>
+
+<section aria-labelledby="h3s">
+  <div class="head"><h2 id="h3s">Sedem zastávok v histórii</h2><span class="min">7 min</span></div>
+  <p>Klikni na rok a zobrazí sa zaujímavosť. Ktorá ťa prekvapí najviac?</p>
+  <div class="tl" id="tl"></div>
+</section>
+
+<section aria-labelledby="h4s">
+  <div class="head"><h2 id="h4s">Aké operačné systémy poznáme</h2><span class="min">6 min</span></div>
+  <div class="os-tab">
+    <table>
+      <thead><tr><th>Systém</th><th>Zariadenia</th><th>Zaujímavosť</th></tr></thead>
+      <tbody>
+        <tr><td>Windows</td><td>stolové počítače, notebooky</td><td>najpoužívanejší systém v školách a firmách</td></tr>
+        <tr><td>macOS</td><td>počítače a notebooky Apple</td><td>vychádza zo systému Unix</td></tr>
+        <tr><td>Linux</td><td>počítače, servery, Raspberry Pi</td><td>zadarmo, každý smie vidieť a upraviť jeho zdrojový kód</td></tr>
+        <tr><td>Android</td><td>telefóny, tablety, televízory</td><td>postavený na jadre Linuxu</td></tr>
+        <tr><td>iOS</td><td>iPhone a iPad</td><td>aplikácie sa inštalujú iba z App Store</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="task"><b>Úloha</b>Podľa indície uhádni systém.</div>
+  <div class="guess" id="guess"></div>
+  <p class="fb" id="guessFb" role="status" aria-live="polite"></p>
+</section>
+
+<section aria-labelledby="h5s">
+  <div class="head"><h2 id="h5s">Pravda či nepravda</h2><span class="min">4 min</span></div>
+  <p>Rýchle kolo. Rozhodni a hneď uvidíš vysvetlenie.</p>
+  <div class="tf" id="tf"></div>
+  <p class="fb" id="tfFb" role="status" aria-live="polite"></p>
+</section>
+
+<section aria-labelledby="h6s">
+  <div class="head"><h2 id="h6s">Opakovanie</h2><span class="min">7 min</span></div>
+  <p>Osem otázok z dnešnej hodiny. V každej je správna jedna odpoveď.</p>
+  <form class="quiz" id="quiz" onsubmit="return false"></form>
+  <p><button class="btn mint" id="quizBtn">Vyhodnotiť</button> <button class="btn ghost" id="quizReset">Skúsiť znova</button></p>
+  <p class="fb score" id="quizFb" role="status" aria-live="polite"></p>
+</section>
+
+<section aria-labelledby="h7s">
+  <div class="head"><h2 id="h7s">Domáca úloha</h2><span class="min">3 min na zadanie</span></div>
+  <div class="hw">
+    <ol>
+      <li><strong>Detektív doma.</strong> Zisti, aký operačný systém a akú verziu má počítač alebo telefón, ktorý doma používaš. Vo Windows: Nastavenia → Systém → Informácie. V telefóne: Nastavenia → Informácie o telefóne. Zapíš názov systému, verziu a rok vydania tejto verzie.</li>
+      <li><strong>Komiks alebo scénka.</strong> Nakresli štvorpolíčkový komiks alebo napíš krátky dialóg (6 replík) s názvom <em>Deň, keď operačný systém zaspal</em>. Aspoň dve repliky musia ukázať, ktorú svoju úlohu OS nesplnil.</li>
+      <li><strong>Pre zvedavých (nepovinné).</strong> Zisti, čo je Tux a prečo ho má Linux. Odpoveď napíš jednou vetou.</li>
+    </ol>
+    <p><strong>Odovzdaj</strong> na budúcej hodine v zošite alebo cez školskú platformu.</p>
+  </div>
+</section>
+
+<section aria-labelledby="h8s">
+  <div class="head"><h2 id="h8s">Ako sa ti páčila hodina?</h2></div>
+  <p>Klikni na jednu možnosť. Tvoja odpoveď sa nikam neposiela – povedz ju učiteľovi nahlas alebo zdvihnutím ruky.</p>
+  <div class="mood" id="mood">
+    <button data-m="Super hodina"><span class="em">🤩</span>Super</button>
+    <button data-m="Páčila sa mi"><span class="em">🙂</span>Páčila sa</button>
+    <button data-m="Bolo to bežné"><span class="em">😐</span>Bežná</button>
+    <button data-m="Nebavila ma"><span class="em">🙁</span>Nebavila ma</button>
+  </div>
+  <p class="fb" id="moodFb" role="status" aria-live="polite"></p>
+</section>
+
+<p class="sign">Zeleznikova@Claude</p>
+</main>
+
+<script>
+/* ---------------- Scénka ---------------- */
+const CLS={"Procesor":"r0","Operačná pamäť":"r1","Disk":"r2","Klávesnica":"r3","Monitor":"r4","Operačný systém":"r5"};
+const play=[
+ {act:"1. akt – Počítač bez operačného systému"},
+ {n:"Zaznie zvonček. Počítač sa práve zapol."},
+ {w:"Procesor",t:"Som pripravený! Dajte mi prácu. Zvládnem miliardy operácií za sekundu."},
+ {w:"Disk",t:"Mám tu 400-tisíc súborov. Ktorý chceš?"},
+ {w:"Procesor",t:"Ja neviem. A kde vlastne je?"},
+ {w:"Klávesnica",t:"Niekto stlačil písmeno A! Komu to mám povedať?"},
+ {w:"Operačná pamäť",t:"Ku mne nie, som prázdna a nikto mi nepovedal, koho kam uložiť."},
+ {w:"Monitor",t:"Mám čiernu obrazovku a neviem, čo mám kresliť."},
+ {w:"Procesor",t:"Tak čo teraz? Ja rozumiem len povelom, nie tomu, čo človek chce."},
+ {n:"Všetci si sadnú a nič sa nedeje. Počítač je zapnutý, ale zbytočný."},
+ {act:"2. akt – Príchod operačného systému"},
+ {w:"Operačný systém",t:"Dobré ráno! Práve ma Disk načítal do pamäte. Od tejto chvíle veliem ja."},
+ {w:"Operačný systém",t:"Monitor, kresli plochu a ikony. Klávesnica, každý stlačený znak posielaj mne."},
+ {w:"Monitor",t:"Kreslím! Vidím ikony, kurzor aj panel úloh."},
+ {w:"Klávesnica",t:"Používateľ píše heslo."},
+ {w:"Operačný systém",t:"Heslo sedí, používateľ je prihlásený. Disk, pošli mi program Prehliadač."},
+ {w:"Disk",t:"Posielam. Je to 320 megabajtov."},
+ {w:"Operačná pamäť",t:"Miesto mám, ukladám ho na svoje voľné miesto."},
+ {w:"Procesor",t:"Konečne! Čo mám počítať ako prvé?"},
+ {w:"Operačný systém",t:"Najprv prehliadač, potom hudbu. Striedam vás tak rýchlo, že to nikto nepostrehne."},
+ {w:"Procesor",t:"Funguje to! A ja sa nemusím o nič starať."},
+ {n:"Herci sa postavia do radu, operačný systém v strede ako dirigent. Koniec."}
+];
+const stage=document.getElementById("stage"), playBtn=document.getElementById("playBtn"), playFb=document.getElementById("playFb");
+let step=0;
+function renderStep(){
+  const s=play[step];
+  const d=document.createElement("div");
+  if(s.act){d.className="act";d.textContent=s.act;}
+  else if(s.n){d.className="line narr";d.textContent=s.n;}
+  else{d.className="line";d.innerHTML=`<span class="who role ${CLS[s.w]}">${s.w}</span><span class="txt">${s.t}</span>`;}
+  stage.appendChild(d);
+  d.scrollIntoView({block:"nearest"});
+  step++;
+  if(step>=play.length){playBtn.disabled=true;playFb.className="fb ok";playFb.textContent="Potlesk! Otázka do triedy: ktorú prácu operačného systému ste v 2. akte videli najviac?";}
+  else playBtn.textContent="Ďalšia replika";
+}
+playBtn.addEventListener("click",renderStep);
+document.getElementById("resetPlay").addEventListener("click",()=>{stage.innerHTML="";step=0;playBtn.disabled=false;playBtn.textContent="Začať scénku";playFb.textContent="";});
+
+/* ---------------- Dirigent: úlohy OS ---------------- */
+const CATS=["Správa procesov","Správa pamäte","Správa súborov","Správa zariadení","Komunikácia s používateľom"];
+const jobs=[
+ {t:"Naraz máš spustenú hru, hudbu aj prehliadač. Niekto musí rozhodnúť, ktorý z nich práve teraz dostane procesor.",a:0,w:"Toto je správa procesov. OS rýchlo strieda bežiace programy, takže sa zdá, že bežia naraz."},
+ {t:"Hra si pýta 2 GB, prehliadač 1 GB. Každý dostane svoje miesto v RAM a do cudzieho nesmie.",a:1,w:"Toto je správa pamäte. OS prideľuje a chráni miesto v operačnej pamäti."},
+ {t:"Referát uložíš do priečinka Dokumenty pod názvom referat.docx a o týždeň ho tam nájdeš.",a:2,w:"Toto je správa súborov. OS vie, na ktorom mieste disku súbor leží."},
+ {t:"Pripojíš novú tlačiareň a počítač si k nej sám nájde ovládač.",a:3,w:"Toto je správa zariadení. Ovládač je program, cez ktorý OS rozpráva s hardvérom."},
+ {t:"Po zapnutí sa zobrazí plocha s ikonami a musíš zadať svoje heslo.",a:4,w:"Toto je komunikácia s používateľom. OS kreslí rozhranie a stará sa o prihlasovanie."}
+];
+const jobsEl=document.getElementById("jobs"), jobsFb=document.getElementById("jobsFb");
+let jDone=0,jRight=0;
+jobs.forEach(j=>{
+  const d=document.createElement("div");d.className="job";
+  d.innerHTML=`<span>${j.t}</span><div class="opts">${CATS.map((c,i)=>`<button data-i="${i}">${c}</button>`).join("")}</div><div class="why"></div>`;
+  d.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    if(d.dataset.done)return;
+    d.dataset.done=1;jDone++;
+    const ok=+b.dataset.i===j.a;if(ok)jRight++;
+    d.classList.add(ok?"right":"wrong");
+    d.querySelector(".why").textContent=(ok?"Správne. ":"Nie je to tak. ")+j.w;
+    d.querySelectorAll("button").forEach(x=>x.disabled=true);
+    if(jDone===jobs.length){jobsFb.className="fb "+(jRight===jobs.length?"ok":"");jobsFb.textContent=`Správne ${jRight} z ${jobs.length}.`;}
+  }));
+  jobsEl.appendChild(d);
+});
+
+/* ---------------- Časová os ---------------- */
+const tlData=[
+ {y:"1947",t:"Skutočný chrobák v počítači",m:"Do počítača Harvard Mark II vletel mol a spôsobil poruchu. Technici ho vybrali a prilepili do denníka s poznámkou „prvý skutočný prípad nájdeného chrobáka“. Slovo bug – chyba – sa používalo už predtým, no táto príhoda ho preslávila."},
+ {y:"1969",t:"UNIX",m:"V laboratóriách Bell Labs vznikol systém UNIX. Ovládal sa len písaním príkazov, žiadne okná. Jeho myšlienky dnes nesie macOS, Linux aj Android."},
+ {y:"1981",t:"MS-DOS",m:"Systém pre prvé osobné počítače IBM. Používateľ videl čiernu obrazovku a musel vedieť príkazy naspamäť. Firma Microsoft ho nenapísala od nuly – kúpila hotový systém a upravila ho."},
+ {y:"1984",t:"Macintosh a myš",m:"Apple predstavil počítač, ktorý sa ovládal myšou a ikonami. Nápad videli u firmy Xerox, ktorá grafické rozhranie vymyslela, ale nepredala ho."},
+ {y:"1985",t:"Windows 1.0",m:"Prvé Windows ešte neboli samostatný systém – boli nadstavbou nad MS-DOS. Okná sa nesmeli prekrývať, ukladali sa vedľa seba ako dlaždice."},
+ {y:"1991",t:"Linux",m:"Fínsky študent Linus Torvalds napísal jadro systému ako svoj koníček a zverejnil ho zadarmo aj so zdrojovým kódom. Maskotom sa stal tučniak Tux. Dnes na Linuxe bežia takmer všetky veľké servery internetu."},
+ {y:"2007 – 2008",t:"Systémy v mobiloch",m:"V roku 2007 prišiel prvý iPhone so systémom iOS, o rok neskôr prvý telefón s Androidom. Operačný systém sa presunul z písacieho stola do vrecka."}
+];
+const tl=document.getElementById("tl");
+tlData.forEach(d=>{
+  const b=document.createElement("button");
+  b.type="button";b.setAttribute("aria-expanded","false");
+  b.innerHTML=`<div class="yr">${d.y}</div><div class="ttl">${d.t}</div><div class="more">${d.m}</div>`;
+  b.addEventListener("click",()=>{const o=b.classList.toggle("open");b.setAttribute("aria-expanded",o?"true":"false");});
+  tl.appendChild(b);
+});
+
+/* ---------------- Uhádni systém ---------------- */
+const OSS=["Windows","macOS","Linux","Android","iOS"];
+const guesses=[
+ {t:"Beží na počítačoch a notebookoch značky Apple.",a:1,w:"macOS beží iba na počítačoch Apple a vychádza zo systému Unix."},
+ {t:"Napísal ho študent Linus Torvalds, jeho kód je verejný a maskotom je tučniak.",a:2,w:"Linux. Používa sa na serveroch, v Raspberry Pi aj v bežných počítačoch."},
+ {t:"Najrozšírenejší systém na školských a firemných počítačoch.",a:0,w:"Windows od firmy Microsoft."},
+ {t:"Najrozšírenejší systém v telefónoch, postavený na jadre Linuxu.",a:3,w:"Android. Jadro má z Linuxu, nadstavbu robí Google."},
+ {t:"Beží iba na telefónoch a tabletoch iPhone a iPad.",a:4,w:"iOS. Aplikácie sa doň inštalujú iba cez App Store."}
+];
+const gEl=document.getElementById("guess"), gFb=document.getElementById("guessFb");
+let gDone=0,gRight=0;
+guesses.forEach(g=>{
+  const d=document.createElement("div");d.className="g";
+  d.innerHTML=`<span>${g.t}</span><div class="opts">${OSS.map((o,i)=>`<button data-i="${i}">${o}</button>`).join("")}</div><div class="why"></div>`;
+  d.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    if(d.dataset.done)return;d.dataset.done=1;gDone++;
+    const ok=+b.dataset.i===g.a;if(ok)gRight++;
+    d.classList.add(ok?"right":"wrong");
+    d.querySelector(".why").textContent=(ok?"Správne. ":"Nie. ")+g.w;
+    d.querySelectorAll("button").forEach(x=>x.disabled=true);
+    if(gDone===guesses.length){gFb.className="fb "+(gRight===guesses.length?"ok":"");gFb.textContent=`Správne ${gRight} z ${guesses.length}.`;}
+  }));
+  gEl.appendChild(d);
+});
+
+/* ---------------- Pravda či nepravda ---------------- */
+const tfData=[
+ {q:"Operačný systém je program, nie súčiastka.",a:true,w:"Je to softvér. Uložený je na disku, po zapnutí sa načíta do operačnej pamäte."},
+ {q:"Počítač bez operačného systému sa dá bežne používať rovnako ako s ním.",a:false,w:"Hardvér by síce fungoval, ale nemal by kto spúšťať programy, ukladať súbory ani kresliť plochu."},
+ {q:"Android má jadro prevzaté z Linuxu.",a:true,w:"Preto sa hovorí, že Linux máš vo vrecku aj vtedy, keď máš obyčajný telefón."},
+ {q:"Windows, macOS a Linux sú tri rôzne operačné systémy.",a:true,w:"Každý má iné ovládanie aj iné programy, ale úlohy plnia tie isté."},
+ {q:"Hra Minecraft je operačný systém.",a:false,w:"Je to aplikačný program. Beží až vtedy, keď ho operačný systém spustí."},
+ {q:"Linux si môže ktokoľvek stiahnuť zadarmo a pozrieť si jeho zdrojový kód.",a:true,w:"Je to slobodný softvér s otvoreným zdrojovým kódom."}
+];
+const tfEl=document.getElementById("tf"), tfFb=document.getElementById("tfFb");
+let tDone=0,tRight=0;
+tfData.forEach(t=>{
+  const d=document.createElement("div");d.className="t";
+  d.innerHTML=`<span class="q">${t.q}</span><button data-v="1">Pravda</button><button data-v="0">Nepravda</button><span class="why"></span>`;
+  d.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+    if(d.dataset.done)return;d.dataset.done=1;tDone++;
+    const ok=(b.dataset.v==="1")===t.a;if(ok)tRight++;
+    d.classList.add(ok?"right":"wrong");
+    d.querySelector(".why").textContent=(ok?"Správne. ":"Nie. ")+t.w;
+    d.querySelectorAll("button").forEach(x=>x.disabled=true);
+    if(tDone===tfData.length){tfFb.className="fb "+(tRight===tfData.length?"ok":"");tfFb.textContent=`Správne ${tRight} zo ${tfData.length}.`;}
+  }));
+  tfEl.appendChild(d);
+});
+
+/* ---------------- Opakovanie ---------------- */
+const Q=[
+ {q:"Čo je operačný systém?",o:["Súčiastka vnútri počítača.","Základný program, ktorý riadi celý počítač.","Program na písanie textu.","Iný názov pre procesor."],a:1,e:"Je to softvér, ktorý riadi hardvér aj ostatné programy."},
+ {q:"Odkiaľ sa operačný systém načíta pri zapnutí počítača?",o:["Z disku do operačnej pamäte.","Z internetu.","Z klávesnice.","Z monitora."],a:0,e:"Uložený je na disku, pracuje však v operačnej pamäti."},
+ {q:"Ktorá z týchto úloh NEPATRÍ operačnému systému?",o:["Prideľovať programom miesto v pamäti.","Ukladať a mazať súbory.","Napísať za teba slohovú prácu.","Riadiť tlačiareň cez ovládač."],a:2,e:"Písanie textu je práca človeka v aplikačnom programe."},
+ {q:"Spustíš naraz hudbu, prehliadač aj hru. Ktorá úloha OS rozhoduje, kto dostane procesor?",o:["Správa súborov.","Správa procesov.","Správa zariadení.","Komunikácia s používateľom."],a:1,e:"Programy sa striedajú tak rýchlo, že to vyzerá ako súčasný beh."},
+ {q:"Čo je ovládač?",o:["Program, cez ktorý OS komunikuje so zariadením.","Kábel k tlačiarni.","Osoba, ktorá opravuje počítače.","Iné meno pre myš."],a:0,e:"Po slovensky ovládač, po anglicky driver."},
+ {q:"Ktorý operačný systém napísal v roku 1991 študent Linus Torvalds?",o:["Windows","macOS","Linux","MS-DOS"],a:2,e:"Linux má verejný zdrojový kód a maskota tučniaka Tuxa."},
+ {q:"Ktorá dvojica sedí?",o:["macOS – telefóny Samsung","iOS – iPhone a iPad","Android – počítače Apple","Windows – iba servery"],a:1,e:"iOS beží na zariadeniach iPhone a iPad."},
+ {q:"Ktoré tvrdenie o programoch je pravdivé?",o:["Programy komunikujú s hardvérom priamo, OS nepotrebujú.","Každý program si sám prideľuje pamäť.","Programy žiadajú o pamäť aj o zariadenia operačný systém.","Bez internetu sa program nespustí."],a:2,e:"Prístup k pamäti a zariadeniam riadi operačný systém."}
+];
+const quiz=document.getElementById("quiz"), quizFb=document.getElementById("quizFb");
+function drawQuiz(){
+  quiz.innerHTML="";
+  Q.forEach((x,i)=>{
+    const fs=document.createElement("fieldset");
+    fs.innerHTML=`<legend>${i+1}. ${x.q}</legend>`+x.o.map((o,j)=>`<label><input type="radio" name="q${i}" value="${j}"> <span>${o}</span></label>`).join("")+`<p class="qf" id="qf${i}"></p>`;
+    quiz.appendChild(fs);
+  });
+  quizFb.textContent="";
+}
+drawQuiz();
+document.getElementById("quizBtn").addEventListener("click",()=>{
+  let s=0,miss=0;
+  Q.forEach((x,i)=>{
+    const ch=quiz.querySelector(`input[name="q${i}"]:checked`), f=document.getElementById("qf"+i);
+    if(!ch){f.className="qf bad";f.textContent="Chýba odpoveď.";miss++;return;}
+    if(+ch.value===x.a){s++;f.className="qf ok";f.textContent="Správne. "+x.e;}
+    else{f.className="qf bad";f.textContent="Nesprávne. "+x.e;}
+  });
+  quizFb.className="fb score "+(s===Q.length?"ok":"");
+  quizFb.textContent=`Výsledok: ${s} / ${Q.length}`+(s===Q.length?" – výborne!":miss?" – doplň chýbajúce odpovede.":" – prečítaj si vysvetlenia a skús znova.");
+});
+document.getElementById("quizReset").addEventListener("click",drawQuiz);
+
+/* ---------------- Spätná väzba ---------------- */
+const moodFb=document.getElementById("moodFb");
+document.querySelectorAll("#mood button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("#mood button").forEach(x=>x.classList.remove("pick"));
+  b.classList.add("pick");
+  moodFb.className="fb ok";
+  moodFb.textContent=`Vybral si: ${b.dataset.m}. Ďakujem. Povedz ešte jednu vec, ktorú si si z hodiny zapamätal.`;
+}));
+</script>
+</body>
+</html>
