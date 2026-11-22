@@ -1,0 +1,1901 @@
+<!doctype html>
+<html lang="sk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nastavenie stránky, písmo, riadkovanie, tabulátory</title>
+<meta name="author" content="Miroslav Lajgút">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: an office desk — every mission level is a file folder with a tab, activities sit inside it as sheets;
+   document-type colours (text / sheet / slides) and suite colours (Microsoft / LibreOffice) carry meaning everywhere */
+:root{
+  --desk:#EDF1FA;--paper:#FFFFFF;--paper2:#F5F7FD;--ink:#1E1B3A;--muted:#55527A;--line:#1E1B3A;--hair:#D2D8EC;--soft:#E3E8FA;--shadow:#1E1B3A;
+  --doc:#2B5FD9;--sheet:#0F8A45;--slide:#D9561A;--db:#7E47DB;--draw:#A87A00;--math:#C42F6B;
+  --ms:#3B4CCB;--lo:#0B8572;--on-suite:#FFFFFF;
+  --sun:#FFC93C;--mint:#2EC4B6;--coral:#FF8A80;--sky:#62D2F3;--lilac:#CDAEF7;--peach:#FFB98F;--lime:#C3E670;--rose:#F8AED3;
+  --on-bright:#1E1B3A;
+  --ok:#11743C;--okbg:#DCF2E4;--bad:#BF2830;--badbg:#FBE3E3;--warn:#8A5700;--warnbg:#FFF0C9;--stamp:#C3233F;
+  --go:#2BB673;--stop:#E5484D;
+  --fh:"Fredoka","Trebuchet MS",system-ui,sans-serif;
+  --fb:"Nunito","Segoe UI",system-ui,sans-serif;
+  --fm:"JetBrains Mono",ui-monospace,Consolas,"Courier New",monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --desk:#13122A;--paper:#1E1C3F;--paper2:#191838;--ink:#F0EEFF;--muted:#B6B2DE;--line:#8D86D6;--hair:#35325F;--soft:#2A2756;--shadow:#06050F;
+  --doc:#8AABFF;--sheet:#5BD893;--slide:#FFA06C;--db:#BC9BFF;--draw:#F2CB55;--math:#FF8AB8;
+  --ms:#909CFF;--lo:#47D4BB;--on-suite:#12102A;
+  --ok:#62DE9B;--okbg:#163A29;--bad:#FF8E8E;--badbg:#47192A;--warn:#FFCB6B;--warnbg:#3D2E12;--stamp:#FF7590;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --desk:#13122A;--paper:#1E1C3F;--paper2:#191838;--ink:#F0EEFF;--muted:#B6B2DE;--line:#8D86D6;--hair:#35325F;--soft:#2A2756;--shadow:#06050F;
+  --doc:#8AABFF;--sheet:#5BD893;--slide:#FFA06C;--db:#BC9BFF;--draw:#F2CB55;--math:#FF8AB8;
+  --ms:#909CFF;--lo:#47D4BB;--on-suite:#12102A;
+  --ok:#62DE9B;--okbg:#163A29;--bad:#FF8E8E;--badbg:#47192A;--warn:#FFCB6B;--warnbg:#3D2E12;--stamp:#FF7590;
+  color-scheme:dark}
+
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{font-size:17px;scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 128px)}
+html.board{font-size:20px}
+body{margin:0;background:var(--desk);color:var(--ink);font-family:var(--fb);font-size:1rem;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:70;background:var(--paper)}
+h1,h2,h3,h4{font-family:var(--fh);line-height:1.15;margin:0;text-wrap:balance;font-weight:600}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:8px}
+.i{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none;vertical-align:-.18em}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.mono{font-family:var(--fm);font-size:.92em}
+kbd{font-family:var(--fh);font-weight:600;font-size:.92em;background:var(--paper);color:var(--ink);border:2px solid var(--line);border-bottom-width:4px;border-radius:7px;padding:0 .45em;white-space:nowrap}
+.wrap{width:100%;max-width:1120px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:60;background:var(--paper);border-bottom:3px solid var(--line)}
+.top-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding-block:9px 6px}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;min-width:0;text-decoration:none}
+.brand svg{width:40px;height:40px;flex:none}
+.brand b{display:block;font-family:var(--fh);font-weight:700;font-size:1.06rem;line-height:1.1}
+.brand small{display:block;font-size:.76rem;font-weight:800;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.xp{display:flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:12px;padding:4px 10px 4px 6px;background:var(--paper2);font-weight:800;font-size:.86rem;font-variant-numeric:tabular-nums}
+.xp-rank{font-family:var(--fh);font-weight:600;background:var(--sun);color:var(--on-bright);border-radius:8px;padding:1px 8px;white-space:nowrap}
+.xp-num b{font-family:var(--fh);font-size:1.05rem}
+.xp-bar{width:64px;height:8px;border-radius:99px;background:var(--soft);overflow:hidden;border:1px solid var(--hair)}
+.xp-bar i{display:block;height:100%;width:0;background:var(--mint);transition:width .5s}
+.seg{display:flex;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--paper);padding:5px 11px;font-weight:800;font-size:.85rem;letter-spacing:.04em}
+.seg button+button{border-left:2px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.iconbtn{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);background:var(--paper);border-radius:10px;padding:5px 10px;font-weight:800;font-size:.85rem;min-height:36px}
+.iconbtn.sq{width:38px;justify-content:center;padding:0}
+.path{display:flex;gap:6px;overflow-x:auto;padding-block:2px 9px;scrollbar-width:thin}
+.path a{flex:none;display:flex;align-items:center;gap:7px;text-decoration:none;font-weight:800;font-size:.82rem;padding:3px 10px 3px 3px;border:2px solid var(--line);border-radius:10px;background:var(--paper)}
+.path a .n{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:var(--c);color:var(--on-bright);font-family:var(--fh);font-weight:600;font-size:.82rem}
+.path a.done{background:color-mix(in srgb,var(--ok) 12%,var(--paper));border-color:var(--ok)}
+.path a.done .n{background:var(--ok);color:var(--paper)}
+
+/* ---------- hero ---------- */
+main{padding-block:26px 40px}
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:28px;align-items:center}
+.kicker{display:inline-block;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.hero h1{font-weight:700;font-size:clamp(2.3rem,6.2vw,3.9rem);letter-spacing:-.02em}
+.hero .h1b{display:block;font-size:.5em;font-weight:600;letter-spacing:0;margin-top:6px}
+.hero .h1b .ms{color:var(--ms)}.hero .h1b .lo{color:var(--lo)}
+.story{font-size:1.08rem;max-width:62ch;margin-top:14px}
+.hero-art{width:100%;max-width:440px;height:auto;justify-self:center;overflow:visible}
+.ha-shadow{fill:var(--hair)}
+.ha-paper{fill:var(--paper);stroke:var(--line);stroke-width:3.5}
+.ha-line{stroke:var(--hair);stroke-width:5;stroke-linecap:round}
+.ha-case{fill:color-mix(in srgb,var(--ms) 72%,var(--lo));stroke:var(--line);stroke-width:4}
+.ha-strap{fill:var(--sun);stroke:var(--line);stroke-width:3}
+.ha-clasp{fill:var(--paper);stroke:var(--line);stroke-width:3}
+.ha-handle{fill:none;stroke:var(--line);stroke-width:9;stroke-linecap:round}
+.ha-tag{stroke:var(--line);stroke-width:3}
+.ha-tag.ms{fill:var(--ms)}.ha-tag.lo{fill:var(--lo)}
+.ha-tagt{fill:var(--on-suite);font:700 15px var(--fm)}
+.ha-spark{fill:var(--sun);stroke:var(--line);stroke-width:2}
+.ha-float{animation:float 5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.ha-float.f2{animation-delay:-1.6s}.ha-float.f3{animation-delay:-3.2s}
+@keyframes float{50%{transform:translateY(-9px)}}
+.team-h{font-family:var(--fh);font-weight:600;font-size:1.05rem;margin:22px 0 10px}
+.team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.member{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid var(--line);border-radius:14px;background:var(--paper);padding:10px 6px 9px;text-align:center}
+.member .ava{width:58px;height:58px}
+.member b{font-family:var(--fh);font-weight:600;font-size:1.02rem}
+.member small{font-size:.76rem;font-weight:800;color:var(--muted);line-height:1.2}
+.member[aria-pressed="true"]{background:color-mix(in srgb,var(--sun) 28%,var(--paper));box-shadow:3px 3px 0 var(--shadow)}
+.bubble{margin-top:12px;border:2px solid var(--line);border-radius:16px;background:var(--paper);padding:12px 14px;display:flex;gap:12px;align-items:flex-start;position:relative}
+.bubble .ava{width:46px;height:46px;flex:none}
+.bubble q{font-family:var(--fh);font-weight:500;font-size:1.1rem;quotes:"„" "“"}
+.bubble .go{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-weight:800;font-size:.86rem;color:var(--muted);text-decoration:none;border-bottom:2px dotted var(--hair)}
+.goals{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:26px}
+.panel{border:2px solid var(--line);border-radius:18px;background:var(--paper);padding:16px 18px}
+.panel h3{font-size:1.15rem;margin-bottom:8px}
+.goals ul{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.plan{display:flex;flex-wrap:wrap;gap:6px}
+.plan a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;border:2px solid var(--line);border-radius:10px;padding:3px 9px 3px 3px;font-weight:800;font-size:.84rem;background:var(--paper)}
+.plan a .n{display:grid;place-items:center;width:22px;height:22px;border-radius:6px;background:var(--c);color:var(--on-bright);font-family:var(--fh)}
+.plan a em{font-style:normal;color:var(--muted);font-weight:700}
+.plan-note{font-size:.86rem;color:var(--muted);margin-top:8px}
+
+/* ---------- section folders ---------- */
+.lvl{position:relative;margin-top:62px;background:var(--paper);border:3px solid var(--line);border-radius:0 22px 22px 22px;box-shadow:7px 7px 0 var(--shadow);padding:22px 24px 26px}
+.lvl-tab{position:absolute;left:-3px;bottom:100%;display:flex;align-items:center;gap:9px;background:var(--c);color:var(--on-bright);border:3px solid var(--line);border-bottom:0;border-radius:14px 14px 0 0;padding:5px 16px 4px 6px;font-family:var(--fh);font-weight:600;font-size:1rem}
+.lvl-tab .n{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--paper);color:var(--ink);border:2px solid var(--line);font-weight:700}
+.stamp{position:absolute;right:20px;top:-26px;transform:rotate(-7deg);border:3px solid var(--stamp);color:var(--stamp);background:color-mix(in srgb,var(--paper) 88%,transparent);font-family:var(--fh);font-weight:700;letter-spacing:.12em;text-transform:uppercase;font-size:1rem;padding:2px 12px;border-radius:9px;pointer-events:none;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--stamp) 25%,transparent)}
+.stamp.new{animation:stamp .55s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes stamp{0%{transform:rotate(-7deg) scale(2.4);opacity:0}60%{opacity:1}100%{transform:rotate(-7deg) scale(1)}}
+.lvl-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px 18px;flex-wrap:wrap}
+.lvl-ttl{min-width:0;flex:1 1 420px}
+.lvl-head h2{font-size:clamp(1.5rem,3.4vw,2.05rem);font-weight:600}
+.lead{color:var(--muted);max-width:70ch;margin-top:8px;font-size:1.02rem}
+.tchip{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);background:var(--paper2);border-radius:10px;padding:4px 10px;font-weight:800;font-size:.85rem}
+.tchip em{font-style:normal;background:var(--c);color:var(--on-bright);border-radius:6px;padding:0 6px;font-size:.76rem;text-transform:uppercase;letter-spacing:.05em}
+.tchip:hover{background:var(--soft)}
+
+/* activities inside a folder */
+.act{border-top:2px dashed var(--hair);padding-top:20px;margin-top:22px}
+.act-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-bottom:6px}
+.act-h h3{font-size:1.24rem}
+.kind{font-size:.72rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;padding:2px 9px;border-radius:99px;background:var(--soft);color:var(--muted)}
+.how{color:var(--muted);font-size:.94rem;margin:0 0 12px;max-width:75ch}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.mt{margin-top:14px}
+.small{font-size:.88rem;color:var(--muted)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:var(--fh);font-weight:600;font-size:1rem;border:3px solid var(--line);border-radius:12px;padding:7px 16px;background:var(--sun);color:var(--on-bright);box-shadow:3px 3px 0 var(--shadow);transition:transform .08s,box-shadow .08s}
+.btn:hover:not(:disabled){filter:brightness(1.04)}
+.btn:active:not(:disabled){transform:translate(3px,3px);box-shadow:0 0 0 var(--shadow)}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+.btn.mint{background:var(--mint)}.btn.sky{background:var(--sky)}.btn.coral{background:var(--coral)}
+.btn.sm{font-size:.9rem;padding:4px 11px;border-width:2px;box-shadow:2px 2px 0 var(--shadow)}
+.btn:disabled{opacity:.45}
+.linkbtn{border:0;background:none;padding:0;font-weight:800;color:var(--muted);text-decoration:underline dotted;text-underline-offset:3px}
+
+/* choices */
+.opts{display:grid;gap:8px}
+.opts.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:9px 13px;font-weight:700;color:var(--ink);transition:transform .1s,background .1s}
+.opt:hover:not(:disabled){background:var(--paper2);transform:translateX(2px)}
+.opt .mk{flex:none;display:grid;place-items:center;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);font-family:var(--fh);font-weight:600;font-size:.85rem;background:var(--paper2)}
+.opt.pick{background:color-mix(in srgb,var(--sun) 32%,var(--paper))}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}
+.opt.ok .mk{background:var(--ok);border-color:var(--ok);color:var(--paper)}
+.opt.no{background:var(--badbg);border-color:var(--bad)}
+.opt.no .mk{background:var(--bad);border-color:var(--bad);color:var(--paper)}
+.opt.warn{background:var(--warnbg);border-color:var(--warn)}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.ok):not(.no):not(.pick):not(.warn){opacity:.6}
+.fb{margin-top:12px;padding:10px 14px;border-radius:12px;border:2px solid var(--hair);background:var(--paper2);font-weight:600;max-width:80ch}
+.fb.ok{border-color:var(--ok);background:var(--okbg)}
+.fb.no{border-color:var(--bad);background:var(--badbg)}
+.fb.warn{border-color:var(--warn);background:var(--warnbg)}
+.fb b,.fb strong{font-family:var(--fh);font-weight:600}
+.shake{animation:shake .38s}
+@keyframes shake{20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.pop{animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+/* chips (things to sort) */
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:46px}
+.chip{display:inline-flex;align-items:center;gap:8px;border:2px solid var(--line);background:var(--paper);border-radius:12px;padding:5px 12px 5px 5px;font-weight:800;color:var(--ink);font-size:.95rem;text-align:left}
+.chip .ic{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:color-mix(in srgb,var(--tc,var(--muted)) 16%,var(--paper));color:var(--tc,var(--muted))}
+.chip[aria-pressed="true"]{background:color-mix(in srgb,var(--sun) 35%,var(--paper));box-shadow:3px 3px 0 var(--shadow);transform:translate(-1px,-1px)}
+.chip.placed{border-color:var(--ok);cursor:default}
+.chip.file{font-family:var(--fm);font-size:.95rem;padding:6px 12px}
+.zones{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.zone{display:flex;flex-direction:column;align-items:stretch;gap:8px;text-align:left;border:3px dashed var(--zc,var(--line));border-radius:16px;padding:12px;min-height:130px;background:color-mix(in srgb,var(--zc,var(--soft)) 7%,var(--paper));color:var(--ink)}
+.zone.armed{border-style:solid;box-shadow:0 0 0 4px color-mix(in srgb,var(--zc,var(--sun)) 25%,transparent)}
+.zone h4{display:flex;align-items:center;gap:8px;font-size:1.05rem}
+.zone h4 small{font-family:var(--fb);font-weight:700;font-size:.8rem;color:var(--muted)}
+.zone .in{display:flex;flex-wrap:wrap;gap:6px}
+.zone .in .chip{font-size:.85rem;padding:3px 10px 3px 3px}
+.zone .in .chip .ic{width:24px;height:24px}
+
+/* ---------- section 1 ---------- */
+.email{border:2px solid var(--line);border-radius:16px;background:var(--paper2);overflow:hidden;max-width:620px}
+.email-h{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;padding:12px 16px;border-bottom:2px solid var(--hair);font-size:.92rem}
+.email-h b{color:var(--muted);font-weight:800}
+.email-b{padding:12px 16px}
+.att{display:inline-flex;align-items:center;gap:10px;margin-top:10px;border:2px solid var(--line);border-radius:12px;padding:6px 12px 6px 6px;background:var(--paper);font-family:var(--fm);font-weight:700}
+.att .ic{display:grid;place-items:center;width:34px;height:34px;border-radius:8px;background:color-mix(in srgb,var(--lo) 16%,var(--paper));color:var(--lo)}
+.att small{font-family:var(--fb);color:var(--muted);font-weight:700}
+.lock{display:inline-flex;align-items:center;gap:6px}
+
+/* ---------- section 2 ---------- */
+.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.flip{border:0;background:none;padding:0;perspective:900px;text-align:left;min-height:200px;color:var(--ink)}
+.flip-in{position:relative;display:block;width:100%;height:100%;min-height:200px;transition:transform .55s cubic-bezier(.3,.7,.3,1);transform-style:preserve-3d}
+.flip[aria-pressed="true"] .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border:3px solid var(--line);border-radius:16px;background:var(--paper);padding:14px;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.face.front{align-items:center;justify-content:center;text-align:center;background:color-mix(in srgb,var(--tc) 10%,var(--paper))}
+.face.front .big{display:grid;place-items:center;width:64px;height:64px;border-radius:16px;background:var(--paper);border:3px solid var(--line);color:var(--tc)}
+.face.front .big .i{width:34px;height:34px}
+.face.front b{font-family:var(--fh);font-weight:600;font-size:1.2rem}
+.face.front small{color:var(--muted);font-weight:700;font-size:.8rem}
+.face.back{transform:rotateY(180deg)}
+.fl-type{display:flex;align-items:center;gap:6px;font-family:var(--fh);font-weight:600;color:var(--tc)}
+.fl-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;flex:1}
+.fl-col{border-radius:10px;padding:6px 8px;background:var(--paper2);border:2px solid var(--hair);min-width:0}
+.fl-col.ms{border-color:color-mix(in srgb,var(--ms) 55%,var(--hair))}.fl-col.lo{border-color:color-mix(in srgb,var(--lo) 55%,var(--hair))}
+.fl-col small{display:block;font-size:.66rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.fl-col b{display:block;font-family:var(--fh);font-weight:600;font-size:1rem;line-height:1.15;overflow-wrap:anywhere;hyphens:auto}
+.fl-col i{display:block;font-style:normal;font-family:var(--fm);font-size:.8rem;color:var(--muted)}
+.fl-col em{display:block;font-style:normal;font-size:.72rem;color:var(--muted);line-height:1.25;margin-top:2px}
+.fl-use{font-size:.82rem;font-weight:700}
+.twins{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(36px,.55fr) minmax(0,1fr);align-items:start}
+.tw-col{display:grid;gap:10px;position:relative;z-index:1}
+.tw-col h4{font-size:.8rem;font-family:var(--fb);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tw-btn{display:flex;align-items:center;gap:8px;border:2px solid var(--line);border-radius:12px;background:var(--paper);padding:8px 10px;font-family:var(--fh);font-weight:600;font-size:1.02rem;text-align:left;color:var(--ink);min-width:0}
+.tw-btn .ic{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;flex:none;background:color-mix(in srgb,var(--tc) 16%,var(--paper));color:var(--tc)}
+.tw-btn.ms{border-left:6px solid var(--ms)}.tw-btn.lo{border-right:6px solid var(--lo)}
+.tw-btn[aria-pressed="true"]{background:color-mix(in srgb,var(--sun) 35%,var(--paper));box-shadow:3px 3px 0 var(--shadow)}
+.tw-btn.done{border-color:var(--tc);cursor:default}
+.twins>svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.tw-line{fill:none;stroke-width:4;stroke-linecap:round}
+.tasks{display:grid;gap:12px}
+.trow{border:2px solid var(--hair);border-radius:14px;padding:10px 12px;background:var(--paper2)}
+.trow.ok{border-color:var(--ok);background:var(--okbg)}
+.trow p{font-weight:700}
+.tbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tbtn{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:10px;background:var(--paper);padding:4px 10px 4px 4px;font-weight:800;font-size:.86rem;color:var(--ink)}
+.tbtn .ic{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:color-mix(in srgb,var(--tc) 16%,var(--paper));color:var(--tc)}
+.tbtn.ok{background:var(--okbg);border-color:var(--ok)}.tbtn.no{background:var(--badbg);border-color:var(--bad)}
+.tbtn:disabled{cursor:default}
+.tfb{font-size:.9rem;font-weight:700;margin-top:6px}
+
+/* ---------- section 3 ---------- */
+.duel{display:grid;grid-template-columns:minmax(110px,.6fr) minmax(0,1fr) minmax(0,1fr);border:3px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper)}
+.duel>div{padding:9px 12px;border-top:2px solid var(--hair);min-width:0}
+.duel .dh{border-top:0;font-family:var(--fh);font-weight:600;font-size:1.1rem;display:flex;align-items:center;gap:8px}
+.duel .dh.ms{background:var(--ms);color:var(--on-suite)}.duel .dh.lo{background:var(--lo);color:var(--on-suite)}
+.duel .dl{font-weight:800;font-size:.84rem;color:var(--muted);background:var(--paper2)}
+.duel .dh.dl{background:var(--paper2)}
+.duel .mono{font-weight:700}
+.shared{margin-top:10px;font-weight:700}
+.fact{display:flex;gap:12px;align-items:flex-start;margin-top:14px;border:2px solid var(--line);border-radius:14px;padding:10px 14px;background:color-mix(in srgb,var(--sun) 22%,var(--paper))}
+.fact .i{width:26px;height:26px;margin-top:2px}
+.hood{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.hbox{border:3px solid var(--line);border-radius:16px;background:var(--paper2);overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.hbox-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;font-family:var(--fh);font-weight:600;font-size:1.05rem;color:var(--on-suite)}
+.hbox.ms .hbox-h{background:var(--ms)}.hbox.lo .hbox-h{background:var(--lo)}
+.hbox-b{padding:12px;display:flex;flex-direction:column;gap:10px;flex:1}
+.code{margin:0;font-family:var(--fm);font-size:.82rem;line-height:1.55;background:var(--desk);border:2px solid var(--hair);border-radius:10px;padding:10px 12px;overflow-x:auto;white-space:pre;color:var(--ink)}
+.code .cm{color:var(--muted)}
+.code .kw{color:var(--db);font-weight:700}
+.binary{font-family:var(--fm);font-size:.8rem;line-height:1.35;color:var(--muted);background:var(--desk);border:2px solid var(--hair);border-radius:10px;padding:10px;overflow:hidden;word-break:break-all;height:6.4em;position:relative}
+.binary::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 40%,var(--desk))}
+.lockline{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--bad)}
+.openline{display:flex;align-items:center;gap:8px;font-weight:800;color:var(--ok)}
+.free{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.free div{border:2px solid var(--line);border-radius:12px;padding:8px 10px;background:color-mix(in srgb,var(--lo) 10%,var(--paper));font-size:.88rem;font-weight:700}
+.free b{display:block;font-family:var(--fh);font-weight:600;font-size:1rem}
+.sema{display:grid;gap:10px}
+.smr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 14px;align-items:center;border:2px solid var(--hair);border-radius:14px;padding:10px 12px;background:var(--paper2)}
+.smr .who{display:flex;gap:10px;align-items:center;min-width:0}
+.smr .who .ava{width:40px;height:40px;flex:none}
+.smr p{font-weight:700}
+.smr .bt{display:flex;gap:6px}
+.smr .why{grid-column:1/-1;font-size:.92rem;font-weight:700}
+.smr.ok{border-color:var(--ok);background:var(--okbg)}.smr.no{border-color:var(--bad);background:var(--badbg)}
+.light{display:inline-flex;align-items:center;gap:6px;border:2px solid var(--line);border-radius:999px;padding:4px 12px 4px 6px;font-weight:800;font-size:.88rem;background:var(--paper);color:var(--ink)}
+.light::before{content:"";width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:var(--lc)}
+.light.ok{--lc:var(--go)}.light.bad{--lc:var(--stop)}
+.light.sel{box-shadow:0 0 0 3px color-mix(in srgb,var(--lc) 45%,transparent)}
+.calc{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;align-items:start}
+.fields{display:grid;gap:10px}
+.field{display:grid;gap:4px}
+.field label{font-weight:800;font-size:.88rem}
+.field .hint{font-size:.78rem;color:var(--muted);font-weight:700}
+.field input[type=number],.field input[type=text]{width:100%;max-width:9.5rem;border:2px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--paper);font-weight:800;font-variant-numeric:tabular-nums}
+.pricegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+input[type=range]{width:100%;accent-color:var(--mint)}
+.stepper{display:inline-flex;align-items:center;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.stepper button{border:0;background:var(--paper2);width:36px;height:34px;font-weight:800;font-size:1.1rem}
+.stepper output{min-width:42px;text-align:center;font-family:var(--fh);font-weight:600;font-size:1.1rem}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;align-items:end}
+.bar .bn{font-weight:800;font-size:.9rem;min-width:0}
+.bar .bn small{display:block;font-weight:700;color:var(--muted);font-size:.76rem}
+.bar .bv{font-family:var(--fh);font-weight:600;font-size:1.15rem;font-variant-numeric:tabular-nums;text-align:right}
+.bar .bt{grid-column:1/-1;height:16px;border-radius:99px;background:var(--soft);overflow:hidden;border:1px solid var(--hair)}
+.bar .bt i{display:block;height:100%;border-radius:99px;background:var(--bc);transition:width .4s}
+.bar.ms{--bc:var(--ms)}.bar.lo{--bc:var(--lo)}
+.best{display:inline-block;margin-left:6px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;background:var(--sun);color:var(--on-bright);border-radius:6px;padding:0 6px}
+.qcard{border:2px solid var(--hair);border-radius:14px;padding:12px 14px;background:var(--paper2);margin-top:12px}
+.qcard p.q{font-weight:800;margin-bottom:8px}
+.ninput{width:6.5rem;border:2px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--paper);font-weight:800;font-variant-numeric:tabular-nums}
+
+/* ---------- section 4 ---------- */
+.lab{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;align-items:start}
+.pickers{display:grid;gap:12px}
+.pgrp h4{font-size:.78rem;font-family:var(--fb);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.pgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.pgrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pick{display:flex;align-items:center;gap:7px;border:2px solid var(--line);border-radius:10px;background:var(--paper);padding:5px 8px;font-weight:800;font-size:.86rem;text-align:left;min-width:0;color:var(--ink)}
+.pick .ic{display:grid;place-items:center;width:24px;height:24px;border-radius:7px;flex:none;background:color-mix(in srgb,var(--tc) 16%,var(--paper));color:var(--tc)}
+.pick.f{font-family:var(--fm);font-size:.8rem;word-break:break-all}
+.pick.ms{border-left:5px solid var(--ms)}.pick.lo{border-left:5px solid var(--lo)}
+.pick[aria-pressed="true"]{background:color-mix(in srgb,var(--sun) 35%,var(--paper));box-shadow:2px 2px 0 var(--shadow)}
+.tried{font-size:.86rem;font-weight:800;color:var(--muted)}
+.win{border:3px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper);box-shadow:5px 5px 0 var(--shadow)}
+.win-bar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:6px 10px;border-bottom:3px solid var(--line);font-weight:800;font-size:.84rem;background:var(--wc,var(--soft));color:var(--on-suite);min-width:0}
+.win-bar .t{flex:1 1 110px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--fm)}
+.win-bar .dots{display:flex;gap:5px}
+.win-bar .dots i{width:10px;height:10px;border-radius:50%;background:color-mix(in srgb,var(--on-suite) 70%,transparent)}
+.win.ms{--wc:var(--ms)}.win.lo{--wc:var(--lo)}
+.win.idle .win-bar{color:var(--ink)}
+.win-body{padding:14px;background:var(--desk);min-height:250px;position:relative}
+.status{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;border-radius:7px;padding:1px 8px;background:var(--paper);color:var(--ink)}
+.status.native{background:var(--okbg);color:var(--ok)}.status.cross{background:var(--warnbg);color:var(--warn)}.status.err{background:var(--badbg);color:var(--bad)}
+.pg{position:relative;background:var(--paper);border:2px solid var(--hair);border-radius:6px;padding:16px 18px;box-shadow:0 2px 0 var(--hair);color:var(--ink)}
+.pg-h{font-family:var(--fh);font-weight:700;font-size:1.32rem;color:var(--doc);line-height:1.15}
+.pg-row{display:flex;gap:14px;margin-top:10px;align-items:flex-start}
+.pg-img{flex:none;width:96px;height:80px;border-radius:8px;background:var(--paper2);border:2px solid var(--hair);display:grid;place-items:center}
+.pg-img svg{width:74px;height:64px}
+.pg-txt{font-size:.88rem;min-width:0}
+.pg-txt p+p{margin-top:5px}
+.pg-when{font-weight:800}
+.pg-sig{color:var(--muted);font-style:italic}
+.pg.shift .pg-h{font-family:Georgia,"Times New Roman",serif;font-weight:700;letter-spacing:0;font-size:1.2rem}
+.pg.shift .pg-row{flex-direction:row-reverse}
+.pg.shift .pg-img{transform:translate(4px,16px) rotate(-3deg)}
+.smk{position:absolute;z-index:2;display:inline-flex;align-items:center;gap:4px;font-size:.72rem;font-weight:800;background:var(--warnbg);color:var(--warn);border:2px dashed var(--warn);border-radius:8px;padding:0 6px;white-space:nowrap}
+.smk.m1{top:-11px;left:12px}.smk.m2{bottom:-11px;right:12px}
+.sheet{width:100%;border-collapse:collapse;font-size:.82rem;font-variant-numeric:tabular-nums;background:var(--paper)}
+.sheet th,.sheet td{border:1px solid var(--hair);padding:4px 6px;text-align:left;white-space:nowrap}
+.sheet th{background:color-mix(in srgb,var(--sheet) 16%,var(--paper));font-weight:800}
+.sheet .rn{width:22px;text-align:center;color:var(--muted);background:var(--paper2);font-weight:700}
+.sheet td.num{text-align:right}
+.sheet tr.tot td{font-weight:800;border-top:2px solid var(--sheet)}
+.sheet.shift td.num.cut{letter-spacing:.08em;color:var(--bad)}
+.tablewrap{overflow-x:auto;border:2px solid var(--hair);border-radius:6px;position:relative}
+.slidebox{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--paper);border:2px solid var(--hair);border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:12px;align-items:center;overflow:visible}
+.slidebox h5{grid-column:1/-1;margin:0;font-family:var(--fh);font-weight:700;font-size:1.25rem;color:var(--slide);align-self:start}
+.slidebox ul{margin:0;padding-left:1.1em;font-size:.86rem;font-weight:700;display:grid;gap:3px}
+.minichart{display:flex;align-items:flex-end;gap:6px;height:70px;border-bottom:2px solid var(--hair);padding:0 4px}
+.minichart i{flex:1;background:var(--slide);border-radius:4px 4px 0 0}
+.slidebox.shift h5{font-family:Georgia,"Times New Roman",serif;transform:translate(14px,6px)}
+.errbox{display:flex;gap:12px;align-items:flex-start;border:3px solid var(--bad);border-radius:12px;background:var(--paper);padding:14px;font-weight:700}
+.errbox .i{width:28px;height:28px;color:var(--bad)}
+.modsw{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;font-size:.8rem;font-weight:800;border:2px dashed var(--lo);border-radius:9px;padding:2px 8px;color:var(--ink);background:var(--paper)}
+.resmsg{margin-top:12px}
+.zipwrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.zbox{border:3px solid var(--line);border-radius:16px;background:var(--paper2);overflow:hidden;min-width:0;display:flex;flex-direction:column}
+.zhead{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:2px solid var(--hair)}
+.zhead .ic{display:grid;place-items:center;width:40px;height:40px;border-radius:10px;border:2px solid var(--line);background:var(--paper);color:var(--tc)}
+.zhead b{font-family:var(--fm);font-size:1rem;display:block}
+.zhead b .ren{color:var(--bad);text-decoration:line-through}
+.zhead b .new{color:var(--ok)}
+.zhead small{color:var(--muted);font-weight:700;font-size:.8rem}
+.zbody{padding:10px 12px;display:grid;gap:10px}
+.tree{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-family:var(--fm);font-size:.82rem}
+.tree li{min-width:0}
+.tnode{display:flex;align-items:center;gap:6px;width:100%;border:2px solid transparent;border-radius:8px;background:none;padding:3px 6px;text-align:left;font-family:var(--fm);font-size:.82rem;font-weight:700;color:var(--ink);overflow-wrap:anywhere}
+.tnode .i{color:var(--muted)}
+.tnode.dir{cursor:default;color:var(--muted)}
+.tnode.dir .i{color:var(--draw)}
+.tnode.lv1{padding-left:24px}
+.tnode.lv2{padding-left:42px}
+.tnode:not(.dir):hover{background:var(--soft)}
+.tnode[aria-pressed="true"]{border-color:var(--line);background:color-mix(in srgb,var(--sun) 30%,var(--paper))}
+.tnode.seen:not([aria-pressed="true"])::after{content:"✓";margin-left:auto;color:var(--ok)}
+.zprev{border:2px solid var(--hair);border-radius:12px;background:var(--paper);padding:10px 12px;display:grid;gap:8px;min-height:120px}
+.zprev p{font-size:.9rem;font-weight:700}
+.xml{margin:0;font-family:var(--fm);font-size:.76rem;line-height:1.55;white-space:pre;overflow-x:auto;background:var(--desk);border-radius:8px;padding:8px 10px;color:var(--ink)}
+.xml .xt{color:var(--doc);font-weight:700}.xml .xa{color:var(--slide)}.xml .xv{color:var(--sheet)}
+.xml mark{background:color-mix(in srgb,var(--sun) 55%,transparent);color:inherit;border-radius:3px;padding:0 2px}
+.zimg{display:grid;place-items:center;background:var(--desk);border-radius:8px;padding:8px}
+.zimg svg{width:120px;height:100px}
+.zclosed{display:grid;place-items:center;gap:10px;padding:18px 10px;text-align:center}
+.zclosed svg.boxart{width:120px;height:96px}
+.steps{margin:0;padding-left:0;list-style:none;display:grid;gap:8px;counter-reset:st}
+.steps label{display:flex;gap:10px;align-items:flex-start;border:2px solid var(--hair);border-radius:12px;padding:8px 12px;background:var(--paper2);cursor:pointer;font-weight:600}
+.steps input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--mint)}
+.steps label:has(input:checked){border-color:var(--ok);background:var(--okbg)}
+textarea{width:100%;min-height:80px;resize:vertical;border:2px solid var(--line);border-radius:12px;padding:9px 12px;background:var(--paper);font-weight:600;line-height:1.45}
+.extg{display:grid;grid-template-columns:minmax(90px,.55fr) minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:12px}
+.extg .eh{font-family:var(--fh);font-weight:600;padding:6px 10px;border-radius:10px;display:flex;align-items:center;gap:6px;min-width:0}
+.extg .eh.ms{background:var(--ms);color:var(--on-suite)}.extg .eh.lo{background:var(--lo);color:var(--on-suite)}
+.extg .er{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.9rem;padding:6px 4px;color:var(--tc)}
+.extg .er span{color:var(--ink)}
+.ecell{min-height:52px;border:3px dashed var(--line);border-radius:12px;background:var(--paper);display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px;color:var(--ink);min-width:0}
+.ecell.armed{border-style:solid;background:color-mix(in srgb,var(--sun) 16%,var(--paper))}
+.ecell .chip{font-size:.85rem;padding:3px 9px;cursor:default}
+.ecell.uni{grid-column:1/-1;min-height:56px}
+.uni-l{grid-column:1/-1;font-weight:800;font-size:.88rem;margin-top:4px}
+.dlg{border:3px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper);box-shadow:5px 5px 0 var(--shadow);max-width:640px}
+.dlg-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 12px;background:var(--soft);border-bottom:3px solid var(--line);font-weight:800}
+.dlg-b{padding:14px;display:grid;gap:10px}
+.dlg-r{display:grid;grid-template-columns:8.5rem minmax(0,1fr);gap:8px;align-items:center}
+.dlg-r label{font-weight:800;font-size:.9rem}
+.dlg-r .fname{border:2px solid var(--line);border-radius:8px;padding:5px 10px;background:var(--paper2);font-family:var(--fm);font-weight:700;overflow-wrap:anywhere}
+.dlg-r select{border:2px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--paper);font-weight:700;width:100%;min-width:0}
+.dlg-f{display:flex;justify-content:flex-end;gap:8px}
+.scn{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--line);border-radius:14px;padding:10px 14px;background:color-mix(in srgb,var(--sky) 16%,var(--paper));margin-bottom:12px;max-width:640px}
+.scn .ava{width:44px;height:44px;flex:none}
+.scn p{font-weight:700}
+.pdots{display:flex;gap:6px;margin-bottom:10px}
+.pdots i{width:28px;height:8px;border-radius:99px;background:var(--hair)}
+.pdots i.cur{background:var(--sun)}.pdots i.ok{background:var(--ok)}.pdots i.mid{background:var(--warn)}.pdots i.no{background:var(--bad)}
+
+/* ---------- section 5: ninja ---------- */
+.nj{position:relative;border:3px solid var(--line);border-radius:18px;background:var(--paper2);padding:16px;outline:none;display:grid;gap:14px}
+.nj-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.nj-meta{display:flex;gap:8px;flex-wrap:wrap}
+.nj-meta span{border:2px solid var(--line);border-radius:10px;padding:2px 10px;font-weight:800;font-variant-numeric:tabular-nums;background:var(--paper)}
+.nj-stage{display:grid;place-items:center;text-align:center;min-height:132px;border:2px dashed var(--hair);border-radius:14px;background:var(--paper);padding:12px}
+.nj-ask{font-size:.95rem;font-weight:700;color:var(--muted)}
+.nj-act{font-family:var(--fh);font-weight:700;font-size:clamp(1.7rem,5vw,2.5rem);line-height:1.1;display:flex;align-items:center;gap:12px;justify-content:center}
+.nj-act .i{width:1em;height:1em}
+.nj-msg{font-weight:800;min-height:1.4em}
+.nj-msg.ok{color:var(--ok)}.nj-msg.no{color:var(--bad)}
+.nj.flash-ok .nj-stage{animation:flashok .4s}
+.nj.flash-no .nj-stage{animation:shake .38s}
+@keyframes flashok{0%{background:var(--okbg)}100%{background:var(--paper)}}
+.kb{display:grid;gap:6px;user-select:none;-webkit-user-select:none}
+.kb-row{display:flex;gap:5px;justify-content:center}
+.kb-row:nth-child(2){padding-left:3%}.kb-row:nth-child(3){padding-left:6%}
+.key{flex:1 1 0;max-width:3.1rem;min-width:0;height:2.75rem;border:2px solid var(--line);border-bottom-width:5px;border-radius:9px;background:var(--paper);font-family:var(--fh);font-weight:600;font-size:1rem;display:grid;place-items:center;color:var(--ink);padding:0;transition:transform .06s,border-bottom-width .06s}
+.key.ctrl{flex:0 0 auto;max-width:none;width:4.6rem;background:var(--ink);color:var(--paper);font-size:.85rem}
+.key.used{background:color-mix(in srgb,var(--lilac) 40%,var(--paper))}
+.key.on{transform:translateY(3px);border-bottom-width:2px}
+.key.hint{background:var(--sun);color:var(--on-bright);animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--sun) 45%,transparent)}}
+.key.hit{background:var(--okbg);border-color:var(--ok)}
+.key.miss{background:var(--badbg);border-color:var(--bad)}
+.nj-over{position:absolute;inset:0;display:grid;place-items:center;background:color-mix(in srgb,var(--paper2) 80%,transparent);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);border-radius:15px;z-index:3;font-family:var(--fh);font-weight:600;font-size:1.2rem;text-align:center;padding:12px}
+.nj-res{display:grid;gap:6px;justify-items:center;text-align:center;background:var(--paper);border:3px solid var(--line);border-radius:16px;padding:16px 24px;box-shadow:4px 4px 0 var(--shadow)}
+.nj-res.bare{background:none;border:0;box-shadow:none;padding:0}
+.nj-res .big{font-family:var(--fh);font-weight:700;font-size:2.4rem;line-height:1}
+.cheat{width:100%;border-collapse:collapse;font-size:.95rem}
+.cheat td{border-top:2px solid var(--hair);padding:7px 8px}
+.cheat td:first-child{white-space:nowrap;width:1%}
+.cheatwrap{border:2px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper)}
+
+/* ---------- section 6: drama ---------- */
+.roles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.role{border:2px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--paper2)}
+.role .ri{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--rc,var(--soft));color:var(--on-bright);border:2px solid var(--line);margin-bottom:6px}
+.role.ms .ri{background:var(--ms);color:var(--on-suite)}.role.lo .ri{background:var(--lo);color:var(--on-suite)}
+.role b{font-family:var(--fh);font-weight:600;display:block}
+.role p{font-size:.86rem;color:var(--muted);font-weight:700}
+.flow{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.flow span{display:inline-flex;align-items:center;gap:6px;font-size:.82rem;font-weight:800;border:2px solid var(--hair);border-radius:99px;padding:2px 10px 2px 3px;background:var(--paper)}
+.flow span i{font-style:normal;display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--peach);color:var(--on-bright);font-family:var(--fh);font-size:.75rem}
+.client{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;border:3px solid var(--line);border-radius:18px;padding:14px;background:var(--paper)}
+.client .ava{width:84px;height:84px}
+.client .who{font-weight:800;color:var(--muted);font-size:.9rem}
+.client q{display:block;font-family:var(--fh);font-weight:500;font-size:1.2rem;line-height:1.3;margin-top:2px;quotes:"„" "“"}
+.client .duo{display:flex}
+.client .duo .ava{width:58px;height:58px}
+.client .duo .ava+.ava{margin-left:-14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tags span{font-size:.78rem;font-weight:800;border-radius:7px;padding:1px 8px;background:var(--soft)}
+.client-empty{display:grid;place-items:center;gap:8px;border:3px dashed var(--line);border-radius:18px;padding:24px;text-align:center;font-weight:800;color:var(--muted)}
+.dtimers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.dtm{display:grid;gap:6px;border:2px solid var(--line);border-radius:14px;padding:10px;background:var(--paper2)}
+.dtm .btn{width:100%}
+.dtm .tb{height:12px;border-radius:99px;background:var(--soft);overflow:hidden;border:1px solid var(--hair)}
+.dtm .tb i{display:block;height:100%;width:100%;background:var(--tcl)}
+.dtm.ms{--tcl:var(--ms)}.dtm.lo{--tcl:var(--lo)}
+.dtm .tl{font-family:var(--fh);font-weight:600;font-variant-numeric:tabular-nums;text-align:center}
+.verdict{margin-top:12px}
+.reco{margin-top:12px;border:3px solid var(--line);border-radius:16px;padding:12px 14px;background:color-mix(in srgb,var(--rc) 14%,var(--paper))}
+.reco h4{display:flex;align-items:center;gap:8px;font-size:1.1rem}
+.reco.ms{--rc:var(--ms)}.reco.lo{--rc:var(--lo)}.reco.both{--rc:var(--sun)}
+.kwl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.kwl span{font-size:.8rem;font-weight:800;border:2px solid var(--line);border-radius:99px;padding:0 9px;background:var(--paper)}
+.played{display:flex;gap:6px;align-items:center;margin-top:12px;font-weight:800;font-size:.86rem}
+.played i{width:14px;height:14px;border-radius:50%;border:2px solid var(--line);background:var(--paper)}
+.played i.on{background:var(--peach)}
+
+/* ---------- section 7: myths ---------- */
+.myths{display:grid;gap:10px}
+.myth{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 12px;align-items:center;border:2px solid var(--hair);border-radius:14px;padding:10px 12px;background:var(--paper2)}
+.myth .mn{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--lime);color:var(--on-bright);font-family:var(--fh);font-weight:600;border:2px solid var(--line)}
+.myth p{font-weight:700}
+.myth .bt{display:flex;gap:6px}
+.myth .why{grid-column:2/-1;font-size:.92rem;font-weight:700}
+.myth.ok{border-color:var(--ok);background:var(--okbg)}.myth.no{border-color:var(--bad);background:var(--badbg)}
+.tf{border:2px solid var(--line);border-radius:10px;padding:5px 12px;font-weight:800;background:var(--paper);color:var(--ink)}
+.tf.ok{background:var(--ok);border-color:var(--ok);color:var(--paper)}
+.tf.no{background:var(--bad);border-color:var(--bad);color:var(--paper)}
+.score{font-family:var(--fh);font-weight:600;font-size:1.15rem;margin-top:12px}
+
+/* ---------- section 8: test & certificate ---------- */
+.tq{border:3px solid var(--line);border-radius:18px;background:var(--paper2);padding:16px}
+.tq-meta{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.tq-meta .topic{font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;border-radius:7px;padding:1px 8px;background:var(--rose);color:var(--on-bright)}
+.tq h3{font-size:1.3rem;margin-bottom:12px}
+.tdots{display:flex;gap:5px;flex-wrap:wrap}
+.tdots i{width:20px;height:8px;border-radius:99px;background:var(--hair)}
+.tdots i.cur{background:var(--sun)}.tdots i.ok{background:var(--ok)}.tdots i.no{background:var(--bad)}
+.result{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center;border:3px solid var(--line);border-radius:18px;padding:16px;background:var(--paper2)}
+.gradebox{display:grid;justify-items:center;gap:6px}
+.grade{display:grid;place-items:center;width:96px;height:96px;border-radius:50%;border:4px solid var(--stamp);color:var(--stamp);font-family:var(--fh);font-weight:700;font-size:3rem;line-height:1;transform:rotate(-6deg)}
+.gradebox small{font-family:var(--fh);font-weight:700;color:var(--stamp);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+.result h3{font-size:1.3rem}
+.bytopic{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.bytopic span{font-size:.8rem;font-weight:800;border:2px solid var(--line);border-radius:8px;padding:1px 8px;background:var(--paper)}
+.cert{position:relative;border:3px solid var(--line);border-radius:18px;background:var(--paper);padding:26px 22px;text-align:center;overflow:hidden;box-shadow:6px 6px 0 var(--shadow)}
+.cert::before{content:"";position:absolute;inset:10px;border:2px dashed var(--hair);border-radius:12px;pointer-events:none}
+.cert .ct{font-family:var(--fh);font-weight:700;font-size:clamp(1.6rem,5vw,2.4rem);letter-spacing:.14em}
+.cert .cn{font-family:var(--fh);font-weight:600;font-size:clamp(1.4rem,4.4vw,2rem);border-bottom:3px solid var(--line);display:inline-block;padding:0 18px 2px;margin:8px 0;min-width:60%}
+.cert .cr{display:inline-block;margin-top:8px;font-weight:800;background:var(--sun);color:var(--on-bright);border-radius:8px;padding:2px 12px}
+.cert .cf{display:flex;justify-content:space-between;gap:12px;margin-top:22px;font-size:.84rem;color:var(--muted);font-weight:700;flex-wrap:wrap}
+.cert .cf span{border-top:2px solid var(--hair);padding-top:4px;min-width:40%}
+.cert .cseal{position:absolute;right:18px;top:16px;transform:rotate(12deg);border:3px solid var(--stamp);color:var(--stamp);border-radius:50%;width:92px;height:92px;display:grid;place-items:center;font-family:var(--fh);font-weight:700;font-size:.72rem;line-height:1.05;text-align:center;padding:6px}
+.selfchk{display:grid;gap:6px}
+.selfchk label{display:flex;gap:10px;align-items:center;font-weight:700;cursor:pointer}
+.selfchk input{width:20px;height:20px;accent-color:var(--mint)}
+.namein{border:2px solid var(--line);border-radius:10px;padding:7px 12px;background:var(--paper);font-weight:800;width:min(100%,22rem)}
+.sizecmp{display:grid;gap:8px;margin-top:10px}
+.sizecmp .field input{max-width:7rem}
+
+/* ---------- footer, toast, timer, dialog ---------- */
+.foot{border-top:3px solid var(--line);background:var(--paper);margin-top:30px}
+.foot .wrap{padding-block:18px 22px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;font-weight:700;color:var(--muted);font-size:.88rem}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translate(-50%,calc(100% + 40px));opacity:0;visibility:hidden;z-index:90;border:3px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);padding:8px 16px;font-family:var(--fh);font-weight:600;box-shadow:4px 4px 0 var(--shadow);transition:transform .3s,opacity .3s,visibility .3s;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{transform:translate(-50%,0);opacity:1;visibility:visible}
+.toast .stampy{display:inline-block;color:var(--stamp);border:3px solid var(--stamp);border-radius:8px;padding:0 10px;transform:rotate(-5deg);letter-spacing:.06em}
+.timer{position:fixed;left:calc(12px + env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:85;display:flex;align-items:center;gap:8px;border:3px solid var(--line);border-radius:14px;background:var(--paper);padding:6px 8px 6px 12px;box-shadow:4px 4px 0 var(--shadow);max-width:calc(100vw - 24px)}
+.timer .tt{font-family:var(--fh);font-weight:700;font-size:1.5rem;font-variant-numeric:tabular-nums;min-width:3.6ch}
+.timer .tl{font-size:.78rem;font-weight:800;color:var(--muted);max-width:11rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.timer button{border:2px solid var(--line);background:var(--paper2);border-radius:9px;width:34px;height:32px;display:grid;place-items:center;padding:0}
+.timer.ding{animation:ding 1s 3;background:color-mix(in srgb,var(--coral) 40%,var(--paper))}
+@keyframes ding{50%{transform:scale(1.06)}}
+.tdlg{border:3px solid var(--line);border-radius:18px;background:var(--paper);color:var(--ink);padding:0;width:min(760px,calc(100vw - 24px));max-height:calc(100vh - 40px);box-shadow:8px 8px 0 var(--shadow)}
+.tdlg::backdrop{background:rgba(10,8,30,.55)}
+.tdlg-h{position:sticky;top:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:var(--sun);color:var(--on-bright);border-bottom:3px solid var(--line);z-index:1}
+.tdlg-h h2{font-size:1.3rem}
+.tdlg-b{padding:16px;display:grid;gap:16px}
+.tdlg-b h3{font-size:1.08rem;margin-bottom:6px}
+.tdlg-b ul{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.ptbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.ptbl th,.ptbl td{border-top:2px solid var(--hair);padding:6px 8px;text-align:left;vertical-align:top}
+.ptbl td:first-child,.ptbl td:nth-child(2){white-space:nowrap}
+.ptbl th{font-size:.76rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ptwrap{overflow-x:auto}
+#certPrint{display:none}
+.cpick{position:relative;display:inline-grid;place-items:center;border:2px solid var(--line);border-radius:12px;background:var(--paper);padding:3px}
+.cpick .ava{width:38px;height:38px}
+.cpick[aria-pressed="true"]{background:color-mix(in srgb,var(--sun) 40%,var(--paper));box-shadow:2px 2px 0 var(--shadow)}
+.cpick .ck{position:absolute;right:-7px;top:-7px;width:20px;height:20px;border-radius:50%;background:var(--ok);color:var(--paper);display:grid;place-items:center;border:2px solid var(--paper)}
+.cpick .ck .i{width:12px;height:12px;stroke-width:3}
+.cpicks{display:flex;flex-wrap:wrap;gap:8px}
+/* locked answers & small fixes */
+.opts.locked .opt{cursor:default}
+.opts.locked .opt:hover{transform:none;background:var(--paper)}
+.opts.locked .opt.ok:hover{background:var(--okbg)}.opts.locked .opt.no:hover{background:var(--badbg)}
+.opts.locked .opt.pick:hover{background:color-mix(in srgb,var(--sun) 32%,var(--paper))}.opts.locked .opt.warn:hover{background:var(--warnbg)}
+.opts.locked .opt:not(.ok):not(.no):not(.pick):not(.warn){opacity:.6}
+[aria-disabled="true"]{cursor:default}
+.ha-line{stroke:color-mix(in srgb,var(--muted) 45%,transparent)}
+.zone,.ecell{cursor:pointer;font:inherit}
+.flip,.flip-in{min-height:220px}
+:lang(hu) .bubble q,:lang(hu) .client q{quotes:"„" "”"}
+.panel h3,.act-h h3{display:flex;align-items:center;gap:8px}
+.tq .opts{margin-top:4px}
+.member:hover,.chip:hover:not(.placed),.pick:hover,.tbtn:hover:not([aria-disabled="true"]),.tw-btn:hover:not([aria-disabled="true"]){background:var(--paper2)}
+.member[aria-pressed="true"]:hover{background:color-mix(in srgb,var(--sun) 28%,var(--paper))}
+.chip[aria-pressed="true"]:hover,.pick[aria-pressed="true"]:hover,.tw-btn[aria-pressed="true"]:hover{background:color-mix(in srgb,var(--sun) 35%,var(--paper))}
+.light:hover:not([aria-disabled="true"]),.tf:hover:not([aria-disabled="true"]){background:var(--paper2)}
+.tf.ok:hover{background:var(--ok)}.tf.no:hover{background:var(--bad)}
+h4{font-family:var(--fh);font-weight:600;margin:0}
+
+@media (max-width:900px){
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .hero-art{max-width:340px;order:-1}
+  .calc,.lab{grid-template-columns:minmax(0,1fr)}
+  .roles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .team{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .goals,.zones,.hood,.zipwrap,.dtimers,.opts.two{grid-template-columns:minmax(0,1fr)}
+  .free{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lvl{padding:18px 14px 22px;box-shadow:5px 5px 0 var(--shadow)}
+  .duel{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .duel .dl{grid-column:1/-1}
+  .duel .dh.dl{display:none}
+  .extg{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .extg .er{grid-column:1/-1;padding-bottom:0}
+  .extg .eh.dl{display:none}
+  .dlg-r{grid-template-columns:minmax(0,1fr)}
+  .smr{grid-template-columns:minmax(0,1fr)}
+  .myth{grid-template-columns:auto minmax(0,1fr)}
+  .myth .bt{grid-column:1/-1}
+  .myth .why{grid-column:1/-1}
+  .client{grid-template-columns:minmax(0,1fr)}
+  .result{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center}
+  .pricegrid{grid-template-columns:minmax(0,1fr)}
+  .xp-bar{display:none}
+  .iconbtn .lbl{display:none}
+  .pgrid.three{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:480px){
+  .pgrid:not(.three){grid-template-columns:minmax(0,1fr)}
+  .pick.f{word-break:normal}
+}
+@media (max-width:640px){
+  .brand{display:none}
+  .top-row{flex-wrap:nowrap;gap:6px;padding-block:7px 5px}
+  .xp{flex:1 1 auto;min-width:0;margin-right:auto;gap:6px;padding:3px 8px 3px 4px}
+  .xp-rank{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .xp-num{white-space:nowrap}
+  .seg button{padding:5px 9px}
+  .path{padding-block:0 7px}
+}
+@media (max-width:420px){
+  .gallery{grid-template-columns:minmax(0,1fr)}
+  .free{grid-template-columns:minmax(0,1fr)}
+  .brand small{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+@media print{
+  html.printing{--paper:#FFFFFF;--paper2:#F5F7FD;--ink:#1E1B3A;--muted:#55527A;--line:#1E1B3A;--hair:#D2D8EC;--stamp:#C3233F;--sun:#FFC93C;--on-bright:#1E1B3A;color-scheme:light}
+  html.printing body>*{display:none!important}
+  html.printing body{background:#fff}
+  html.printing #certPrint{display:block!important;color:#1E1B3A}
+  #certPrint .cert{box-shadow:none;border-color:#1E1B3A;background:#fff;color:#1E1B3A;margin:40px auto;max-width:720px}
+  #certPrint .cert .cr{background:#FFC93C;color:#1E1B3A}
+  #certPrint .cert .cseal{border-color:#C3233F;color:#C3233F}
+}
+
+/* ===== lesson-specific: worksheet box, ribbon, page preview, tabs, game ===== */
+.wl{margin-top:24px;border:3px dashed var(--warn);border-radius:16px;background:color-mix(in srgb,var(--sun) 20%,var(--paper));padding:12px 16px}
+.wl-h{display:flex;align-items:center;gap:8px;font-family:var(--fh);font-weight:600;font-size:1.08rem;color:var(--ink)}
+.wl-h small{font-family:var(--fb);font-weight:800;color:var(--muted)}
+.wl-b{margin-top:6px}
+.wl-ol{margin:0;padding-left:1.3em;display:grid;gap:5px}
+.wl-ol i{font-style:normal;font-weight:800;color:var(--muted);white-space:nowrap}
+.docwin{border:3px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden;min-width:0}
+.docwin-h{display:flex;align-items:center;gap:8px;padding:5px 10px;border-bottom:2px solid var(--line);background:var(--ms);color:var(--on-suite);font-weight:800;font-size:.84rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+pre.spaced{margin:0;padding:12px 14px;font-size:1rem;line-height:1.6;white-space:pre;overflow-x:auto;color:var(--ink)}
+pre.spaced.mono,.tabbed.mono{font-family:"Courier New","Liberation Mono",Courier,monospace}
+pre.spaced.prop,.tabbed.prop{font-family:Arial,"Liberation Sans",Helvetica,sans-serif}
+.sp{position:relative}
+.sp::after{content:"·";position:absolute;left:50%;top:0;transform:translateX(-50%);color:var(--doc);font-weight:800}
+.pil{color:var(--doc);font-style:normal;font-weight:800;margin-left:2px}
+.tabbed{padding:6px 14px 12px;font-size:1rem;line-height:1.6;position:relative;color:var(--ink)}
+.trul{position:relative;height:16px;border-bottom:2px solid var(--hair);margin-bottom:4px;color:var(--mint)}
+.trul span{position:absolute;top:-2px}
+.trul .tm{width:16px;height:16px}
+.trow2{display:grid;grid-template-columns:5.2em 5.8em auto}
+.trow2>span{white-space:nowrap;min-width:0}
+.tarr{font-style:normal;color:var(--doc);font-weight:800;margin-left:4px}
+.twin{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+/* ribbon mock */
+.rib{border:3px solid var(--line);border-radius:12px;background:var(--paper);overflow:hidden}
+.rib-tabs{display:flex;gap:2px;padding:4px 6px 0;background:var(--ms);overflow:hidden;white-space:nowrap}
+.rib-tabs span{padding:3px 8px;font-size:.78rem;font-weight:800;color:var(--on-suite);border-radius:6px 6px 0 0;opacity:.85}
+.rib-tabs span.on{background:var(--paper);color:var(--ink);opacity:1}
+.rib-body{display:flex;flex-wrap:wrap;gap:10px;padding:8px}
+.rib-grp{border:2px solid var(--hair);border-radius:10px;padding:6px 6px 2px;min-width:0}
+.rib-row{display:flex;flex-wrap:wrap;gap:6px}
+.rib-gl{text-align:center;font-size:.74rem;font-weight:800;color:var(--muted);border-top:1px solid var(--hair);margin-top:4px;padding-top:2px}
+.rib-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:84px;border:2px solid var(--line);border-radius:10px;background:var(--paper2);padding:8px 8px 5px;font-weight:800;font-size:.84rem;color:var(--ink)}
+.rib-btn .i{width:26px;height:26px;color:var(--doc)}
+.rib-btn small{font-weight:700;font-size:.72rem;color:var(--muted)}
+.rib-btn[aria-expanded="true"]{background:color-mix(in srgb,var(--sun) 35%,var(--paper))}
+.rib-btn .num{position:absolute;top:-9px;left:-9px;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--coral);color:var(--on-bright);border:2px solid var(--line);font-family:var(--fh);font-size:.8rem}
+.rib-menu{margin-top:8px;display:grid;gap:6px;border:2px solid var(--line);border-radius:12px;background:var(--paper);padding:8px;box-shadow:4px 4px 0 var(--shadow)}
+.rib-menu button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:2px solid var(--hair);border-radius:9px;background:var(--paper);padding:5px 10px;color:var(--ink)}
+.rib-menu button[aria-checked="true"]{border-color:var(--ok);background:var(--okbg)}
+.rib-menu small{color:var(--muted);font-weight:700;font-size:.78rem}
+.pgwrap{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:16px;align-items:start}
+.pgprev{display:grid;justify-items:center;gap:8px}
+.pgprev svg{max-width:100%;height:auto}
+.pgdl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;margin:0;font-size:.88rem;width:100%}
+.pgdl dt{font-weight:800;color:var(--muted)}
+.pgdl dd{margin:0}
+.mis-n{display:flex;gap:6px;margin-bottom:8px}
+.mis-n span{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;border:2px solid var(--line);font-family:var(--fh);background:var(--paper2)}
+.mis-n span.cur{background:var(--sun);color:var(--on-bright)}
+.mis-n span.ok{background:var(--ok);color:var(--paper);border-color:var(--ok)}
+.namein.short{width:8rem}
+.restbl .ptbl td.w{color:var(--muted);font-weight:800;white-space:nowrap}
+.restbl .ptbl tr.sum td{border-top:3px solid var(--line)}
+.lpaper{border:2px solid var(--line);border-radius:6px;background:#fff;color:#1E1B3A;padding:16px 18px;box-shadow:4px 4px 0 var(--shadow);overflow-wrap:anywhere;max-height:360px;overflow:auto}
+.lpaper p+p{margin-top:.4em}
+.lab2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+/* tab types */
+.ttgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ttbox{position:relative;border:2px solid var(--hair);border-radius:10px;background:var(--paper);margin-top:8px;padding:0 0 6px;overflow:hidden}
+.ttrul{position:relative;height:22px;background:var(--paper2);border-bottom:2px solid var(--hair);color:var(--mint)}
+.ttstop{position:absolute;left:50%;top:2px;transform:translateX(-50%)}
+.ttstop .tm{width:18px;height:18px}
+.ttline{position:relative;height:1.7em;font-weight:700}
+.tv{position:absolute;top:.2em;white-space:nowrap}
+.ttguide{position:absolute;left:50%;top:22px;bottom:0;border-left:2px dashed color-mix(in srgb,var(--mint) 60%,transparent);pointer-events:none}
+.tbtn .ic .tm{width:18px;height:18px}
+.howto{margin:0;padding-left:1.3em;display:grid;gap:6px}
+.tol{margin:0;padding-left:1.3em;display:grid;gap:4px}
+/* game */
+.gm{border:3px solid var(--line);border-radius:16px;background:var(--paper2);padding:14px}
+.gm-top{display:flex;flex-wrap:wrap;gap:8px 18px;font-weight:800}
+.gm-t{color:var(--stamp)}
+.gm-order{margin-top:10px;border:3px solid var(--line);border-radius:14px;background:var(--paper);padding:12px 14px;display:grid;gap:2px}
+.gm-order small{font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:.72rem}
+.gm-order b{font-family:var(--fh);font-weight:600;font-size:1.25rem}
+.gm-tools{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.gm-tool{display:flex;flex-direction:column;align-items:center;gap:4px;border:2px solid var(--line);border-radius:12px;background:var(--paper);padding:10px 6px;font-weight:800;font-size:.86rem;color:var(--ink);text-align:center}
+.gm-tool .i{width:28px;height:28px;color:var(--db)}
+.gm-tool:active{transform:translate(2px,2px)}
+.gm-idle h3{font-size:1.3rem;margin-bottom:6px}
+.lockbox{display:flex;gap:12px;align-items:flex-start;border:3px dashed var(--line);border-radius:16px;padding:14px;background:var(--paper2)}
+.lockbox .i{width:30px;height:30px}
+/* hidden marks */
+.hid{display:grid;gap:10px}
+.hid-r{border:2px solid var(--hair);border-radius:12px;padding:10px 12px;background:var(--paper2)}
+.hid-r.ok{border-color:var(--ok);background:var(--okbg)}.hid-r.no{border-color:var(--bad);background:var(--badbg)}
+.hid-c{display:block;font-family:Arial,"Liberation Sans",sans-serif;font-size:1.05rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.sp2,.ta2,.pi2{font-style:normal;color:var(--doc);font-weight:800}
+.leader{max-width:420px}
+.leader div{display:flex;align-items:baseline;gap:6px}
+.leader i{flex:1;border-bottom:3px dotted #1E1B3A;transform:translateY(-4px)}
+.filebtn{position:relative;overflow:hidden;cursor:pointer}
+.filebtn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.ptbl.imp{font-size:.82rem}
+.ptbl.imp td{white-space:nowrap}
+.okc{color:var(--ok);font-weight:800}.badc{color:var(--bad);font-weight:800}
+.tm{vertical-align:-.2em}
+@media (max-width:900px){.pgwrap,.lab2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.twin,.ttgrid{grid-template-columns:minmax(0,1fr)}.gm-tools{grid-template-columns:repeat(2,minmax(0,1fr))}.rib-btn{min-width:72px}}
+.tdlg{overflow-x:hidden}
+.tdlg-b{grid-template-columns:minmax(0,1fr)}
+.tdlg-b section{min-width:0}
+.ptwrap{overflow-x:auto;max-width:100%}
+
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="wrap">
+    <div class="top-row" id="topRow"></div>
+    <nav class="path" id="path"></nav>
+  </div>
+</header>
+<main class="wrap" id="main">
+  <section id="hero"></section>
+  <section class="lvl" id="s1" style="--c:var(--sun)"></section>
+  <section class="lvl" id="s2" style="--c:var(--sky)"></section>
+  <section class="lvl" id="s3" style="--c:var(--mint)"></section>
+  <section class="lvl" id="s4" style="--c:var(--coral)"></section>
+  <section class="lvl" id="s5" style="--c:var(--lilac)"></section>
+  <section class="lvl" id="s6" style="--c:var(--peach)"></section>
+  <section class="lvl" id="s7" style="--c:var(--lime)"></section>
+</main>
+<footer class="foot"><div class="wrap" id="foot"></div></footer>
+<div class="timer" id="timer" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<dialog class="tdlg" id="tdlg" aria-labelledby="tdlgT"></dialog>
+<div id="certPrint" aria-hidden="true"></div>
+<script>window.KB_STUDENT=true;</script>
+<script>
+'use strict';
+/* ================= core: helpers, icons, avatars, state, XP, active time ================= */
+const tr=a=>Array.isArray(a)?a[0]:(a??'');
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const store={
+  get(k){try{return localStorage.getItem(k)}catch(e){return null}},
+  set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const fill=(s,o)=>String(s).replace(/\{(\w+)\}/g,(m,k)=>o[k]??m);
+const fmt=(n,d=0)=>Number(n).toLocaleString('sk-SK',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pnum=s=>{const v=parseFloat(String(s??'').replace(/[\s ]/g,'').replace(',','.'));return Number.isFinite(v)?v:NaN};
+const REDUCE=(()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}})();
+const INFRAME=(()=>{try{return window.self!==window.top}catch(e){return true}})();
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const mmss=s=>{s=Math.max(0,Math.round(s||0));return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`};
+const minTxt=s=>{s=Math.round(s||0);const m=Math.floor(s/60),x=s%60;return m?`${m} min ${x} s`:`${x} s`};
+
+/* ---------- lesson identity ---------- */
+const LESSON={id:'nastavenie-stranky-pisma',title:'Nastavenie stránky, písmo, riadkovanie, tabulátory',salt:'INF-SEK-NSPRT-2026-11'};
+const AUTHOR='Miroslav Lajgút - Informatika - Sekunda';
+
+/* ---------- general UI strings ---------- */
+const T={
+  title:'Stránka, písmo a tabulátory',
+  brandS:'Informatika · sekunda',
+  teacher:'Pre učiteľa',
+  themeL:'Prepnúť svetlé/tmavé farby',
+  navL:'Časti misie',
+  min:'min',bonus:'bonus',done:'Hotovo',
+  check:'Skontrolovať',again:'Skúsiť znova',next:'Ďalej',
+  correct:'Správne!',wrong:'Ešte nie.',
+  timeUp:'Čas vypršal!',
+  pause:'Pauza',resume:'Pokračovať',plus1:'Pridať minútu',close:'Zavrieť',
+  timerFor:'Časovač',
+  secDone:'Šanón „{n}“ je hotový!',
+  rankUp:'Nová hodnosť: {r}',
+  footL:AUTHOR,
+  footR:'Postup sa ukladá len v tomto prehliadači. Nič sa neposiela na internet.',
+  kindHyp:'Hypotéza',kindSort:'Triedenie',kindExp:'Objavovanie',kindDec:'Rozhodovanie',kindSim:'Simulácia',
+  kindLab:'Experiment',kindGame:'Hra na čas',kindQuiz:'Kvíz',kindTest:'Test',kindRead:'Čítanie',kindReal:'Na skutočnom PC',
+  kindWrite:'Písanie',kindHome:'Doma',kindSend:'Odovzdanie',kindDet:'Pátranie',
+};
+const t=k=>tr(T[k]);
+const RANKS=[[0,'Nováčik'],[.2,'Pomocník sadzby'],[.45,'Úpravca textu'],[.7,'Majster formátu'],[.9,'Typograf triedy']];
+
+const SECS=[
+  {id:'s1',c:'sun',min:5,ic:'page',tab:'Stránka',h:'Nastavenie stránky'},
+  {id:'s2',c:'sky',min:5,ic:'font',tab:'Písmo',h:'Písmo a riadkovanie'},
+  {id:'s3',c:'mint',min:5,ic:'tab',tab:'Tabulátory',h:'Tabulátory: stĺpce bez medzier'},
+  {id:'s4',c:'coral',min:7,ic:'award',tab:'Test',h:'Test a odovzdanie výsledku'},
+  {id:'s5',c:'lilac',min:3,ic:'game',tab:'Mini hra',h:'Mini hra: Formátovací expres',reward:1},
+  {id:'s6',c:'peach',min:4,ic:'eye',bonus:1,tab:'Skryté znaky',h:'Detektív skrytých znakov'},
+  {id:'s7',c:'lime',min:6,ic:'board',bonus:1,tab:'Vodiace bodky',h:'Na skutočnom PC: obsah s bodkami'},
+];
+const REQ=['s1','s2','s3','s4'];
+/* XP (all activities) */
+const MAXP={hyp:1,page:6,area:1,sort:8,sit:3,lab:1,tabQ:2,tabArrows:1,ttype:4,test:16,game:5,hid:6,real:6};
+const MAXT=Object.values(MAXP).reduce((a,b)=>a+b,0);
+/* graded task points of the required folders (first attempt) */
+const TASKS={page:6,sort:8,sit:3,tabQ:2,ttype:4};
+const TASKMAX=Object.values(TASKS).reduce((a,b)=>a+b,0);
+const ACT_FULL=15*60; // 15 min of active work = 100 %
+
+/* ---------- icons (own line set, stroke = currentColor) ---------- */
+const P={
+  page:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><rect x="8" y="10" width="8" height="8" rx="1" stroke-dasharray="2 2"/>',
+  font:'<path d="M4 19l5-14h1l5 14M6 14h7"/><path d="M15 19v-6a2.5 2.5 0 0 1 5 0v6M15 16h5"/>',
+  tab:'<path d="M3 6h18M3 18h18"/><path d="M3 12h9M12 9l3 3-3 3M17 9v6"/>',
+  lines:'<path d="M5 6h14M5 10h14M5 14h14M5 18h9"/>',
+  spacing:'<path d="M10 6h10M10 12h10M10 18h10M5 4v16M3 6l2-2 2 2M3 18l2 2 2-2"/>',
+  margins:'<rect x="4" y="3" width="16" height="18" rx="1.5"/><rect x="7.5" y="6.5" width="9" height="11" stroke-dasharray="2 2"/>',
+  orient:'<rect x="3" y="7" width="12" height="15" rx="1.5"/><rect x="9" y="3" width="12" height="9" rx="1.5"/>',
+  size:'<rect x="3" y="3" width="13" height="18" rx="1.5"/><rect x="11" y="11" width="10" height="10" rx="1.5"/>',
+  align:'<path d="M4 6h16M7 10h10M4 14h16M7 18h10"/>',
+  bold:'<path d="M7 4h6a4 4 0 0 1 0 8H7zM7 12h7a4 4 0 0 1 0 8H7z"/>',
+  color:'<path d="M5 18L10 4h1l5 14M7 13h7"/><path d="M4 21h16" stroke-width="3"/>',
+  para:'<path d="M17 4v16M13 4v16M17 4H10a4 4 0 0 0 0 8h3"/>',
+  ruler:'<rect x="2" y="8" width="20" height="8" rx="1.5"/><path d="M6 8v3M10 8v4M14 8v3M18 8v4"/>',
+  check:'<path d="M5 12.5l4.5 4.5L20 7"/>',
+  x:'<path d="M6 6l12 12M18 6L6 18"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  play:'<path d="M7 4.5l12 7.5-12 7.5z"/>',
+  pause:'<path d="M8 5v14M16 5v14"/>',
+  reset:'<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>',
+  moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  cap:'<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5M22 9v6"/>',
+  lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  unlock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.6-1.8"/>',
+  mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+  file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+  doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6M9 9h2"/>',
+  game:'<rect x="2" y="7" width="20" height="11" rx="5"/><path d="M7 10.5v3.5M5.25 12.25h3.5"/><circle cx="16" cy="11" r="1"/><circle cx="18" cy="14" r="1"/>',
+  key:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4.5 4-7 8-7s7.2 2.5 8 7"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-4 3.2-6 6.5-6s6 2 6.5 6"/><circle cx="17" cy="9" r="2.8"/><path d="M16.5 14c2.8.2 4.6 2 5 5"/>',
+  award:'<circle cx="12" cy="9" r="6"/><path d="M9 14.5L7.5 22 12 19.5 16.5 22 15 14.5"/>',
+  bulb:'<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/>',
+  alert:'<path d="M12 3.5l9.5 17h-19z"/><path d="M12 10v5M12 18h.01"/>',
+  help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17h.01"/>',
+  arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  save:'<path d="M5 3h11l5 5v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M7 3v5h8V3M7 21v-7h10v7"/>',
+  download:'<path d="M12 3v12M7 10l5 5 5-5M4 20h16"/>',
+  upload:'<path d="M12 21V9M7 14l5-5 5 5M4 4h16"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+  list:'<path d="M10 6h10M10 12h10M10 18h10M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>',
+  spark:'<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/>',
+  hand:'<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11M11 10V4.5a1.5 1.5 0 0 1 3 0V10M14 10.5V6a1.5 1.5 0 0 1 3 0v8a7 7 0 0 1-7 7c-3 0-4.5-1.5-6-4l-2-3.5a1.5 1.5 0 0 1 2.6-1.5L8 15"/>',
+  pencil:'<path d="M4 20l4-1L19 8l-3-3L5 16z"/><path d="M14 7l3 3"/>',
+  camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+  print:'<path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/>',
+  dot:'<circle cx="12" cy="12" r="4"/>',
+  board:'<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21l4-4 4 4"/>',
+  star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+  table:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16"/>',
+  tree:'<path d="M12 3l6 8h-3l4 6H5l4-6H6z"/><path d="M12 17v4"/>',
+  sheet:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16M15 4v16"/>',
+};
+const ico=(n,cls='i')=>`<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[n]||P.dot}</svg>`;
+/* tab-stop marks as on Word's ruler */
+const TABMARK={
+  left:'<path d="M8 4v14h10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"/>',
+  center:'<path d="M12 4v14M4 18h16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"/>',
+  right:'<path d="M16 4v14H6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"/>',
+  dec:'<path d="M12 4v14M4 18h16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"/><circle cx="17" cy="11" r="2" fill="currentColor"/>',
+};
+const tabmark=k=>`<svg class="i tm" viewBox="0 0 24 24" aria-hidden="true">${TABMARK[k]}</svg>`;
+
+/* ---------- avatars (drawn, no emoji) ---------- */
+const SKIN=['#F7D5B5','#E8B48A','#C68B5E','#8A583A'];
+let AVN=0;
+function avatar(c,cls='ava'){
+  const id='av'+(++AVN), sk=SKIN[c.s||0], hc=c.h||'#3B2A20', sw='stroke="var(--line)" stroke-width="2"';
+  let back='',front='',extra='';
+  switch(c.st){
+    case 'long': back=`<path d="M14 31c0-13 8-21 18-21s18 8 18 21v24H14z" fill="${hc}" ${sw}/>`;
+      front=`<path d="M17.5 29c1.5-9 7.5-14 14.5-14s13 5 14.5 14c-6.5-1-11.5-4-14-8.5-2.5 4.5-8.5 7.5-15 8.5z" fill="${hc}"/>`;break;
+    case 'bun': back=`<circle cx="32" cy="10" r="6.5" fill="${hc}" ${sw}/>`;
+      front=`<path d="M17.5 28.5c.5-9 6.5-14.5 14.5-14.5s14 5.5 14.5 14.5c-4-4-9-6-14.5-6s-10.5 2-14.5 6z" fill="${hc}" ${sw}/>`;break;
+    case 'curly': front=`<path d="M16.5 31c-4-11 3.5-20 15.5-20s19.5 9 15.5 20c-2-3.5-3.5-6.5-6.5-7.5-2.5 2-5.5 3-9 3s-6.5-1-9-3c-3 1-4.5 4-6.5 7.5z" fill="${hc}" ${sw}/><circle cx="21" cy="16" r="3.2" fill="${hc}"/><circle cx="43" cy="16" r="3.2" fill="${hc}"/>`;break;
+    case 'cap': front=`<path d="M16.5 27c0-9 7-14 15.5-14s15.5 5 15.5 14z" fill="${c.cap||'var(--coral)'}" ${sw}/><path d="M31 27h21a3 3 0 0 1-3 3H31z" fill="${c.cap||'var(--coral)'}" ${sw}/><path d="M17.5 28.5c-.8 2-.9 4-.4 6" stroke="${hc}" stroke-width="3" stroke-linecap="round" fill="none"/>`;break;
+    case 'pony': back=`<path d="M44 20c7 2 9 10 6 18-1-5-3-8-6-9z" fill="${hc}" ${sw}/>`;
+      front=`<path d="M17 29c.5-9.5 6.5-15 15-15s14.5 5.5 15 15c-5-3-10-7.5-12-10.5-3 4-10 8.5-18 10.5z" fill="${hc}" ${sw}/>`;break;
+    default: front=`<path d="M16.5 29c0-10.5 7-16.5 15.5-16.5S47.5 18.5 47.5 29c-3-3.5-6-5.5-9.5-5.5-4 1.8-9 1.8-13.5 0-3.5 0-6.5 2-8 5.5z" fill="${hc}" ${sw}/>`;
+  }
+  const m={smile:'<path d="M27.5 37.5c2.8 2.6 6.2 2.6 9 0" fill="none" stroke="var(--line)" stroke-width="2.2" stroke-linecap="round"/>',
+    grin:'<path d="M27 36.5h10c0 4-2.4 6-5 6s-5-2-5-6z" fill="var(--line)"/>',
+    worry:'<path d="M28 40c2.5-2 5.5-2 8 0" fill="none" stroke="var(--line)" stroke-width="2.2" stroke-linecap="round"/>',
+    smirk:'<path d="M28 38.5c3 1.2 6 .6 8.8-1.8" fill="none" stroke="var(--line)" stroke-width="2.2" stroke-linecap="round"/>',
+    think:'<path d="M28.5 39h7" stroke="var(--line)" stroke-width="2.2" stroke-linecap="round"/>'}[c.m||'smile'];
+  if(c.g) extra+=`<g fill="none" stroke="var(--line)" stroke-width="2"><circle cx="26.5" cy="31" r="4.6"/><circle cx="37.5" cy="31" r="4.6"/><path d="M31.1 31h1.8"/></g>`;
+  if(c.ph) extra+=`<path d="M16.5 32a15.5 15.5 0 0 1 31 0" fill="none" stroke="var(--line)" stroke-width="3"/><rect x="13" y="29" width="6" height="10" rx="2.5" fill="var(--mint)" ${sw}/><rect x="45" y="29" width="6" height="10" rx="2.5" fill="var(--mint)" ${sw}/>`;
+  return `<svg class="${cls}" viewBox="0 0 64 64" aria-hidden="true"><defs><clipPath id="${id}"><circle cx="32" cy="32" r="30"/></clipPath></defs>`+
+    `<circle cx="32" cy="32" r="31" fill="${c.bg||'var(--soft)'}"/><g clip-path="url(#${id})">${back}`+
+    `<path d="M7 67c1.5-12 10.5-18.5 25-18.5S55.5 55 57 67z" fill="${c.sh||'var(--sky)'}" ${sw}/><rect x="28" y="41" width="8" height="9" fill="${sk}"/>`+
+    `<ellipse cx="32" cy="30.5" rx="14" ry="15" fill="${sk}" ${sw}/>${front}`+
+    `<circle cx="26.5" cy="31" r="1.9" fill="var(--line)"/><circle cx="37.5" cy="31" r="1.9" fill="var(--line)"/>`+
+    `<circle cx="21.5" cy="36" r="2.3" fill="var(--coral)" opacity=".5"/><circle cx="42.5" cy="36" r="2.3" fill="var(--coral)" opacity=".5"/>${m}${extra}</g>`+
+    `<circle cx="32" cy="32" r="31" fill="none" stroke="var(--line)" stroke-width="2"/></svg>`;
+}
+const AV={
+  nina:{s:0,h:'#7A4527',st:'long',sh:'var(--ms)',bg:'var(--sky)',m:'smile'},
+  david:{s:1,h:'#2A1E18',st:'curly',sh:'var(--lo)',bg:'var(--mint)',m:'grin',g:1},
+  lea:{s:2,h:'#1E1410',st:'bun',sh:'var(--coral)',bg:'var(--peach)',m:'smile'},
+  bence:{s:0,h:'#C9962F',st:'cap',cap:'var(--sun)',sh:'var(--lilac)',bg:'var(--lime)',m:'worry'},
+  teach:{s:0,h:'#8B4A2B',st:'bun',sh:'var(--lilac)',bg:'var(--sky)',g:1,m:'smile'},
+};
+const ava=(k,cls)=>avatar(AV[k],cls);
+
+/* ---------- state ---------- */
+const KEY='inf-sek-stranka-v1';
+const S0=()=>({v:1,xp:{},tp:{},done:{},doneAt:{},member:'bence',
+  act:{t:0,sec:{}},
+  hyp:null,hypV:false,
+  pg:{m:'norm',o:'v',s:'a4'},pmi:0,pm:{},pmTry:{},areaIn:'',
+  sort:{},sit:{},lab:{f:'sans',z:12,l:'1.15',a:'left'},labSeen:{},
+  tabFont:'mono',tabShow:false,tabFlip:0,tabQ:null,tabArrows:'',ttype:{},ttTry:{},ttPick:{},
+  test:{i:0,a:[],done:false,best:null,order:null,first:null},
+  name:'',cls:'',saved:0,hw:{},
+  game:{best:null,runs:0,last:null},
+  hid:{},real:{}
+});
+let S=S0();
+function loadState(){
+  let raw=null;try{raw=JSON.parse(store.get(KEY)||'null')}catch(e){raw=null}
+  if(!raw||raw.v!==1) return;
+  const d=S0();
+  for(const k of Object.keys(d)){
+    if(!(k in raw)) continue;
+    const dv=d[k],rv=raw[k];
+    if(dv&&typeof dv==='object'&&!Array.isArray(dv)&&rv&&typeof rv==='object'&&!Array.isArray(rv)) d[k]=Object.assign(dv,rv);
+    else if(typeof dv===typeof rv||dv===null) d[k]=rv;
+  }
+  S=d;
+}
+let PT=0;
+function persist(){clearTimeout(PT);PT=setTimeout(()=>store.set(KEY,JSON.stringify(S)),250)}
+
+/* ---------- XP, task points, ranks, toasts ---------- */
+const xpTotal=()=>Object.values(S.xp).reduce((a,b)=>a+(+b||0),0);
+const rankIdx=x=>{let r=0;RANKS.forEach(([f],i)=>{if(x>=Math.round(f*MAXT))r=i});return r};
+const rankName=i=>RANKS[i][1];
+function award(id,pts){
+  if(S.xp[id]!=null) return 0;
+  pts=+pts||0;
+  const before=rankIdx(xpTotal());
+  S.xp[id]=pts;persist();
+  if(!pts) return 0;
+  updXP(pts);
+  const after=rankIdx(xpTotal());
+  if(after>before) setTimeout(()=>toast(`${ico('award')} ${fill(t('rankUp'),{r:esc(rankName(after))})}`,2600),1300);
+  return pts;
+}
+/* graded point on the first attempt (0 is stored as well) */
+function tpoint(group,id,pts){
+  const k=group+':'+id;
+  if(S.tp[k]!=null) return;
+  S.tp[k]=+pts||0;persist();
+}
+const tpSum=g=>Object.entries(S.tp).filter(([k])=>k.split(':')[0]===g).reduce((a,[,v])=>a+v,0);
+const taskPts=()=>Object.keys(TASKS).reduce((a,g)=>a+Math.min(TASKS[g],tpSum(g)),0);
+function updXP(gain){
+  const x=xpTotal(),r=rankIdx(x);
+  const v=$('#xpVal'),rk=$('#xpRank'),b=$('#xpBar');
+  if(v) v.textContent=x; if(rk) rk.textContent=rankName(r); if(b) b.style.width=Math.min(100,x/MAXT*100)+'%';
+  if(gain>0) toast(`<span class="stampy">+${gain} XP</span>`,1200);
+}
+let TT=0;
+function toast(html,ms=2000){
+  const el=$('#toast');if(!el) return;
+  el.innerHTML=html;el.classList.add('show');
+  clearTimeout(TT);TT=setTimeout(()=>el.classList.remove('show'),ms);
+}
+
+/* ---------- active time: counts only when the page is visible, focused and the pupil interacted in the last minute ---------- */
+let LASTIN=Date.now(),CURSEC='hero';
+['pointerdown','keydown','wheel','scroll','touchstart','input'].forEach(ev=>addEventListener(ev,()=>{LASTIN=Date.now()},{passive:true,capture:true}));
+function curSection(){
+  const mid=innerHeight*0.45;let best='hero';
+  for(const id of ['hero',...SECS.map(s=>s.id)]){const el=document.getElementById(id);if(!el) continue;const r=el.getBoundingClientRect();if(r.top<=mid&&r.bottom>mid) best=id}
+  return best;
+}
+setInterval(()=>{
+  let vis=true,foc=true;
+  try{vis=document.visibilityState==='visible'}catch(e){}
+  try{foc=document.hasFocus()}catch(e){}
+  if(!vis||!foc||Date.now()-LASTIN>60000) return;
+  CURSEC=curSection();
+  S.act.t=(S.act.t||0)+1;
+  S.act.sec[CURSEC]=(S.act.sec[CURSEC]||0)+1;
+  if(S.act.t%5===0) persist();
+  const a=$('#actVal');if(a) a.textContent=mmss(S.act.t);
+},1000);
+const actPct=()=>Math.min(100,Math.round((S.act.t||0)/ACT_FULL*100));
+/* ================= render framework, header, nav, timer ================= */
+const R={},A={},IN={},CH={},AFTER={},DONE={};
+let JUST=null;
+const fkOf=x=>x.dataset.fk||(x.dataset.a?x.dataset.a+'|'+(x.dataset.v??''):x.dataset.in?'in|'+x.dataset.in+'|'+(x.dataset.v??''):x.dataset.ch?'ch|'+x.dataset.ch+'|'+(x.dataset.v??''):null);
+function grabFocus(root){
+  const ae=document.activeElement;
+  if(!ae||ae===document.body||!root.contains(ae)) return null;
+  let sel=null;try{sel=ae.selectionStart}catch(e){}
+  return {k:fkOf(ae),sel};
+}
+function putFocus(root,f){
+  if(!f||!f.k) return;
+  const n=$$('[data-fk],[data-a],[data-in],[data-ch]',root).find(x=>fkOf(x)===f.k);
+  if(!n) return;
+  try{n.focus({preventScroll:true})}catch(e){}
+  if(f.sel!=null&&typeof n.setSelectionRange==='function'){try{n.setSelectionRange(f.sel,f.sel)}catch(e){}}
+}
+function paint(id){
+  const el=document.getElementById(id);if(!el||!R[id]) return;
+  el.innerHTML=R[id]();
+  if(AFTER[id]) AFTER[id](el);
+}
+function rr(id){
+  const nd=checkDone();
+  const el=document.getElementById(id);if(!el||!R[id]) return;
+  const f=grabFocus(el);
+  paint(id);putFocus(el,f);
+  nd.filter(x=>x!==id).forEach(paint);
+  if(nd.length) paint('s5');
+  renderNav();
+}
+function checkDone(){
+  const nd=[];
+  for(const s of SECS){
+    if(S.done[s.id]||!DONE[s.id]) continue;
+    let ok=false;try{ok=!!DONE[s.id]()}catch(e){ok=false}
+    if(!ok) continue;
+    S.done[s.id]=1;S.doneAt[s.id]=S.act.t||0;JUST=s.id;nd.push(s.id);persist();
+    const id=s.id;setTimeout(()=>{if(JUST===id)JUST=null},1400);
+    setTimeout(()=>toast(`<span class="stampy">${t('done')}</span> ${fill(t('secDone'),{n:esc(s.tab)})}`,2600),900);
+  }
+  return nd;
+}
+function secHead(i,lead){
+  const s=SECS[i];
+  return `<div class="lvl-tab"><span class="n">${i+1}</span>${esc(s.tab)}</div>`+
+    (S.done[s.id]?`<div class="stamp${JUST===s.id&&!REDUCE?' new':''}" aria-label="${t('done')}">${t('done')}</div>`:'')+
+    `<div class="lvl-head"><div class="lvl-ttl"><h2>${s.h}</h2><p class="lead">${lead}</p></div>`+
+    `<button class="tchip" data-a="timer" data-v="${i}" title="${t('timerFor')}">${ico('clock')} ${s.min} ${t('min')}${s.bonus?`<em>${t('bonus')}</em>`:s.reward?`<em>odmena</em>`:''}</button></div>`;
+}
+function act(kind,title,how,body,attrs=''){
+  return `<div class="act"${attrs}><div class="act-h"><h3>${title}</h3><span class="kind">${t(kind)}</span></div>${how?`<p class="how">${how}</p>`:''}${body}</div>`;
+}
+/* worksheet box – the same task as on paper */
+function wl(n,html,pts){
+  return `<div class="wl" role="note"><div class="wl-h">${ico('pencil')} Pracovný list – úloha ${n}${pts?` <small>(${pts} b)</small>`:''}</div><div class="wl-b">${html}</div></div>`;
+}
+/* deterministic shuffle of options */
+function permFor(key,n){
+  let h=2166136261;for(const ch of key){h^=ch.charCodeAt(0);h=Math.imul(h,16777619)}
+  const a=[...Array(n).keys()];
+  for(let i=n-1;i>0;i--){h=Math.imul(h^(h>>>15),2246822507)>>>0;const j=h%(i+1);[a[i],a[j]]=[a[j],a[i]]}
+  return a;
+}
+/* multiple-choice: q={o:[...],c:index,ex:''} */
+function mcq(name,q,picked,opt={}){
+  const L='ABCDEFGH',ans=picked!=null&&picked!=='';
+  let h=`<div class="opts${opt.two?' two':''}${ans?' locked':''}" role="group">`;
+  permFor(name,q.o.length).forEach((i,k)=>{
+    let cls='',mk=L[k];
+    if(ans){if(i===q.c){cls='ok';mk=ico('check')}else if(i===picked){cls='no';mk=ico('x')}}
+    h+=`<button class="opt ${cls}" data-a="${name}" data-v="${i}"${ans?' aria-disabled="true"':''}><span class="mk">${mk}</span><span>${q.o[i]}</span></button>`;
+  });
+  h+='</div>';
+  if(ans) h+=`<div class="fb ${picked===q.c?'ok':'no'}" role="status"><b>${picked===q.c?t('correct'):t('wrong')}</b> ${q.ex}</div>`;
+  return h;
+}
+
+/* ---------- header, nav, footer ---------- */
+function isDark(){
+  const th=document.documentElement.dataset.theme;
+  if(th==='dark') return true; if(th==='light') return false;
+  try{return matchMedia('(prefers-color-scheme: dark)').matches}catch(e){return false}
+}
+const BRAND=`<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M3 10a3 3 0 0 1 3-3h9l3 3h16a3 3 0 0 1 3 3v19a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3z" fill="var(--sun)" stroke="var(--line)" stroke-width="2.5"/><rect x="11" y="12" width="18" height="21" rx="2" fill="var(--paper)" stroke="var(--line)" stroke-width="2"/><rect x="14" y="15" width="12" height="15" fill="none" stroke="var(--doc)" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M16 19h8M16 23h3M21 23h3M16 27h8" stroke="var(--line)" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+const STUDENT=!!window.KB_STUDENT;
+const teacherOn=()=>!STUDENT||false;
+let BRC=[];
+function renderTop(){
+  const el=$('#topRow'),f=grabFocus(el);
+  el.innerHTML=`<a class="brand" href="#hero">${BRAND}<span><b>${t('title')}</b><small>${t('brandS')}</small></span></a>`+
+    `<div class="xp" title="XP"><span class="xp-rank" id="xpRank"></span><span class="xp-num"><b id="xpVal">0</b> / <span id="xpMax">${MAXT}</span> XP</span><span class="xp-bar"><i id="xpBar"></i></span></div>`+
+    (teacherOn()?`<button class="iconbtn" data-a="teacher" aria-haspopup="dialog">${ico('cap')}<span class="lbl">${t('teacher')}</span></button>`:'')+
+    `<button class="iconbtn sq" data-a="theme" aria-label="${t('themeL')}" title="${t('themeL')}">${ico(isDark()?'sun':'moon')}</button>`;
+  putFocus(el,f);updXP(0);
+}
+function renderNav(){
+  const n=$('#path');n.setAttribute('aria-label',t('navL'));
+  n.innerHTML=SECS.map((s,i)=>`<a href="#${s.id}" class="${S.done[s.id]?'done':''}" style="--c:var(--${s.c})"><span class="n">${S.done[s.id]?ico('check'):i+1}</span>${esc(s.tab)}${s.bonus?' ★':''}</a>`).join('');
+}
+function renderFoot(){$('#foot').innerHTML=`<span>${t('footL')}</span><span>${t('footR')}</span>`}
+function setPad(){const h=$('#top').offsetHeight;document.documentElement.style.scrollPaddingTop=(h+14)+'px'}
+function renderAll(){
+  const f=grabFocus(document.body);
+  checkDone();renderTop();renderNav();
+  ['hero',...SECS.map(s=>s.id)].forEach(paint);
+  renderFoot();
+  if(!$('#timer').hidden) renderTimer();
+  const d=$('#tdlg');if(d.open) d.innerHTML=renderTeacher();
+  putFocus(document.body,f);setPad();
+}
+A.theme=()=>{const nx=isDark()?'light':'dark';document.documentElement.dataset.theme=nx;store.set('inf-theme',nx);renderTop()};
+
+/* ---------- floating countdown timer ---------- */
+const TM={end:0,left:0,run:false,done:false,sec:0,iv:0};
+let AC=null;
+function audioUnlock(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){AC=null}}
+function beep(){
+  if(!AC) return;
+  try{const now=AC.currentTime;[0,.32,.64].forEach(d=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=880;
+    g.gain.setValueAtTime(.0001,now+d);g.gain.exponentialRampToValueAtTime(.22,now+d+.02);g.gain.exponentialRampToValueAtTime(.0001,now+d+.24);
+    o.connect(g);g.connect(AC.destination);o.start(now+d);o.stop(now+d+.28)})}catch(e){}
+}
+function startTimer(min,sec){
+  audioUnlock();
+  TM.left=min*60000;TM.end=Date.now()+TM.left;TM.run=true;TM.done=false;TM.sec=sec;
+  clearInterval(TM.iv);TM.iv=setInterval(tick,250);renderTimer();
+}
+function tick(){
+  if(TM.run){TM.left=Math.max(0,TM.end-Date.now());if(TM.left===0){TM.run=false;TM.done=true;beep();toast(`${ico('clock')} ${t('timeUp')}`,2600);renderTimer();}}
+  paintTimer();
+}
+function renderTimer(){
+  const el=$('#timer'),f=grabFocus(el);el.hidden=false;
+  el.innerHTML=`${ico('clock')}<span class="tt" id="tt" aria-live="off"></span><span class="tl">${esc(SECS[TM.sec].tab)}</span>`+
+    `<button data-a="tpause" aria-label="${t(TM.run?'pause':'resume')}" title="${t(TM.run?'pause':'resume')}">${ico(TM.run?'pause':'play')}</button>`+
+    `<button data-a="tplus" aria-label="${t('plus1')}" title="${t('plus1')}"><b>+1</b></button>`+
+    `<button data-a="tclose" aria-label="${t('close')}" title="${t('close')}">${ico('x')}</button>`;
+  putFocus(el,f);paintTimer();
+}
+function paintTimer(){
+  const s=Math.ceil(TM.left/1000),el=$('#tt');
+  if(el) el.textContent=`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  $('#timer').classList.toggle('ding',TM.done);
+}
+A.timer=el=>{const i=+el.dataset.v;startTimer(SECS[i].min,i)};
+A.tpause=()=>{if(TM.run){TM.run=false;TM.left=Math.max(0,TM.end-Date.now())}else if(TM.left>0){TM.end=Date.now()+TM.left;TM.run=true}renderTimer()};
+A.tplus=()=>{TM.left+=60000;TM.done=false;if(TM.run)TM.end+=60000;else{TM.end=Date.now()+TM.left;TM.run=true}renderTimer()};
+A.tclose=()=>{clearInterval(TM.iv);TM.run=false;$('#timer').hidden=true};
+
+/* ---------- global event delegation ---------- */
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a[href^="#"]');
+  if(a&&!a.dataset.a){
+    if(STUDENT&&a.classList.contains('brand')){const now=Date.now();BRC=BRC.filter(x=>now-x<2500);BRC.push(now);if(false){BRC=[];e.preventDefault();A.teacher();return}}
+    const id=a.getAttribute('href').slice(1),tg=id&&document.getElementById(id);
+    if(tg){e.preventDefault();tg.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'start'})}
+    return;
+  }
+  const el=e.target.closest('[data-a]');
+  if(!el||el.getAttribute('aria-disabled')==='true') return;
+  const fn=A[el.dataset.a];if(fn) fn(el,e);
+});
+document.addEventListener('input',e=>{const el=e.target.closest('[data-in]');if(el&&IN[el.dataset.in]) IN[el.dataset.in](el,e)});
+document.addEventListener('change',e=>{const el=e.target.closest('[data-ch]');if(el&&CH[el.dataset.ch]) CH[el.dataset.ch](el,e)});
+
+/* ================= hero ================= */
+const H={
+  kicker:'Misia pre celú triedu · Informatika · Word',
+  h1b:'Nastavenie stránky, typ písma, riadkovanie a tabulátory',
+  story:'Sekunda chystá <b>vianočnú akadémiu</b>. Bence dostal za úlohu napísať vo Worde program na plagát a pozvánky pre rodičov. Lenže plagát je natlačený na úzkej strane, písmo je drobné, riadky sa lepia na seba a stĺpce s časmi sa po zmene písma rozsypali. <b>Vaša misia:</b> naučiť sa nastaviť stránku, vybrať vhodné písmo a riadkovanie a zarovnať stĺpce tabulátormi – aby program vyzeral ako od profíka.',
+  art:'Strana papiera s okrajmi, pravítkom so zarážkami tabulátora a veľkými písmenami Aa',
+  teamH:'Zoznámte sa s tímom – kliknite na spolužiaka',
+  goalsH:'Na konci hodiny budete vedieť',
+  goals:[
+    'nastaviť vo Worde <b>okraje, orientáciu a veľkosť</b> strany (karta Rozloženie),',
+    'zmeniť <b>typ a veľkosť písma</b> a vysvetliť, čo je bod (pt),',
+    'nastaviť <b>riadkovanie</b> a rozlíšiť, čo mení písmo a čo celý odsek,',
+    'zarovnať stĺpce <b>tabulátormi</b> namiesto medzier a vybrať správny druh zarážky.',
+  ],
+  planH:'Plán misie (25 minút)',
+  planNote:'Po teste sa odomkne mini hra. Šanóny so ★ sú bonusové – pre rýchlych alebo na doma. Výsledok si stiahnete v šanóne 4.',
+};
+const TEAM=[
+  {k:'bence',n:'Bence',tag:'píše program akadémie',q:'Plagát mi vyšiel úzky a stĺpce s časmi sa rozsypali. Ja som ich pritom tak pekne zarovnal medzerníkom!',go:'a-hyp',gl:'Čo sa stalo? → Hypotéza'},
+  {k:'nina',n:'Nina',tag:'robí pozvánky',q:'Pozvánky chcem malé, do vrecka. Dá sa vo Worde nastaviť menší papier?',go:'s1',gl:'Nastavíme stránku → Stránka'},
+  {k:'lea',n:'Lea',tag:'kontroluje čitateľnosť',q:'Babka hovorí, že to drobné písmo neprečíta. Aké veľké má byť?',go:'s2',gl:'Písmo a riadkovanie → Písmo'},
+  {k:'david',n:'Dávid',tag:'pozná skratky',q:'Na stĺpce sa používa kláves Tab. Ukážem vám, prečo je lepší ako medzery.',go:'s3',gl:'Tabulátory → Tabulátory'},
+];
+function heroArt(){
+  return `<svg class="hero-art" viewBox="0 0 440 360" role="img" aria-label="${esc(H.art)}">
+  <ellipse cx="220" cy="342" rx="160" ry="12" fill="var(--shadow)" opacity=".14"/>
+  <g transform="rotate(-4 220 190)">
+    <rect x="98" y="40" width="230" height="290" rx="10" fill="var(--paper)" stroke="var(--line)" stroke-width="4"/>
+    <rect x="128" y="72" width="170" height="226" fill="none" stroke="var(--doc)" stroke-width="2.5" stroke-dasharray="7 6"/>
+    <text x="150" y="132" style="font-family:var(--fh)" font-weight="700" font-size="54" fill="var(--ink)">Aa</text>
+    <text x="232" y="132" font-family="Georgia,serif" font-size="40" fill="var(--doc)">Aa</text>
+    <g stroke="var(--line)" stroke-width="5" stroke-linecap="round"><path d="M146 162h134M146 186h134M146 210h96"/></g>
+    <g style="font-family:var(--fm)" font-size="15" font-weight="700" fill="var(--muted)"><text x="146" y="246">17:00</text><text x="210" y="246">Koledy</text><text x="146" y="272">17:20</text><text x="210" y="272">Tanec</text></g>
+    <g fill="var(--mint)"><path d="M196 236l9 5-9 5z"/><path d="M196 262l9 5-9 5z"/></g>
+  </g>
+  <g transform="rotate(3 220 30)">
+    <rect x="70" y="10" width="300" height="34" rx="6" fill="var(--sun)" stroke="var(--line)" stroke-width="3.5"/>
+    <g stroke="var(--line)" stroke-width="2.5">${Array.from({length:19},(_,i)=>`<path d="M${86+i*15} 44v${i%2?-8:-14}"/>`).join('')}</g>
+    <path d="M150 16v14h12" fill="none" stroke="var(--ink)" stroke-width="4"/>
+    <path d="M250 16v14M242 30h16" fill="none" stroke="var(--ink)" stroke-width="4"/><circle cx="256" cy="23" r="2.5" fill="var(--ink)"/>
+    <path d="M330 16v14h-12" fill="none" stroke="var(--ink)" stroke-width="4"/>
+  </g>
+  <g transform="translate(332 190) rotate(10)"><rect x="0" y="0" width="74" height="104" rx="8" fill="var(--peach)" stroke="var(--line)" stroke-width="3.5"/><text x="37" y="60" text-anchor="middle" style="font-family:var(--fh)" font-weight="700" font-size="24" fill="var(--on-bright)">A5</text></g>
+  <g transform="translate(26 200) rotate(-8)"><rect x="0" y="0" width="96" height="66" rx="8" fill="var(--lilac)" stroke="var(--line)" stroke-width="3.5"/><text x="48" y="42" text-anchor="middle" style="font-family:var(--fh)" font-weight="700" font-size="20" fill="var(--on-bright)">12 pt</text></g>
+  <path d="M40 96l5 11 11 5-11 5-5 11-5-11-11-5 11-5z" fill="var(--sun)" stroke="var(--line)" stroke-width="2"/>
+  <path d="M404 92l3.5 8 8 3.5-8 3.5-3.5 8-3.5-8-8-3.5 8-3.5z" fill="var(--mint)" stroke="var(--line)" stroke-width="2"/>
+</svg>`;
+}
+R.hero=()=>{
+  const m=TEAM.find(x=>x.k===S.member)||TEAM[0];
+  return `<div class="hero"><div><span class="kicker">${H.kicker}</span><h1>${t('title')}<span class="h1b">${H.h1b}</span></h1><p class="story">${H.story}</p></div>${heroArt()}</div>`+
+    `<h2 class="team-h">${H.teamH}</h2>`+
+    `<div class="team" role="group" aria-label="${esc(H.teamH)}">${TEAM.map(x=>`<button class="member" data-a="member" data-v="${x.k}" aria-pressed="${x.k===m.k}">${ava(x.k)}<b>${x.n}</b><small>${x.tag}</small></button>`).join('')}</div>`+
+    `<div class="bubble" aria-live="polite">${ava(m.k)}<div><b>${m.n}:</b> <q>${m.q}</q><br><a class="go" href="#${m.go}">${m.gl} ${ico('arrow')}</a></div></div>`+
+    `<div class="goals"><div class="panel"><h3>${ico('target')} ${H.goalsH}</h3><ul>${H.goals.map(g=>`<li>${g}</li>`).join('')}</ul></div>`+
+    `<div class="panel"><h3>${ico('list')} ${H.planH}</h3><div class="plan">${SECS.map((s,i)=>`<a href="#${s.id}" style="--c:var(--${s.c})"><span class="n">${i+1}</span>${esc(s.tab)} <em>${s.min}′${s.bonus?' ★':''}</em></a>`).join('')}</div><p class="plan-note">${H.planNote}</p>`+
+    `<p class="plan-note">${ico('clock')} Aktívny čas: <b id="actVal">${mmss(S.act.t)}</b> <span class="small">(počíta sa, len keď pracujete)</span></p></div></div>`+
+    `<div class="fact">${ico('pencil')}<div><b>Majte pri sebe pracovný list.</b> Pri každom šanóne je žltý rámček „Pracovný list – úloha“ – tú istú úlohu nájdete na papieri a odpovede zapíšete tam.</div></div>`;
+};
+A.member=el=>{S.member=el.dataset.v;persist();rr('hero')};
+/* ================= 1 · Nastavenie stránky ================= */
+const S1={
+  lead:'Bence poslal program akadémie. Na plagáte je strana na výšku, okraje sú široké a stĺpce zarovnal medzerníkom. Najprv si tipnite, čo sa stane so stĺpcami, potom nastavte stránku tak, ako ju potrebujeme.',
+  hypH:'Bencov program v obálke',
+  hypHow:'Pozrite sa na program. Bence medzi stĺpce nabúchal medzery, kým to nevyzeralo rovno. Svoj tip zapečatíme – otvoríme ho v šanóne 3.',
+  hypQ:'Nina si program otvorí a zmení typ písma z Courier New na Arial. Čo sa stane so stĺpcami?',
+  hypO:['Nič – stĺpce ostanú pekne pod sebou.','Stĺpce sa rozídu a nebudú pod sebou.','Text zmizne a ostanú len medzery.','Word sám nahradí medzery tabulátormi.'],
+  hypC:1,
+  locked:'Tip je zalepený v obálke. Otvoríme ho v šanóne 3 – Tabulátory.',
+  goTab:'Ísť k tabulátorom',
+  hypEx:'Medzera má v každom písme inú šírku. V písme Courier New majú všetky znaky rovnakú šírku, preto to Bencovi vyzeralo rovno. V Ariali je „i“ užšie ako „m“ a stĺpce sa rozídu. Tabulátor skočí vždy na rovnaké miesto – na zarážku.',
+  verified:'Obálka otvorená!',
+  ribH:'Karta Rozloženie – skupina Nastavenie strany',
+  ribHow:'Takto vyzerá časť pásu s nástrojmi vo Worde (zjednodušene). Kliknite na tlačidlo a vyberte možnosť – náhľad strany sa hneď zmení. Všimnite si čísla 1, 2, 3.',
+  misH:'Tri zákazky pre tlačiareň',
+  misHow:'Nastavte stránku podľa zákazky a kliknite na Skontrolovať. Za správne nastavenie na prvý pokus sú 2 body.',
+};
+const PSIZE={a4:{w:21,h:29.7,n:'A4',d:'21 × 29,7 cm'},a5:{w:14.8,h:21,n:'A5',d:'14,8 × 21 cm'},a3:{w:29.7,h:42,n:'A3',d:'29,7 × 42 cm'}};
+const PMARG={norm:{t:2.54,b:2.54,l:2.54,r:2.54,n:'Normálne',d:'všade 2,54 cm'},narrow:{t:1.27,b:1.27,l:1.27,r:1.27,n:'Úzke',d:'všade 1,27 cm'},wide:{t:2.54,b:2.54,l:5.08,r:5.08,n:'Široké',d:'hore a dole 2,54 cm, vľavo a vpravo 5,08 cm'}};
+const PORI={v:{n:'Na výšku',d:'strana je vyššia ako širšia'},h:{n:'Na šírku',d:'strana je širšia ako vyššia'}};
+const MIS=[
+  {id:'m1',av:'bence',txt:'<b>Plagát s programom</b> na nástenku. Papier A4. Program má veľa stĺpcov, preto má byť strana <b>širšia ako vyššia</b> a okraje <b>čo najmenšie</b>.',want:{s:'a4',o:'h',m:'narrow'},ok:'Presne tak: A4, na šírku, úzke okraje. Na plagát sa zmestí najviac.'},
+  {id:'m2',av:'nina',txt:'<b>Pozvánky do vrecka</b> – každá na polovicu papiera A4. Pozvánka je <b>vyššia ako širšia</b>, okraje <b>bežné</b>.',want:{s:'a5',o:'v',m:'norm'},ok:'Áno: A5 je presne polovica A4. Na výšku a normálne okraje.'},
+  {id:'m3',av:'lea',txt:'<b>Text pre moderátorov</b> na papier A4 na výšku. Pani učiteľka chce mať <b>vľavo aj vpravo veľa miesta</b> na poznámky perom.',want:{s:'a4',o:'v',m:'wide'},ok:'Správne: široké okraje nechajú vľavo aj vpravo 5,08 cm na poznámky.'},
+];
+const MISHINT={s:'Skontrolujte veľkosť papiera (tlačidlo 3).',o:'Skontrolujte orientáciu (tlačidlo 2).',m:'Skontrolujte okraje (tlačidlo 1).'};
+let PGOPEN=null,PMFB=null;
+const pgDims=pg=>{const z=PSIZE[pg.s],m=PMARG[pg.m];const w=pg.o==='h'?z.h:z.w,h=pg.o==='h'?z.w:z.h;return {w,h,tw:w-m.l-m.r,th:h-m.t-m.b,m}};
+function programMock(font){
+  const rows=[['17:00','Koledy','1.A'],['17:15','Básne','sekunda'],['17:30','Tanec','2.B'],['17:50','Divadlo','tercia']];
+  /* aligned with spaces for a fixed-width font */
+  const line=r=>r[0]+'  '+r[1].padEnd(10,' ')+r[2];
+  return `<pre class="spaced ${font==='mono'?'mono':'prop'}">${rows.map(r=>esc(line(r))).join('\n')}</pre>`;
+}
+function hypBlock(){
+  const L='ABCD',picked=S.hyp,ans=picked!=null;
+  let h=`<div class="opts mt${ans?' locked':''}" role="group" aria-label="${esc(S1.hypQ)}">`;
+  S1.hypO.forEach((o,i)=>{
+    let cls='',mk=L[i];
+    if(ans&&S.hypV){if(i===S1.hypC){cls='ok';mk=ico('check')}else if(i===picked){cls='no';mk=ico('x')}}
+    else if(i===picked){cls='pick';mk=ico('lock')}
+    h+=`<button class="opt ${cls}" data-a="hyp" data-v="${i}"${ans?' aria-disabled="true"':''}><span class="mk">${mk}</span><span>${o}</span></button>`;
+  });
+  h+='</div>';
+  if(ans&&!S.hypV) h+=`<div class="fb warn" role="status">${ico('lock')} ${S1.locked} <a class="linkbtn" href="#a-tabs">${S1.goTab} ${ico('arrow')}</a></div>`;
+  if(ans&&S.hypV) h+=`<div class="fb ${picked===S1.hypC?'ok':'no'}" role="status"><b>${S1.verified} ${picked===S1.hypC?t('correct'):t('wrong')}</b> ${S1.hypEx}</div>`;
+  return h;
+}
+const RTABS=['Súbor','Domov','Vložiť','Návrh','Rozloženie','Referencie','Revízia','Zobraziť'];
+function ribbon(tab,groups){
+  return `<div class="rib"><div class="rib-tabs" aria-hidden="true">${RTABS.map(x=>`<span class="${x===tab?'on':''}">${x}</span>`).join('')}</div><div class="rib-body">${groups}</div></div>`;
+}
+function pgMenu(){
+  if(!PGOPEN) return '';
+  const opts=PGOPEN==='m'?Object.entries(PMARG).map(([k,v])=>[k,v.n,v.d]):PGOPEN==='o'?Object.entries(PORI).map(([k,v])=>[k,v.n,v.d]):Object.entries(PSIZE).map(([k,v])=>[k,v.n,v.d]);
+  return `<div class="rib-menu" role="menu">${opts.map(([k,n,d])=>`<button role="menuitemradio" aria-checked="${S.pg[PGOPEN]===k}" data-a="pgset" data-v="${PGOPEN}:${k}"><b>${n}</b><small>${d}</small></button>`).join('')}</div>`;
+}
+function pgRibbon(){
+  const b=(k,n,ic,num)=>`<button class="rib-btn" data-a="pgopen" data-v="${k}" aria-expanded="${PGOPEN===k}"><span class="num">${num}</span>${ico(ic)}<span>${n}</span><small>${k==='m'?PMARG[S.pg.m].n:k==='o'?PORI[S.pg.o].n:PSIZE[S.pg.s].n}</small></button>`;
+  return ribbon('Rozloženie',`<div class="rib-grp"><div class="rib-row">${b('m','Okraje','margins',1)}${b('o','Orientácia','orient',2)}${b('s','Veľkosť','size',3)}</div><div class="rib-gl">Nastavenie strany</div></div>`)+pgMenu();
+}
+function pgPreview(){
+  const d=pgDims(S.pg),sc=200/Math.max(d.w,d.h),W=d.w*sc,Hh=d.h*sc,m=d.m;
+  const lines=[];const lh=1.05;let y=m.t+0.9;let i=0;
+  while(y<d.h-m.b-0.3&&i<40){const len=[1,.92,.97,.6,1,.85][i%6];lines.push(`<path d="M${(m.l*sc).toFixed(1)} ${(y*sc).toFixed(1)}h${(d.tw*len*sc).toFixed(1)}"/>`);y+=lh;i++}
+  return `<div class="pgprev"><svg viewBox="-4 -4 ${(W+8).toFixed(1)} ${(Hh+8).toFixed(1)}" width="${(W+8).toFixed(0)}" height="${(Hh+8).toFixed(0)}" role="img" aria-label="Náhľad strany ${PSIZE[S.pg.s].n}, ${PORI[S.pg.o].n}, okraje ${m.n}">`+
+    `<rect x="0" y="0" width="${W.toFixed(1)}" height="${Hh.toFixed(1)}" rx="3" fill="var(--paper)" stroke="var(--line)" stroke-width="2.5"/>`+
+    `<rect x="${(m.l*sc).toFixed(1)}" y="${(m.t*sc).toFixed(1)}" width="${(d.tw*sc).toFixed(1)}" height="${(d.th*sc).toFixed(1)}" fill="color-mix(in srgb,var(--doc) 7%,transparent)" stroke="var(--doc)" stroke-width="1.5" stroke-dasharray="5 4"/>`+
+    `<g stroke="var(--hair)" stroke-width="${Math.max(2,sc*0.35).toFixed(1)}" stroke-linecap="round">${lines.join('')}</g></svg>`+
+    `<dl class="pgdl"><dt>Papier</dt><dd>${PSIZE[S.pg.s].n} · ${PORI[S.pg.o].n.toLowerCase()} · ${fmt(d.w,1)} × ${fmt(d.h,1)} cm</dd><dt>Okraje</dt><dd>${m.n} (${m.d})</dd><dt>Priestor na text</dt><dd><b>šírka ${fmt(d.tw,2)} cm</b> × výška ${fmt(d.th,2)} cm</dd></dl></div>`;
+}
+function misBlock(){
+  const doneN=MIS.filter(x=>S.pm[x.id]).length;
+  if(doneN===MIS.length) return `<div class="fb ok">${ico('check')} <b>Všetky tri zákazky sú hotové.</b> Body na prvý pokus: ${tpSum('page')} / ${TASKS.page}.</div>`;
+  const i=Math.min(S.pmi,MIS.length-1),m=MIS[i];
+  return `<div class="mis"><div class="mis-n">${MIS.map((x,k)=>`<span class="${S.pm[x.id]?'ok':k===i?'cur':''}">${S.pm[x.id]?ico('check'):k+1}</span>`).join('')}</div>`+
+    `<div class="bubble">${ava(m.av)}<div><b>Zákazka ${i+1}:</b> ${m.txt}</div></div>`+
+    `<div class="row mt"><button class="btn" data-a="pmcheck">${ico('check')} ${t('check')}</button><span class="small">Nastavte to na karte Rozloženie hore.</span></div>`+
+    (PMFB?`<div class="fb ${PMFB.ok?'ok':'no'}" role="status">${PMFB.ok?`<b>${t('correct')}</b> `:`<b>${t('wrong')}</b> `}${PMFB.msg}</div>`:'')+`</div>`;
+}
+function areaBlock(){
+  const v=pnum(S.areaIn),ok=Math.abs(v-15.92)<0.03;
+  return `<div class="qcard"><p class="q">Kontrola čísla z pracovného listu: šírka priestoru na text pri <b>A4, na výšku, okraje Normálne</b>.</p><div class="row"><input class="ninput" type="text" inputmode="decimal" data-in="area" value="${esc(S.areaIn||'')}" aria-label="šírka v cm"> <span>cm</span></div><p class="small" id="areaMsg">${S.areaIn?(ok?ico('check')+' Správne: 21 − 2,54 − 2,54 = 15,92 cm.':'Ešte nie – nastavte náhľad na A4, na výšku, Normálne a prečítajte údaj „Priestor na text“.'):''}</p></div>`;
+}
+R.s1=()=>secHead(0,S1.lead)+
+  act('kindHyp',S1.hypH,S1.hypHow,`<div class="docwin"><div class="docwin-h">${ico('doc')} program-akademie.docx · písmo Courier New</div>${programMock('mono')}</div><p class="mt"><b>${S1.hypQ}</b></p>`+hypBlock(),' id="a-hyp"')+
+  act('kindExp',S1.ribH,S1.ribHow,`<div class="pgwrap"><div>${pgRibbon()}</div>${pgPreview()}</div>`,' id="a-page"')+
+  act('kindSim',S1.misH,S1.misHow,misBlock()+areaBlock())+
+  wl(1,`<ol class="wl-ol"><li>Na obrázku karty <b>Rozloženie</b> sú čísla 1, 2, 3. Napíšte, ako sa volá každé tlačidlo. <i>(3 b)</i></li><li>Plagát zo zákazky 1: akú <b>orientáciu</b> a aké <b>okraje</b> ste nastavili? <i>(2 b)</i></li><li>Zo simulátora: šírka priestoru na text pri A4, na výšku, okraje Normálne = ____ cm. <i>(1 b)</i></li></ol>`,6);
+A.hyp=el=>{if(S.hyp!=null) return;S.hyp=+el.dataset.v;persist();rr('s1')};
+A.pgopen=el=>{const k=el.dataset.v;PGOPEN=PGOPEN===k?null:k;rr('s1')};
+A.pgset=el=>{const [k,v]=el.dataset.v.split(':');S.pg[k]=v;PGOPEN=null;PMFB=null;persist();rr('s1')};
+A.pmcheck=()=>{
+  const i=Math.min(S.pmi,MIS.length-1),m=MIS[i];
+  const bad=Object.keys(m.want).filter(k=>S.pg[k]!==m.want[k]);
+  const ok=!bad.length,first=!S.pmTry[m.id];
+  S.pmTry[m.id]=(S.pmTry[m.id]||0)+1;
+  tpoint('page',m.id,first&&ok?2:0);
+  award('pg_'+m.id,first&&ok?2:0);
+  if(ok){S.pm[m.id]=1;PMFB={ok:true,msg:m.ok};setTimeout(()=>{if(S.pmi===i&&i<MIS.length-1){S.pmi=i+1;PMFB=null;persist();rr('s1')}},1800);if(i===MIS.length-1) S.pmi=i}
+  else PMFB={ok:false,msg:bad.map(k=>MISHINT[k]).join(' ')};
+  persist();rr('s1');
+};
+IN.area=el=>{S.areaIn=el.value.slice(0,10);persist();const v=pnum(S.areaIn),ok=Math.abs(v-15.92)<0.03,m=$('#areaMsg');
+  if(m) m.innerHTML=S.areaIn?(ok?ico('check')+' Správne: 21 − 2,54 − 2,54 = 15,92 cm.':'Ešte nie – nastavte náhľad na A4, na výšku, Normálne a prečítajte údaj „Priestor na text“.'):'';
+  if(ok){award('area',MAXP.area);checkDone();renderNav()}};
+DONE.s1=()=>S.hyp!=null&&MIS.every(x=>S.pm[x.id]);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&PGOPEN){PGOPEN=null;rr('s1')}});
+/* ================= 2 · Písmo a riadkovanie ================= */
+const S2={
+  lead:'Lea testuje pozvánku na babke: drobné písmo a natlačené riadky sa čítajú zle. Zistite, čo mení písmo (jednotlivé znaky) a čo mení celý odsek – a nastavte text tak, aby sa dobre čítal.',
+  sortH:'Písmo, alebo Odsek?',
+  sortHow:'Ťuknite na kartičku a potom na skupinu, kam patrí. Na karte Domov sú vedľa seba skupina <b>Písmo</b> a skupina <b>Odsek</b>. Bod dostanete za správne zaradenie na prvý pokus.',
+  zFont:'Skupina Písmo – mení vybrané znaky',zPara:'Skupina Odsek – mení celý odsek',
+  pickFirst:'Najprv ťuknite na kartičku.',
+  labH:'Laboratórium čitateľnosti',
+  labHow:'Toto je zjednodušená karta Domov. Skúste všetky štyri očíslované tlačidlá a sledujte, ako sa mení pozvánka. Čísla 1 – 4 budete potrebovať na pracovný list.',
+  sitH:'Aké písmo a riadkovanie sem patrí?',
+  sitHow:'Vyberte najlepšiu možnosť. Bod dostanete za správnu odpoveď na prvý pokus.',
+};
+const SORT=[
+  {id:'typ',n:'Typ písma (napr. Arial)',ic:'font',in:'font',ex:'Typ písma sa nastavuje v skupine Písmo – mení tvar znakov.'},
+  {id:'vel',n:'Veľkosť písma (12 pt)',ic:'font',in:'font',ex:'Veľkosť písma je v skupine Písmo – meria sa v bodoch (pt).'},
+  {id:'bold',n:'Tučné písmo',ic:'bold',in:'font',ex:'Tučné (B) je v skupine Písmo – platí pre vybrané znaky.'},
+  {id:'far',n:'Farba písma',ic:'color',in:'font',ex:'Farba písma je v skupine Písmo.'},
+  {id:'riad',n:'Riadkovanie 1,5',ic:'spacing',in:'para',ex:'Riadkovanie je v skupine Odsek – mení medzery medzi riadkami celého odseku.'},
+  {id:'stred',n:'Zarovnanie na stred',ic:'align',in:'para',ex:'Zarovnanie je v skupine Odsek – vždy pre celý odsek.'},
+  {id:'medz',n:'Medzera za odsekom',ic:'para',in:'para',ex:'Medzeru pred a za odsekom nastavíte v skupine Odsek (aj cez tlačidlo Riadkovanie).'},
+  {id:'tabz',n:'Zarážka tabulátora',ic:'tab',in:'para',ex:'Zarážky tabulátora patria odseku – dialóg Tabulátory otvoríte z okna Odsek.'},
+];
+const SORD=permFor('sort-v1',SORT.length).map(i=>SORT[i].id);
+let SSEL=null,SFB=null;
+function sortBlock(){
+  const pool=SORD.filter(id=>!S.sort[id]).map(id=>SORT.find(x=>x.id===id));
+  const chip=(x,stat)=>stat?`<span class="chip placed"><span class="ic">${ico(x.ic)}</span>${x.n}</span>`
+    :`<button class="chip" data-a="schip" data-v="${x.id}" aria-pressed="${SSEL===x.id}"><span class="ic">${ico(x.ic)}</span>${x.n}</button>`;
+  const zone=z=>{const items=SORT.filter(x=>S.sort[x.id]&&x.in===z);
+    return `<button class="zone${SSEL?' armed':''}" data-a="szone" data-v="${z}" style="--zc:${z==='font'?'var(--doc)':'var(--sheet)'}"><h4>${ico(z==='font'?'font':'para')} ${z==='font'?S2.zFont:S2.zPara} <small>${items.length}/4</small></h4><span class="in">${items.map(x=>chip(x,1)).join('')}</span></button>`};
+  let fb='';
+  if(SFB&&SFB.id){const x=SORT.find(p=>p.id===SFB.id);fb=`<div class="fb ${SFB.ok?'ok':'no'}" role="status">${SFB.ok?ico('check'):ico('x')} <b>${SFB.ok?t('correct'):t('wrong')}</b> ${x.ex}</div>`}
+  else if(SFB&&SFB.pick) fb=`<div class="fb warn">${S2.pickFirst}</div>`;
+  const all=!pool.length;
+  return (all?'':`<div class="pool" role="group">${pool.map(x=>chip(x,0)).join('')}</div>`)+`<div class="zones">${zone('font')}${zone('para')}</div>${fb}`+
+    (all?`<div class="fact">${ico('bulb')}<div><b>Pravidlo:</b> písmo mení <b>vybrané znaky</b> – môžete mať v jednej vete jedno slovo tučné. Odsek sa mení <b>celý naraz</b> – riadkovanie ani zarovnanie nemôže mať polovica odseku inak. Body na prvý pokus: ${tpSum('sort')} / ${TASKS.sort}.</div></div>`:'');
+}
+A.schip=el=>{SSEL=SSEL===el.dataset.v?null:el.dataset.v;SFB=null;rr('s2')};
+A.szone=el=>{
+  if(!SSEL){SFB={pick:1};rr('s2');return}
+  const x=SORT.find(p=>p.id===SSEL),ok=x.in===el.dataset.v;
+  tpoint('sort',x.id,ok?1:0);award('so_'+x.id,ok?1:0);
+  if(ok){S.sort[x.id]=1;SSEL=null}
+  SFB={id:x.id,ok};persist();rr('s2');
+};
+/* ---- readability lab ---- */
+const LFONT={sans:{n:'Arial',k:'bezpätkové',css:'Arial,"Liberation Sans",Helvetica,sans-serif'},serif:{n:'Times New Roman',k:'pätkové',css:'"Times New Roman","Liberation Serif",Times,serif'},mono:{n:'Courier New',k:'všetky znaky rovnako široké',css:'"Courier New","Liberation Mono",Courier,monospace'},deco:{n:'Comic Sans MS',k:'ozdobné',css:'"Comic Sans MS","Comic Neue",cursive'}};
+const LSIZE=[8,10,12,14,18,28];
+const LLINE=['1.0','1.15','1.5','2.0','2.5','3.0'];
+const LALIGN={left:'Zarovnať doľava',center:'Zarovnať na stred',right:'Zarovnať doprava',justify:'Zarovnať do bloku'};
+let LOPEN=null;
+const lineTxt=v=>v.replace('.',',');
+function labRibbon(){
+  const L=S.lab;
+  const b=(k,num,ic,label,val)=>`<button class="rib-btn" data-a="lopen" data-v="${k}" aria-expanded="${LOPEN===k}"><span class="num">${num}</span>${ico(ic)}<span>${label}</span><small>${val}</small></button>`;
+  const grp=`<div class="rib-grp"><div class="rib-row">${b('f',1,'font','Typ písma',LFONT[L.f].n)}${b('z',2,'font','Veľkosť písma',L.z+' pt')}</div><div class="rib-gl">Písmo</div></div>`+
+    `<div class="rib-grp"><div class="rib-row">${b('a',3,'align','Zarovnanie',LALIGN[L.a||'left'].replace('Zarovnať ',''))}${b('l',4,'spacing','Riadkovanie',lineTxt(L.l))}</div><div class="rib-gl">Odsek</div></div>`;
+  let menu='';
+  if(LOPEN){
+    const opts=LOPEN==='f'?Object.entries(LFONT).map(([k,v])=>[k,v.n,v.k,`style="font-family:${v.css.replace(/"/g,"'")}"`]):LOPEN==='z'?LSIZE.map(z=>[String(z),z+' pt','','']):LOPEN==='l'?LLINE.map(x=>[x,lineTxt(x),x==='1.15'?'predvolené vo Worde':'','']):Object.entries(LALIGN).map(([k,v])=>[k,v,'','']);
+    const cur=LOPEN==='z'?String(L.z):LOPEN==='a'?(L.a||'left'):L[LOPEN];
+    menu=`<div class="rib-menu" role="menu">${opts.map(([k,n,d,st])=>`<button role="menuitemradio" aria-checked="${cur===k}" data-a="lset" data-v="${LOPEN}:${k}"><b ${st}>${n}</b>${d?`<small>${d}</small>`:''}</button>`).join('')}</div>`;
+  }
+  return ribbon('Domov',grp)+menu;
+}
+function labPreview(){
+  const L=S.lab,f=LFONT[L.f],px=(L.z*1.1).toFixed(1),lh=(1.2*parseFloat(L.l)).toFixed(2);
+  return `<div class="lpaper" style="font-family:${f.css.replace(/"/g,"'")};font-size:${px}px;line-height:${lh};text-align:${L.a||'left'}"><p><b>Pozvánka na vianočnú akadémiu</b></p><p>Milí rodičia a starí rodičia, srdečne vás pozývame na vianočnú akadémiu našej triedy. Uvidíte koledy, básne, tanec aj krátke divadlo. Začíname o 17:00 v telocvični. Tešíme sa na vás!</p></div>`+
+    `<p class="small mt">Náhľad je približný – skutočný vzhľad závisí od písma a tlačiarne.</p>`;
+}
+A.lopen=el=>{const k=el.dataset.v;LOPEN=LOPEN===k?null:k;rr('s2')};
+A.lset=el=>{const [k,v]=el.dataset.v.split(':');if(k==='z') S.lab.z=+v;else S.lab[k]=v;S.labSeen[k]=1;LOPEN=null;persist();
+  if(['f','z','a','l'].every(x=>S.labSeen[x])) award('lab',MAXP.lab);rr('s2')};
+/* ---- situations ---- */
+const SIT=[
+  {id:'ref',q:'<b>Referát</b>, ktorý bude pani učiteľka čítať na papieri.',o:['písmo 12 pt, riadkovanie 1,15 alebo 1,5','písmo 8 pt, riadkovanie 1,0 – zmestí sa viac','písmo 28 pt, riadkovanie 3,0','písmo 12 pt, všetko VEĽKÝMI PÍSMENAMI'],c:0,ex:'Bežný text sa píše písmom okolo 11 – 12 pt a riadkovaním 1,15 – 1,5. Drobné písmo a natlačené riadky sa čítajú ťažko.'},
+  {id:'nad',q:'<b>Nadpis plagátu</b>, ktorý treba prečítať z niekoľkých metrov.',o:['veľké písmo, napríklad 48 pt a viac','12 pt ako zvyšok textu','9 pt, aby nadpis nezaberal miesto','riadkovanie 3,0 a písmo 12 pt'],c:0,ex:'Na plagáte musí byť nadpis výrazne väčší. Riadkovanie písmo nezväčší – iba oddiali riadky.'},
+  {id:'pop',q:'<b>Popis pod fotkou</b> v pozvánke: „Akadémia v minulom roku“.',o:['o niečo menšie písmo, napríklad 9 – 10 pt','rovnaké písmo ako nadpis, 48 pt','písmo 20 pt a riadkovanie 2,5','žiadne písmo, stačí fotka'],c:0,ex:'Popis obrázka býva menší ako bežný text, aby neprekrikoval hlavný obsah.'},
+];
+function sitBlock(){
+  return SIT.map((x,i)=>`<div class="qcard"><p class="q">${i+1}. ${x.q}</p>${mcq('sit_'+x.id,x,S.sit[x.id]??null)}</div>`).join('');
+}
+SIT.forEach(x=>{A['sit_'+x.id]=el=>{if(S.sit[x.id]!=null) return;const v=+el.dataset.v;S.sit[x.id]=v;const ok=v===x.c;tpoint('sit',x.id,ok?1:0);award('si_'+x.id,ok?1:0);persist();rr('s2')}});
+R.s2=()=>secHead(1,S2.lead)+
+  act('kindSort',S2.sortH,S2.sortHow,sortBlock())+
+  act('kindLab',S2.labH,S2.labHow,`<div class="pgwrap lab2"><div>${labRibbon()}</div><div>${labPreview()}</div></div>`+
+    `<div class="fact">${ico('info')}<div><b>Dobré vedieť:</b> veľkosť písma sa udáva v <b>bodoch</b> – skratka <b>pt</b> je z anglického <i>point</i> (bod). 1 pt je 1/72 palca, asi <b>0,35 mm</b>; <b>72 pt = 1 palec = 2,54 cm</b>. Meria sa celá výška písma – od vrchu písmena „h“ po spodok „g“ –, preto môžu dve písma s rovnakými 12 pt vyzerať rôzne veľké. Jednoducho: čím väčšie číslo pt, tým väčšie písmo. Vo Worde v Microsoft 365 je predvolené písmo <b>Aptos 12 pt</b> a riadkovanie <b>1,15</b>. Písmo <b>pätkové</b> (Times New Roman) má na koncoch čiar malé „pätky“, <b>bezpätkové</b> (Arial, Aptos) ich nemá.</div></div>`,' id="a-lab"')+
+  act('kindDec',S2.sitH,S2.sitHow,sitBlock())+
+  wl(2,`<ol class="wl-ol"><li>Doplňte tabuľku: <b>na ktorej karte</b> a v <b>ktorej skupine</b> nájdete príkaz – Typ písma, Veľkosť písma, Zarovnanie na stred, Riadkovanie, Orientácia (zo šanónu 1). <i>(5 b – 1 b za riadok)</i></li><li>Veľkosť písma sa meria v ____________. <i>(1 b)</i></li><li>Na referát odporúčame písmo ____ pt a riadkovanie ____. <i>(1 b)</i></li></ol>`,7);
+DONE.s2=()=>SORT.every(x=>S.sort[x.id])&&SIT.every(x=>S.sit[x.id]!=null);
+/* ================= 3 · Tabulátory ================= */
+const S3={
+  lead:'Dávid ukáže, prečo sa stĺpce nezarovnávajú medzerníkom. Kláves <kbd>Tab</kbd> posunie text na <b>zarážku tabulátora</b> – na presné miesto na pravítku. Medzery takú istotu nedajú.',
+  expH:'Experiment: medzery proti tabulátoru',
+  expHow:'Vľavo je Bencov program (medzery), vpravo Ninin (tabulátory). Prepnite písmo a potom zapnite skryté znaky ¶ – rovnaké tlačidlo nájdete vo Worde na karte Domov v skupine Odsek.',
+  qH:'Prečo sa to stalo?',
+  tyH:'Ktorá zarážka sem patrí?',
+  tyHow:'Každý stĺpec potrebuje inú zarážku. Vyberte druh – náhľad hneď ukáže, ako sa text zarovná. Bod dostanete za správny výber na prvý pokus.',
+  howH:'Ako na to vo Worde',
+};
+const PROG=[['17:00','Koledy','1.A'],['17:15','Básne','sekunda'],['17:30','Tanec','2.B'],['17:50','Divadlo','tercia']];
+const TQ3={o:['Medzera má v každom písme inú šírku, kým tabulátor skočí vždy na tú istú zarážku.','Arial je pokazené písmo a nemá sa používať.','Nina mala novší počítač.','Medzery sa pri zmene písma zmažú.'],c:0,ex:'Presne tak. V Courier New sú všetky znaky rovnako široké, v Ariali nie – preto rovnaký počet medzier dá rôznu šírku. Tabulátor meria polohu od okraja strany.'};
+function spacedHtml(show){
+  return PROG.map(r=>{const s=r[0]+'  '+r[1].padEnd(10,' ')+r[2];
+    return (show?esc(s).replace(/ /g,'<span class="sp"> </span>'):esc(s))+(show?'<span class="pil">¶</span>':'')}).join('\n');
+}
+function tabbedHtml(show){
+  return `<div class="trul" aria-hidden="true"><span style="left:0">${tabmark('left')}</span><span style="left:5.2em">${tabmark('left')}</span><span style="left:11em">${tabmark('left')}</span></div>`+
+    PROG.map(r=>`<div class="trow2"><span>${r[0]}${show?'<i class="tarr">→</i>':''}</span><span>${r[1]}${show?'<i class="tarr">→</i>':''}</span><span>${r[2]}${show?'<i class="pil">¶</i>':''}</span></div>`).join('');
+}
+function expBlock(){
+  const f=S.tabFont,show=S.tabShow,fn=f==='mono'?'Courier New':'Arial';
+  const seg=`<div class="seg" role="group" aria-label="Písmo"><button data-a="tfont" data-v="mono" aria-pressed="${f==='mono'}">Courier New</button><button data-a="tfont" data-v="prop" aria-pressed="${f==='prop'}">Arial</button></div>`;
+  return `<div class="row">${seg}<button class="btn ghost sm" data-a="tshow" aria-pressed="${show}">${ico('para')} ${show?'Skryť':'Zobraziť'} skryté znaky ¶</button></div>`+
+    `<div class="twin mt"><div class="docwin"><div class="docwin-h">${ico('user')} Bence – medzery · ${fn}</div><pre class="spaced ${f==='mono'?'mono':'prop'}">${spacedHtml(show)}</pre></div>`+
+    `<div class="docwin"><div class="docwin-h">${ico('user')} Nina – tabulátory · ${fn}</div><div class="tabbed ${f==='mono'?'mono':'prop'}">${tabbedHtml(show)}</div></div></div>`+
+    (show?`<p class="small mt">Bodka <b>·</b> = medzera, šípka <b>→</b> = tabulátor, <b>¶</b> = koniec odseku (kláves Enter). Skryté znaky sa netlačia.</p>`:'')+
+    (S.tabFlip?`<div class="qcard"><p class="q">${S3.qH} Bencove stĺpce sa po zmene písma rozišli, Ninine nie.</p>${mcq('tabq',TQ3,S.tabQ)}</div>`:`<div class="fb warn">${ico('hand')} Prepnite písmo na Arial a pozorujte oba programy.</div>`)+
+    `<div class="qcard"><p class="q">Kontrola čísla z pracovného listu: koľko šípok <b>→</b> je v jednom riadku Nininho programu?</p><div class="row"><input class="ninput" type="text" inputmode="numeric" data-in="arrows" value="${esc(S.tabArrows)}" aria-label="počet šípok"></div><p class="small" id="arrMsg">${arrMsg()}</p></div>`;
+}
+function arrMsg(){
+  if(!S.tabArrows) return '';
+  if(!S.tabShow&&!S.xp.tabArrows) return 'Najprv zapnite skryté znaky ¶.';
+  return pnum(S.tabArrows)===2?ico('check')+' Správne: 3 stĺpce → 2 tabulátory (pred druhým a pred tretím stĺpcom).':'Ešte nie – spočítajte šípky v jednom riadku.';
+}
+A.tfont=el=>{const v=el.dataset.v;if(S.tabFont===v) return;S.tabFont=v;
+  if(v==='prop'){S.tabFlip++;if(S.hyp!=null&&!S.hypV){S.hypV=true;award('hyp',S.hyp===S1.hypC?MAXP.hyp:0);setTimeout(()=>toast(`${ico('unlock')} Obálka z šanónu 1 je otvorená – pozrite sa, či ste mali pravdu.`,2600),600);paint('s1')}}
+  persist();rr('s3')};
+A.tshow=()=>{S.tabShow=!S.tabShow;persist();rr('s3')};
+A.tabq=el=>{if(S.tabQ!=null) return;S.tabQ=+el.dataset.v;const ok=S.tabQ===TQ3.c;tpoint('tabQ','q',ok?2:0);award('tabQ',ok?MAXP.tabQ:0);persist();rr('s3')};
+IN.arrows=el=>{S.tabArrows=el.value.slice(0,4);persist();const m=$('#arrMsg');if(m) m.innerHTML=arrMsg();if(pnum(S.tabArrows)===2&&S.tabShow){award('tabArrows',MAXP.tabArrows)}};
+/* ---- tab types ---- */
+const TTN={left:'Ľavá',center:'Stredná',right:'Pravá',dec:'Desatinná'};
+const TTY=[
+  {id:'A',h:'Stĺpec A – názvy čísel',v:['Koledy','Básne','Divadlo'],a:'left',ex:'Text začína vždy na rovnakom mieste – ľavá zarážka.',hint:'Názvy sa čítajú zľava – nech začínajú pod sebou.'},
+  {id:'B',h:'Stĺpec B – ceny v bufete',v:['0,50 €','12,00 €','1,20 €'],a:'dec',ex:'Desatinné čiarky sú presne pod sebou – desatinná zarážka.',hint:'Pozrite sa na desatinné čiarky – mali by byť pod sebou.'},
+  {id:'C',h:'Stĺpec C – čísla strán v obsahu',v:['3','12','105'],a:'right',ex:'Čísla končia pod sebou – jednotky pod jednotkami. Pravá zarážka.',hint:'Čísla strán majú končiť pod sebou (pri pravom okraji).'},
+  {id:'D',h:'Stĺpec D – trieda pod nadpisom „Trieda“',v:['1.A','sekunda','2.B'],a:'center',ex:'Stred každého slova je pod stredom nadpisu – stredná zarážka.',hint:'Krátke aj dlhé slovo má byť v strede stĺpca.'},
+];
+function ttPreview(x,a){
+  const cell=v=>{
+    if(!a) return `<span class="tv" style="left:${10+((v.length*7)%30)}%">${esc(v)}</span>`;
+    if(a==='left') return `<span class="tv" style="left:50%">${esc(v)}</span>`;
+    if(a==='right') return `<span class="tv" style="left:50%;transform:translateX(-100%)">${esc(v)}</span>`;
+    if(a==='center') return `<span class="tv" style="left:50%;transform:translateX(-50%)">${esc(v)}</span>`;
+    const k=v.indexOf(',');if(k<0) return `<span class="tv" style="left:50%;transform:translateX(-100%)">${esc(v)}</span>`;
+    return `<span class="tv" style="left:50%;transform:translateX(-100%)">${esc(v.slice(0,k))}</span><span class="tv" style="left:50%">${esc(v.slice(k))}</span>`;
+  };
+  return `<div class="ttbox"><div class="ttrul">${a?`<span class="ttstop">${tabmark(a)}</span>`:''}</div>${x.v.map(v=>`<div class="ttline">${cell(v)}</div>`).join('')}<i class="ttguide" aria-hidden="true"></i></div>`;
+}
+function tyBlock(){
+  return `<div class="ttgrid">${TTY.map(x=>{const ok=!!S.ttype[x.id],pick=ok?x.a:S.ttPick[x.id]||null;
+    return `<div class="trow${ok?' ok':''}"><p>${x.h}</p>${ttPreview(x,pick)}<div class="tbtns" role="group">${Object.keys(TTN).map(k=>{let cls='';if(ok&&k===x.a)cls='ok';else if(!ok&&pick===k)cls='no';
+      return `<button class="tbtn ${cls}" data-a="ttype" data-v="${x.id}:${k}"${ok?' aria-disabled="true"':''}><span class="ic">${tabmark(k)}</span>${TTN[k]}</button>`}).join('')}</div>`+
+      (ok?`<p class="tfb">${ico('check')} ${x.ex}</p>`:pick?`<p class="tfb">${ico('help')} ${x.hint}</p>`:'')+`</div>`}).join('')}</div>`;
+}
+A.ttype=el=>{const [id,k]=el.dataset.v.split(':'),x=TTY.find(y=>y.id===id);if(S.ttype[id]) return;
+  const ok=k===x.a;tpoint('ttype',id,ok?1:0);award('tt_'+id,ok?1:0);S.ttPick[id]=k;if(ok) S.ttype[id]=1;persist();rr('s3')};
+const HOWTO=[
+  'Zapnite pravítko: karta <b>Zobraziť</b> → zaškrtnite <b>Pravítko</b>.',
+  'Vľavo na začiatku pravítka je malé tlačidlo so značkou zarážky – klikaním na neho vyberiete druh (ľavá, stredná, pravá, desatinná).',
+  'Kliknite do pravítka na miesto, kde má stĺpec začínať – vznikne zarážka. Ťahaním ju posuniete, ťahaním dole z pravítka ju odstránite.',
+  'V texte stlačte <kbd>Tab</kbd> – text skočí na zarážku.',
+  'Presnejšie: karta <b>Domov</b> → malá šípka v rohu skupiny <b>Odsek</b> → tlačidlo <b>Tabulátory…</b> (pozícia v cm, zarovnanie, vodiaci znak).',
+];
+R.s3=()=>secHead(2,S3.lead)+
+  act('kindLab',S3.expH,S3.expHow,expBlock(),' id="a-tabs"')+
+  act('kindDec',S3.tyH,S3.tyHow,tyBlock())+
+  act('kindRead',S3.howH,'',`<ol class="howto">${HOWTO.map(x=>`<li>${x}</li>`).join('')}</ol><div class="fact">${ico('alert')}<div><b>Pozor:</b> zarážky tabulátora sa nedajú nastaviť vo Worde pre web (v prehliadači). Použite počítačovú aplikáciu Word – so školským kontom Microsoft 365 ju máte.</div></div>`)+
+  wl(3,`<ol class="wl-ol"><li>Môj tip z obálky (šanón 1): ____ . Po experimente: tip bol <b>správny / nesprávny</b>, pretože … <i>(2 b)</i></li><li>Ku stĺpcom A, B, C, D zapíšte druh zarážky. <i>(4 b)</i></li><li>Zapnite skryté znaky ¶: koľko šípok → je v jednom riadku Nininho programu? <i>(1 b)</i></li></ol>`,7);
+DONE.s3=()=>S.tabQ!=null&&TTY.every(x=>S.ttype[x.id]);
+/* ================= 4 · Test a odovzdanie výsledku ================= */
+const TOP={str:'Stránka',pis:'Písmo a riadkovanie',tab:'Tabulátory'};
+const TQ=[
+  {t:'str',q:'Na ktorej karte vo Worde nájdete tlačidlá Okraje, Orientácia a Veľkosť?',o:['Rozloženie','Domov','Vložiť','Revízia'],c:0,ex:'Karta Rozloženie, skupina Nastavenie strany.'},
+  {t:'str',q:'Čo znamená orientácia „Na šírku“?',o:['strana je širšia ako vyššia','strana má väčšie okraje','písmo je širšie','strana je väčšia ako A4'],c:0,ex:'Na šírku = strana leží, je širšia ako vyššia.'},
+  {t:'str',q:'Aké veľké sú okraje „Normálne“ vo Worde?',o:['2,54 cm zo všetkých strán','1 cm zo všetkých strán','5 cm len vľavo','0 cm – bez okrajov'],c:0,ex:'Normálne okraje majú 2,54 cm (1 palec) hore, dole, vľavo aj vpravo.'},
+  {t:'pis',q:'V akých jednotkách sa udáva veľkosť písma?',o:['v bodoch (pt)','v pixeloch na stranu','v percentách','v riadkoch'],c:0,ex:'Veľkosť písma je v bodoch – pt je z anglického point (bod), 1 pt je asi 0,35 mm.'},
+  {t:'pis',q:'Čo urobí riadkovanie 2,0 oproti riadkovaniu 1,0?',o:['riadky budú od seba asi dvakrát ďalej','písmo bude dvakrát väčšie','text bude v dvoch stĺpcoch','každý riadok sa napíše dvakrát'],c:0,ex:'Dvojité riadkovanie zväčší medzery medzi riadkami, písmo ostane rovnaké.'},
+  {t:'pis',q:'Ktoré nastavenie patrí do skupiny Odsek?',o:['riadkovanie','typ písma','farba písma','tučné písmo'],c:0,ex:'Riadkovanie a zarovnanie menia celý odsek. Typ, farba a tučné písmo patria do skupiny Písmo.'},
+  {t:'tab',q:'Prečo nezarovnávame stĺpce medzerníkom?',o:['po zmene písma sa stĺpce rozídu','medzery sa nedajú vytlačiť','medzerník je pomalší ako myš','Word medzery zakazuje'],c:0,ex:'Medzera má v každom písme inú šírku. Tabulátor skočí vždy na zarážku.'},
+  {t:'tab',q:'Ceny 0,50 € a 12,00 € chcete mať pod sebou podľa desatinnej čiarky. Ktorú zarážku použijete?',o:['desatinnú','ľavú','strednú','žiadnu, stačia medzery'],c:0,ex:'Desatinná zarážka zarovná čísla podľa čiarky.'},
+];
+const GRADES=['výborný','chválitebný','dobrý','dostatočný','nedostatočný'];
+const S4={
+  lead:'Ukážte, čo ste sa naučili. 8 otázok, po každej uvidíte vysvetlenie. Potom vyplníte meno a triedu a stiahnete si súbor s výsledkom. Po teste sa odomkne mini hra.',
+  testH:'Záverečný test',testHow:'Do známky sa počíta <b>prvý pokus</b>. Potom môžete test opakovať na precvičenie, koľkokrát chcete.',
+  resH:'Váš výsledok a odovzdanie',resHow:'Vyplňte meno a triedu, skontrolujte súhrn a stiahnite si súbor. Odovzdajte ho tak, ako povie učiteľ (napríklad do úlohy v EduPage).',
+  certH:'Certifikát',hwH:'Domáca úloha',hwHow:'Krátka práca vo Worde doma. Súbor prineste alebo odovzdajte podľa pokynu učiteľa.',
+  hw:['Vo Worde nastavte stranu <b>A5 na šírku</b> a okraje <b>Úzke</b>.','Napíšte rozvrh hodín na jeden deň: <b>čas → predmet → učebňa</b>. Stĺpce oddeľte klávesom <kbd>Tab</kbd>, nie medzerami.','Nastavte písmo aspoň <b>14 pt</b> a riadkovanie <b>1,5</b>.','Zapnite skryté znaky ¶ a skontrolujte, či medzi stĺpcami vidíte šípky →.'],
+};
+const gradeOf=p=>p>=90?1:p>=75?2:p>=50?3:p>=25?4:5;
+function testScore(){const o=S.test.order||[];return o.reduce((s,x,k)=>s+(S.test.a[k]===TQ[x.q].c?1:0),0)}
+function testInit(){S.test.order=shuffle(TQ.map((_,i)=>i)).map(q=>({q,p:shuffle([...Array(TQ[q].o.length).keys()])}));S.test.i=0;S.test.a=[];S.test.done=false}
+function testBlock(){
+  const T8=S.test,n=TQ.length;
+  if(!T8.order) return `<div class="tq"><p>${ico('list')} <b>${n} otázok</b> · ${Object.values(TOP).join(' · ')}</p><div class="row mt"><button class="btn" data-a="tstart">${ico('play')} Začať test</button></div></div>`;
+  const dots=`<div class="tdots" aria-hidden="true">${T8.order.map((x,k)=>{const a=T8.a[k];return `<i class="${a==null?(k===T8.i&&!T8.done?'cur':''):a===TQ[x.q].c?'ok':'no'}"></i>`}).join('')}</div>`;
+  if(T8.done){
+    const s=testScore(),p=Math.round(s/n*100),g=gradeOf(p);
+    const by=Object.keys(TOP).map(k=>{const idx=T8.order.map((x,i)=>[x,i]).filter(([x])=>TQ[x.q].t===k);return `<span>${TOP[k]}: ${idx.filter(([x,i])=>T8.a[i]===TQ[x.q].c).length}/${idx.length}</span>`}).join('');
+    return `<div class="result"><div class="gradebox"><div class="grade" aria-label="známka ${g}">${g}</div><small>${GRADES[g-1]}</small></div><div><h3>Výsledok: ${s} z ${n} bodov (${p} %)</h3><p>${g<=2?'Výborne – stránku, písmo aj tabulátory máte v malíčku!':g===3?'Dobrý základ. Pozrite sa na šanóny, kde ste chybovali.':'Prejdite si šanóny 1 – 3 ešte raz a skúste to znova.'}</p><div class="bytopic">${by}</div>${dots}`+
+      `<p class="small mt">Do známky ide prvý pokus: <b>${T8.first??s} / ${n}</b>${T8.best!=null?` · najlepší pokus: ${T8.best} / ${n}`:''}</p><div class="row mt"><button class="btn ghost sm" data-a="tretry">${ico('reset')} Precvičiť test znova</button></div></div></div>`;
+  }
+  const it=T8.order[T8.i],q=TQ[it.q],a=T8.a[T8.i],ans=a!=null,L='ABCD';
+  let h=`<div class="tq"><div class="tq-meta"><span>Otázka ${T8.i+1} / ${n}</span><span class="topic">${TOP[q.t]}</span></div>${dots}<h3 class="mt">${q.q}</h3><div class="opts${ans?' locked':''}" role="group">`;
+  it.p.forEach((oi,k)=>{let cls='',mk=L[k];if(ans){if(oi===q.c){cls='ok';mk=ico('check')}else if(oi===a){cls='no';mk=ico('x')}}
+    h+=`<button class="opt ${cls}" data-a="tans" data-v="${oi}"${ans?' aria-disabled="true"':''}><span class="mk">${mk}</span><span>${q.o[oi]}</span></button>`});
+  h+='</div>';
+  if(ans) h+=`<div class="fb ${a===q.c?'ok':'no'}" role="status"><b>${a===q.c?t('correct'):t('wrong')}</b> ${q.ex}</div><div class="row mt"><button class="btn" data-a="tnext">${T8.i+1<n?'Ďalšia otázka':'Vyhodnotiť'} ${ico('arrow')}</button></div>`;
+  return h+'</div>';
+}
+A.tstart=()=>{testInit();persist();rr('s4')};
+A.tans=el=>{const T8=S.test;if(T8.done||T8.a[T8.i]!=null) return;T8.a[T8.i]=+el.dataset.v;persist();rr('s4')};
+A.tnext=()=>{const T8=S.test;
+  if(T8.i+1<TQ.length){T8.i++;persist();rr('s4');const b=$('#s4 .tq');if(b) b.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'nearest'});return}
+  T8.done=true;const s=testScore();if(T8.first==null) T8.first=s;T8.best=Math.max(T8.best??0,s);award('test',Math.round(MAXP.test*s/TQ.length));persist();rr('s4');paint('s5');
+  const r=$('#s4 .result');if(r) r.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'center'});
+};
+A.tretry=()=>{testInit();persist();rr('s4')};
+
+/* ---------- results ---------- */
+function fnv(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(16).padStart(8,'0')}
+const checkOf=o=>fnv(LESSON.salt+'|'+JSON.stringify(o));
+function results(){
+  const n=TQ.length,first=S.test.first,testPct=first==null?0:Math.round(first/n*100);
+  const tp=taskPts(),taskPct=Math.round(tp/TASKMAX*100),ap=actPct();
+  const total=Math.round(.4*testPct+.4*taskPct+.2*ap);
+  return {testPct,taskPct,actPct:ap,tp,total,grade:gradeOf(total),first,n};
+}
+function payload(){
+  const r=results();
+  const o={lesson:LESSON.id,title:LESSON.title,v:1,name:S.name.trim(),cls:S.cls.trim(),date:new Date().toISOString(),
+    active_s:S.act.t||0,sec_s:Object.fromEntries(SECS.map(s=>[s.id,S.act.sec[s.id]||0])),
+    folders:SECS.filter(s=>S.done[s.id]).map(s=>({id:s.id,name:s.tab,at_s:S.doneAt[s.id]??null})),
+    tasks:{pts:r.tp,max:TASKMAX,pct:r.taskPct},test:{first:r.first,n:r.n,pct:r.testPct,best:S.test.best},
+    active_pct:r.actPct,xp:xpTotal(),total_pct:r.total,grade:r.grade};
+  o.check=checkOf(o);return o;
+}
+const slug=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,30)||'nezadane';
+function resBlock(){
+  const r=results(),ready=S.name.trim()&&S.cls.trim();
+  return `<div class="row"><div class="field"><label for="rname">Meno a priezvisko</label><input class="namein" id="rname" type="text" maxlength="40" autocomplete="off" placeholder="napr. Nina Kováčová" value="${esc(S.name)}" data-in="name"></div>`+
+    `<div class="field"><label for="rcls">Trieda</label><input class="namein short" id="rcls" type="text" maxlength="12" autocomplete="off" placeholder="napr. II.A" value="${esc(S.cls)}" data-in="cls"></div></div>`+
+    `<div class="restbl mt" id="resTbl">${resTable(r)}</div>`+
+    `<div class="row mt"><button class="btn mint" data-a="dl"${ready?'':' disabled'}>${ico('download')} Stiahnuť výsledok</button><span class="small" id="dlMsg">${ready?(S.saved?ico('check')+' Súbor ste už stiahli – môžete ho stiahnuť znova.':''):'Najprv vyplňte meno aj triedu.'}</span></div>`+
+    (INFRAME?`<p class="small mt">${ico('info')} V tomto náhľade sa súbor stiahnuť nedá. Žiaci sťahujú výsledok zo žiackeho súboru HTML.</p>`:'');
+}
+function resTable(r){
+  return `<table class="ptbl"><tbody>`+
+    `<tr><td>Aktívny čas</td><td><b>${minTxt(S.act.t)}</b> → ${r.actPct} % <span class="small">(100 % = 15 min)</span></td><td class="w">20 %</td></tr>`+
+    `<tr><td>Úlohy v šanónoch 1 – 3</td><td><b>${r.tp} / ${TASKMAX} b</b> → ${r.taskPct} % <span class="small">(prvý pokus)</span></td><td class="w">40 %</td></tr>`+
+    `<tr><td>Test</td><td><b>${r.first??'–'} / ${r.n}</b> → ${r.testPct} % <span class="small">(prvý pokus)</span></td><td class="w">40 %</td></tr>`+
+    `<tr class="sum"><td>Spolu</td><td><b>${r.total} %</b> · známka <b>${r.grade} – ${GRADES[r.grade-1]}</b></td><td></td></tr></tbody></table>`;
+}
+IN.name=el=>{S.name=el.value.slice(0,40);persist();resLive()};
+IN.cls=el=>{S.cls=el.value.slice(0,12);persist();resLive()};
+function resLive(){
+  const ready=S.name.trim()&&S.cls.trim(),b=$('#s4 [data-a="dl"]'),m=$('#dlMsg'),c=$('#certName');
+  if(b) b.disabled=!ready; if(m) m.innerHTML=ready?'':'Najprv vyplňte meno aj triedu.';
+  if(c) c.textContent=S.name.trim()||'(vaše meno)';
+  if(ready&&!S.done.s4) rr('s4');
+}
+function downloadText(name,text,type){
+  const blob=new Blob([text],{type});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},1500);
+}
+A.dl=()=>{
+  if(!(S.name.trim()&&S.cls.trim())) return;
+  if(INFRAME){toast(`${ico('info')} V náhľade sa sťahovať nedá – použite žiacky súbor.`,2600);return}
+  const o=payload();
+  downloadText(`${LESSON.id}_${slug(S.cls)}_${slug(S.name)}.json`,JSON.stringify(o,null,2),'application/json');
+  S.saved=1;persist();const m=$('#dlMsg');if(m) m.innerHTML=ico('check')+' Stiahnuté. Odovzdajte súbor podľa pokynu učiteľa.';
+};
+/* ---------- certificate ---------- */
+function certHtml(){
+  const r=results(),nm=S.name.trim(),d=new Date().toLocaleDateString('sk-SK',{year:'numeric',month:'long',day:'numeric'});
+  return `<div class="cert"><div class="cseal">MISIA SPLNENÁ</div><div class="ct">CERTIFIKÁT</div><p>potvrdzuje, že</p><div class="cn" id="certName">${esc(nm||'(vaše meno)')}</div>`+
+    `<p>zvládol(a) misiu <b>Nastavenie stránky, písmo, riadkovanie a tabulátory</b></p><span class="cr">Hodnosť: ${esc(rankName(rankIdx(xpTotal())))}</span>`+
+    `<p class="mt"><b>XP:</b> ${xpTotal()} / ${MAXT} · <b>Test:</b> ${r.first??'–'} / ${r.n} · <b>Spolu:</b> ${r.total} %</p>`+
+    `<div class="cf"><span>Dátum: ${d}</span><span>${esc(AUTHOR)}</span></div></div>`;
+}
+function certBlock(){
+  return `<div id="certBox">${certHtml()}</div>`+
+    (INFRAME?`<p class="small mt">${ico('camera')} Certifikát si odfoťte alebo urobte snímku obrazovky.</p>`:`<div class="row mt"><button class="btn sky" data-a="certPrint">${ico('print')} Vytlačiť certifikát</button></div>`);
+}
+A.certPrint=()=>{if(INFRAME) return;const cp=$('#certPrint');cp.innerHTML=certHtml();document.documentElement.classList.add('printing');
+  const off=()=>{document.documentElement.classList.remove('printing');window.removeEventListener('afterprint',off)};window.addEventListener('afterprint',off);
+  try{window.print()}catch(e){}setTimeout(off,1500)};
+CH.hw=el=>{S.hw[el.dataset.v]=el.checked;persist()};
+R.s4=()=>secHead(3,S4.lead)+
+  act('kindTest',S4.testH,S4.testHow,`<div aria-live="polite">${testBlock()}</div>`)+
+  (S.test.done?act('kindSend',S4.resH,S4.resHow,resBlock(),' id="a-res"')+act('kindWrite',S4.certH,'',certBlock()):`<div class="fb warn mt">${ico('lock')} Súhrn výsledku, stiahnutie a certifikát sa zobrazia po dokončení testu.</div>`)+
+  act('kindHome',S4.hwH,S4.hwHow,`<ol class="steps">${S4.hw.map((x,i)=>`<li><label><input type="checkbox" data-ch="hw" data-v="${i}" ${S.hw[i]?'checked':''}> <span><b>${i+1}.</b> ${x}</span></label></li>`).join('')}</ol>`);
+DONE.s4=()=>S.test.done&&S.name.trim()&&S.cls.trim();
+/* ================= 5 · Mini hra: Formátovací expres ================= */
+const TOOLS=[
+  {k:'okr',n:'Okraje',ic:'margins'},{k:'ori',n:'Orientácia',ic:'orient'},{k:'vel',n:'Veľkosť papiera',ic:'size'},{k:'typ',n:'Typ písma',ic:'font'},
+  {k:'vpis',n:'Veľkosť písma',ic:'font'},{k:'riad',n:'Riadkovanie',ic:'spacing'},{k:'zar',n:'Zarovnanie',ic:'align'},{k:'tab',n:'Tabulátor',ic:'tab'},
+];
+const ORDERS=[
+  ['Plagát má byť širší ako vyšší.','ori'],['Na okraji chýba miesto na poznámky.','okr'],['Pozvánka sa má tlačiť na papier A5.','vel'],
+  ['Babka nevidí drobné písmo.','vpis'],['Riadky sa lepia na seba.','riad'],['Ceny majú byť pod sebou podľa čiarky.','tab'],
+  ['Nadpis má byť v strede strany.','zar'],['Text má vyzerať ako z písacieho stroja – Courier New.','typ'],['Tabuľka sa nezmestí, chceme menšie okraje.','okr'],
+  ['Časy v programe sa po zmene písma rozsypali.','tab'],['Referát chceme s dvojitým riadkovaním.','riad'],['Plagát vytlačíme na veľký papier A3.','vel'],
+  ['Nadpis má mať 36 pt.','vpis'],['Podpis má byť pri pravom okraji.','zar'],['Chceme pätkové písmo Times New Roman.','typ'],['Fotku na celú šírku – stranu otočte.','ori'],
+];
+const GAMESEC=45;
+const GM={run:false,end:0,score:0,streak:0,miss:0,cur:-1,last:-1,iv:0,fb:null,res:null};
+function gmNext(){let i;do{i=Math.random()*ORDERS.length|0}while(i===GM.last&&ORDERS.length>1);GM.last=i;GM.cur=i}
+function gmStage(){
+  if(GM.run){
+    const o=ORDERS[GM.cur];
+    return `<div class="gm-top"><span class="gm-t" id="gmT">${ico('clock')} ${Math.ceil(Math.max(0,GM.end-Date.now())/1000)} s</span><span>Body: <b id="gmS">${GM.score}</b></span><span>Séria: <b>${GM.streak}</b></span></div>`+
+      `<div class="gm-order${GM.fb==='no'?' shake':''}"><small>Objednávka</small><b>${o[0]}</b></div>`+
+      `<div class="gm-tools" role="group" aria-label="Nástroje">${shuffleFixed(TOOLS,GM.cur).map(x=>`<button class="gm-tool" data-a="gpick" data-v="${x.k}">${ico(x.ic)}<span>${x.n}</span></button>`).join('')}</div>`+
+      (GM.fb?`<p class="small" role="status">${GM.fb==='ok'?ico('check')+' Správne!':ico('x')+' Vedľa – skúste iný nástroj.'}</p>`:'<p class="small">&nbsp;</p>');
+  }
+  const best=S.game.best;
+  return `<div class="gm-idle">${GM.res?`<h3>Koniec! Body: ${GM.res.score}</h3><p>${GM.res.score>=12?'Formátovací majster!':GM.res.score>=7?'Výborne, ste rýchli!':'Dobrý začiatok – skúste to ešte raz.'} Chyby: ${GM.res.miss}.</p>`:`<h3>Formátovací expres</h3><p>Za ${GAMESEC} sekúnd vybavte čo najviac objednávok. Ku každej ťuknite na správny nástroj. Za chybu sa body neodpočítavajú.</p>`}`+
+    `${best!=null?`<p class="small">Váš najlepší výsledok: <b>${best}</b> · odohrané hry: ${S.game.runs}</p>`:''}<div class="row mt"><button class="btn" data-a="gstart">${ico('play')} ${GM.res||S.game.runs?'Hrať znova':'Štart'}</button></div><p class="small mt">XP sa počíta len z prvej hry (max. ${MAXP.game} XP). Do známky sa hra nepočíta.</p></div>`;
+}
+function shuffleFixed(a,seed){return permFor('gm'+seed,a.length).map(i=>a[i])}
+function gmPaint(){const el=$('#gmStage');if(el){const f=grabFocus(el);el.innerHTML=gmStage();putFocus(el,f)}}
+A.gstart=()=>{if(!S.test.done) return;Object.assign(GM,{run:true,end:Date.now()+GAMESEC*1000,score:0,streak:0,miss:0,fb:null,res:null});gmNext();clearInterval(GM.iv);GM.iv=setInterval(gmTick,200);gmPaint()};
+function gmTick(){if(!GM.run) return;const left=GM.end-Date.now();if(left<=0){gmFinish();return}const el=$('#gmT');if(el) el.innerHTML=`${ico('clock')} ${Math.ceil(left/1000)} s`}
+A.gpick=el=>{if(!GM.run) return;const ok=el.dataset.v===ORDERS[GM.cur][1];
+  if(ok){GM.score++;GM.streak++;GM.fb='ok';gmNext()}else{GM.miss++;GM.streak=0;GM.fb='no'}gmPaint();
+  const b=$('#gmStage .gm-tool');if(b) try{b.focus({preventScroll:true})}catch(e){}};
+function gmFinish(){
+  clearInterval(GM.iv);GM.run=false;GM.res={score:GM.score,miss:GM.miss};
+  S.game.runs=(S.game.runs||0)+1;S.game.best=Math.max(S.game.best??0,GM.score);S.game.last=GM.score;persist();
+  award('game',Math.min(MAXP.game,Math.floor(GM.score/2)));rr('s5');
+}
+R.s5=()=>secHead(4,'Odmena za test! Hra precvičí, ktorý nástroj Wordu použiť. Hrá sa na čas a môžete ju opakovať aj doma.')+
+  (S.test.done?act('kindGame','Formátovací expres','Prečítajte objednávku a ťuknite na nástroj, ktorým ju vybavíte vo Worde.',`<div class="gm" id="gmStage">${gmStage()}</div>`)
+    :`<div class="act"><div class="lockbox">${ico('lock')}<div><b>Mini hra je zamknutá.</b><br>Odomkne sa po dokončení testu v šanóne 4. <a class="linkbtn" href="#s4">Ísť na test ${ico('arrow')}</a></div></div></div>`);
+DONE.s5=()=>S.game.runs>0;
+
+/* ================= 6 · Bonus: Detektív skrytých znakov ================= */
+const HID=[
+  {s:'Program·akadémie¶',ok:true,ex:'Medzi slovami je jedna medzera – v poriadku.'},
+  {s:'17:00→Koledy→1.A¶',ok:true,ex:'Stĺpce oddelené tabulátorom – presne tak.'},
+  {s:'17:15·······Básne·····sekunda¶',ok:false,ex:'Medzery namiesto tabulátora – po zmene písma sa stĺpce rozsypú.'},
+  {s:'¶<br>¶<br>¶',ok:false,ex:'Prázdne odseky (Enter, Enter, Enter) na odsadenie. Lepšie je nastaviť medzeru za odsekom.'},
+  {s:'Tešíme··sa·na·vás!¶',ok:false,ex:'Dve medzery za sebou – jedna stačí.'},
+  {s:'Vstup·voľný.¶',ok:true,ex:'Všetko správne.'},
+];
+function hidBlock(){
+  return `<div class="hid">${HID.map((x,i)=>{const a=S.hid[i];const ans=a!=null,good=ans&&(a===1)===x.ok;
+    return `<div class="hid-r${ans?(good?' ok':' no'):''}"><code class="hid-c">${x.s.replace(/·/g,'<i class="sp2">·</i>').replace(/→/g,'<i class="ta2">→</i>').replace(/¶/g,'<i class="pi2">¶</i>')}</code>`+
+      `<div class="tbtns"><button class="tbtn${ans&&a===1?(good?' ok':' no'):''}" data-a="hid" data-v="${i}:1"${ans?' aria-disabled="true"':''}>${ico('check')} V poriadku</button><button class="tbtn${ans&&a===0?(good?' ok':' no'):''}" data-a="hid" data-v="${i}:0"${ans?' aria-disabled="true"':''}>${ico('alert')} Chyba</button></div>`+
+      (ans?`<p class="tfb">${good?ico('check'):ico('x')} ${x.ex}</p>`:'')+`</div>`}).join('')}</div>`;
+}
+A.hid=el=>{const [i,v]=el.dataset.v.split(':').map(Number);if(S.hid[i]!=null) return;S.hid[i]=v;award('hd_'+i,(v===1)===HID[i].ok?1:0);persist();rr('s6')};
+R.s6=()=>secHead(5,'Vo Worde zapnete skryté znaky tlačidlom ¶ na karte Domov. Uvidíte medzery (·), tabulátory (→) aj konce odsekov (¶). Nájdite, kde Bence písal zle.')+
+  act('kindDet','Kde je chyba?','Pri každom riadku rozhodnite: v poriadku, alebo chyba?',hidBlock());
+DONE.s6=()=>HID.every((_,i)=>S.hid[i]!=null);
+
+/* ================= 7 · Bonus: vodiace bodky na skutočnom PC ================= */
+const REAL=[
+  'Otvorte <b>Word v počítači</b> (nie v prehliadači) a nový prázdny dokument.',
+  'Napíšte nadpis <b>Program akadémie</b> a pod neho štyri riadky: Koledy, Básne, Tanec, Divadlo.',
+  'Označte tieto štyri riadky. Karta <b>Domov</b> → malá šípka v rohu skupiny <b>Odsek</b> → tlačidlo <b>Tabulátory…</b>',
+  'Pozícia zarážky <b>15 cm</b>, Zarovnanie <b>Pravá</b>, Vodiaci znak <b>2</b> (bodky) → <b>Nastaviť</b> → <b>OK</b>.',
+  'Kliknite za slovo Koledy, stlačte <kbd>Tab</kbd> a napíšte 17:00. Rovnako doplňte 17:15, 17:30 a 17:50.',
+  'Zapnite ¶ a skontrolujte šípky →. Dokument uložte ako <span class="mono">program-akademie.docx</span>.',
+];
+R.s7=()=>secHead(6,'Pre rýchlych: skutočný Word a vodiace znaky – bodky, ktoré vedú oko od názvu k času, ako v obsahu knihy.')+
+  act('kindReal','Program s bodkami','Postupujte krok za krokom a odškrtávajte. Za každý krok je 1 XP.',
+    `<ol class="steps">${REAL.map((x,i)=>`<li><label><input type="checkbox" data-ch="real" data-v="${i}" ${S.real[i]?'checked':''}> <span><b>${i+1}.</b> ${x}</span></label></li>`).join('')}</ol>`+
+    `<p class="small mt">Takto má vyzerať výsledok:</p><div class="lpaper leader">${PROG.map(r=>`<div><span>${r[1]}</span><i></i><span>${r[0]}</span></div>`).join('')}</div>`);
+CH.real=el=>{const i=+el.dataset.v;S.real[i]=el.checked;if(el.checked) award('re_'+i,1);persist();if(REAL.every((_,k)=>S.real[k])) rr('s7')};
+DONE.s7=()=>REAL.every((_,k)=>S.real[k]);
+/* ================= teacher dialog, class results, reset, init ================= */
+const TD={
+  std:[
+    '<b>Dokument:</b> iŠVP – Informatika, gymnázium s osemročným vzdelávacím programom (ŠPÚ, 2015), časť pre 1. – 4. ročník, tematický okruh <b>Reprezentácie a nástroje – práca s textom</b>.',
+    '<b>Výkonový štandard:</b> žiak používa konkrétne nástroje editora na tvorbu a úpravu textu, vyberá vhodný nástroj, posudzuje vplyv formátovania a skrytých značiek na text, skúma nové nástroje v editore.',
+    '<b>Obsahový štandard:</b> formátovanie textu (písmo, veľkosť, hrúbka, farba, zarovnanie odseku), skryté značky formátovania a ich vplyv na štruktúru a vzhľad textu.',
+    '<b>Upozornenie:</b> nastavenie stránky (okraje, orientácia, veľkosť), riadkovanie a tabulátory nie sú v obsahovom štandarde menovite. Hodina ich zaraďuje cez výkonový štandard „skúmať nové nástroje v konkrétnom editore“. Súvis s vaším TVVP <b>overte</b> – v projekte zatiaľ nie je.',
+    'Ak sa na vašu sekundu už vzťahuje nový ŠVP (reforma), priradenie <b>overte</b>.',
+  ],
+  plan:[
+    ['0 – 5','1','Obálka s tipom, karta Rozloženie, tri zákazky. Pracovný list – úloha 1.'],
+    ['5 – 10','2','Triedenie Písmo/Odsek, laboratórium čitateľnosti, tri situácie. PL – úloha 2.'],
+    ['10 – 15','3','Experiment medzery proti tabulátoru (otvorí obálku), druhy zarážok. PL – úloha 3.'],
+    ['15 – 22','4','Test (8 otázok), meno a trieda, súhrn, stiahnutie výsledku.'],
+    ['22 – 25','5','Mini hra ako odmena. Vy medzitým zbierate pracovné listy.'],
+  ],
+  bonus:'Bonus: šanón 6 (skryté znaky, 4 min) a šanón 7 (vodiace bodky v skutočnom Worde, 6 min) – pre rýchlych, na doma alebo na začiatok ďalšej hodiny.',
+  talk:[
+    ['1 · Stránka','Ukážte vo Worde na projektore kartu <b>Rozloženie</b> → Okraje, Orientácia, Veľkosť. Pripomeňte: A5 je polovica A4; „Normálne“ okraje sú 2,54 cm, čiže 1 palec. Tip v obálke nekomentujte – overí sa v šanóne 3.'],
+    ['2 · Písmo','Ukážte rozdiel: <b>písmo</b> platí pre označené znaky (jedno slovo môže byť tučné), <b>odsek</b> sa mení celý – stačí v ňom mať kurzor. Veľkosť je v bodoch: pt = <i>point</i> (bod), 1 pt = 1/72 palca ≈ 0,35 mm, 72 pt = 2,54 cm; meria sa celá výška písma (od vrchu „h“ po spodok „g“). Nový dokument v Microsoft 365: Aptos 12 pt, riadkovanie 1,15.'],
+    ['3 · Tabulátory','Naživo: napíšte tri riadky so stĺpcami raz medzerami, raz klávesom Tab, zmeňte písmo a zapnite ¶. Potom karta Zobraziť → Pravítko, výber druhu zarážky vľavo na pravítku a klik do pravítka.'],
+    ['4 · Test','Test robia žiaci samostatne. Ukážte, kde vyplnia meno a triedu a kam odovzdajú súbor s výsledkom (napr. úloha v EduPage).'],
+    ['5 · Mini hra','Len odmena – do známky sa nepočíta. Kto ju nestihne, môže si ju zahrať doma v tom istom súbore.'],
+  ],
+  warm:[
+    'Ukážte stranu A4 na šírku: „Na ktorej karte a ktorým tlačidlom som to urobil?“ (Rozloženie → Orientácia)',
+    '„Koľko strán A5 sa zmestí na jednu A4?“ (dve)',
+    'Napíšte na tabuľu „12 pt“ a „1,15“ – čo je čo? (veľkosť písma, riadkovanie)',
+    'Nakreslite štyri značky zarážok z pravítka – žiaci ich pomenujú (ľavá, stredná, pravá, desatinná).',
+    'Ukážte program zarovnaný medzerami, ktorý sa po zmene písma rozsypal: „Čo by ste opravili?“ (medzery nahradiť tabulátorom)',
+  ],
+  tips:[
+    'V žiackom súbore sa tlačidlo „Pre učiteľa“ nezobrazuje. Panel otvoríte piatimi rýchlymi kliknutiami na logo vľavo hore (na počítači) alebo adresou, ktorá končí na <span class="mono">#ucitel</span>.',
+    'Aktívny čas sa počíta po sekundách, len keď je stránka viditeľná, má fokus a žiak za poslednú minútu klikol, písal alebo posúval. Stránka v pozadí alebo nečinný žiak sa nepočíta.',
+    'Zarážky tabulátora sa nedajú nastaviť vo Worde pre web. Žiaci potrebujú počítačovú aplikáciu Word (licencia Microsoft 365 A3).',
+    'Pás s nástrojmi je zjednodušená maketa so slovenskými názvami Wordu v Microsoft 365. Presné názvy vo vašej verzii <b>overte</b> – napríklad plný popis tlačidla Riadkovanie a názvy predvolieb okrajov (Normálne, Úzke, Široké).',
+    'Náhľad písma v laboratóriu závisí od písiem nainštalovaných v počítači (Comic Sans MS, Courier New). Ak chýbajú, prehliadač použije podobné.',
+    'Postup žiaka sa ukladá iba v jeho prehliadači a nikam sa neodosiela. Na spoločných počítačoch ho medzi triedami vymažte (nižšie) alebo nechajte žiakov pracovať v súkromnom okne.',
+    'Pri každom šanóne je časovač – spustí odpočítavanie v rohu obrazovky a na konci zapípa.',
+  ],
+  src:[
+    ['https://support.microsoft.com/sk-sk/office/nastavenie-vymazanie-alebo-odstr%C3%A1nenie-zar%C3%A1%C5%BEok-tabul%C3%A1tora-vo-worde-a8f97e27-c02e-40e2-b63f-52718d54c941','Microsoft – Nastavenie, vymazanie alebo odstránenie zarážok tabulátora (SK)'],
+    ['https://support.microsoft.com/en-au/office/set-clear-or-remove-tab-stops-in-word-a8f97e27-c02e-40e2-b63f-52718d54c941','Microsoft – Tab stops: nedajú sa nastaviť vo Worde pre web'],
+    ['https://support.microsoft.com/en-us/word/use-decimal-tabs-to-line-up-numbers-with-decimal-points','Microsoft – Desatinné zarážky'],
+    ['https://support.microsoft.com/lt-lt/office/change-the-default-line-spacing-in-word-411437a0-0646-490d-b426-a9249a78b315','Microsoft – Predvolené riadkovanie 1,15'],
+    ['https://support.microsoft.com/en-us/Word/adjust-indents-and-spacing','Microsoft – Odsadenie a medzery (riadkovanie)'],
+    ['https://support.microsoft.com/en-us/Word/training/change-margins','Microsoft – Okraje (predvolene 1 palec)'],
+    ['https://support.microsoft.com/Word/training/change-page-orientation-to-landscape-or-portrait','Microsoft – Orientácia strany'],
+    ['https://office-watch.com/2023/new-default-styles-word-powerpoint-outlook/','Office Watch – nový štýl Normálny: Aptos 12 pt'],
+    ['https://www.gymparnr.edu.sk//obsah/predmety/subory/informatika/svp8god2015.pdf','ŠPÚ – iŠVP Informatika, osemročné gymnázium (kópia na webe školy)'],
+  ],
+};
+/* ---------- class results ---------- */
+let IMP=[],IMPMSG='';
+function verify(o){
+  if(!o||typeof o!=='object') return 'chyba';
+  if(o.lesson!==LESSON.id) return 'iná hodina';
+  const c=o.check,copy=Object.assign({},o);delete copy.check;
+  return checkOf(copy)===c?'OK':'upravený';
+}
+function impTable(){
+  if(!IMP.length) return `<p class="small">Zatiaľ nič. Vyberte naraz všetky súbory <span class="mono">.json</span> od žiakov.</p>`;
+  const rows=IMP.slice().sort((a,b)=>String(a.o.cls).localeCompare(b.o.cls,'sk')||String(a.o.name).localeCompare(b.o.name,'sk'));
+  return `<div class="ptwrap"><table class="ptbl imp"><thead><tr><th>Meno</th><th>Trieda</th><th>Aktívny čas</th><th>Šanóny</th><th>Úlohy</th><th>Test</th><th>Čas odovzdania</th><th>Spolu</th><th>Známka</th><th>Kontrola</th></tr></thead><tbody>`+
+    rows.map(({o,st})=>{const f=Array.isArray(o.folders)?o.folders:[],req=f.filter(x=>REQ.includes(x.id)).length;
+      return `<tr><td>${esc(o.name)}</td><td>${esc(o.cls)}</td><td>${minTxt(o.active_s)}</td><td>${req}/${REQ.length}${f.length>req?` +${f.length-req}`:''}</td><td>${o.tasks?o.tasks.pct:'–'} %</td><td>${o.test?`${o.test.first??'–'}/${o.test.n}`:'–'}</td><td>${o.date?esc(new Date(o.date).toLocaleString('sk-SK',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'})):'–'}</td><td><b>${o.total_pct??'–'} %</b></td><td><b>${o.grade??'–'}</b></td><td class="${st==='OK'?'okc':'badc'}">${st}</td></tr>`}).join('')+`</tbody></table></div>`;
+}
+CH.imp=el=>{
+  const files=[...(el.files||[])];if(!files.length) return;IMPMSG='';
+  let left=files.length,bad=0;
+  files.forEach(f=>{const rd=new FileReader();
+    rd.onload=()=>{try{const o=JSON.parse(rd.result);const st=verify(o);const key=x=>[x.name,x.cls,x.date,x.lesson,x.check].join('|');IMP=IMP.filter(x=>key(x.o)!==key(o));IMP.push({o,st,file:f.name})}catch(e){bad++}
+      if(--left===0){IMPMSG=`Načítané: ${files.length-bad}${bad?` · nečitateľné: ${bad}`:''}`;teacherPaint()}};
+    rd.onerror=()=>{bad++;if(--left===0){IMPMSG=`Nečitateľné súbory: ${bad}`;teacherPaint()}};
+    rd.readAsText(f)});
+};
+A.impClear=()=>{IMP=[];IMPMSG='';teacherPaint()};
+A.csv=()=>{
+  if(!IMP.length) return;
+  if(INFRAME){IMPMSG='V tomto náhľade sa sťahovať nedá – otvorte žiacky súbor s #ucitel.';teacherPaint();return}
+  const q=v=>{const s=String(v??'');return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+  const head=['Meno','Trieda','Aktívny čas (min)','Povinné šanóny','Úlohy %','Test body','Test z','Test %','Spolu %','Známka','Odovzdané','Kontrola'];
+  const lines=IMP.map(({o,st})=>{const f=Array.isArray(o.folders)?o.folders:[];
+    return [o.name,o.cls,fmt((o.active_s||0)/60,1),f.filter(x=>REQ.includes(x.id)).length+'/'+REQ.length,o.tasks?o.tasks.pct:'',o.test?o.test.first:'',o.test?o.test.n:'',o.test?o.test.pct:'',o.total_pct,o.grade,o.date?new Date(o.date).toLocaleString('sk-SK'):'',st].map(q).join(';')});
+  downloadText(`${LESSON.id}_vysledky.csv`,'﻿'+[head.join(';'),...lines].join('\r\n'),'text/csv;charset=utf-8');
+};
+let RESETQ=false;
+function renderTeacher(){
+  return `<div class="tdlg-h"><h2 id="tdlgT">${ico('cap')} Pre učiteľa</h2><button class="iconbtn sq" data-a="tdclose" aria-label="${t('close')}">${ico('x')}</button></div><div class="tdlg-b">`+
+    `<section><h3>Ciele hodiny</h3><ul>${H.goals.map(g=>`<li>${g}</li>`).join('')}</ul></section>`+
+    `<section><h3>Súvis s obsahovým a výkonovým štandardom</h3><ul>${TD.std.map(x=>`<li>${x}</li>`).join('')}</ul></section>`+
+    `<section><h3>Priebeh hodiny (25 min)</h3><div class="ptwrap"><table class="ptbl"><thead><tr><th>Čas</th><th>Šanón</th><th>Čo robíme</th></tr></thead><tbody>${TD.plan.map(p=>`<tr><td><b>${p[0]}</b></td><td>${p[1]} · ${esc(SECS[+p[1]-1].tab)}</td><td>${p[2]}</td></tr>`).join('')}</tbody></table></div><p class="small mt">${TD.bonus}</p></section>`+
+    `<section><h3>Čo povedať pri výklade</h3><ul>${TD.talk.map(x=>`<li><b>${x[0]}:</b> ${x[1]}</li>`).join('')}</ul></section>`+
+    `<section><h3>Rozcvička na začiatok ďalšej hodiny (5 min)</h3><ol class="tol">${TD.warm.map(x=>`<li>${x}</li>`).join('')}</ol></section>`+
+    `<section><h3>Hodnotenie a pracovný list</h3><ul><li><b>Známka zo stránky:</b> test 40 % (prvý pokus) + úlohy v šanónoch 1 – 3 40 % (${TASKMAX} b, prvý pokus) + aktívny čas 20 % (100 % = 15 min).</li>`+
+      `<li><b>Stupnica:</b> výborný 100 – 90 %, chválitebný 89 – 75 %, dobrý 74 – 50 %, dostatočný 49 – 25 %, nedostatočný 24 – 0 %.</li>`+
+      `<li><b>Pracovný list (20 b):</b> 1 = 18 – 20 b, 2 = 15 – 17 b, 3 = 10 – 14 b, 4 = 5 – 9 b, 5 = 0 – 4 b. Riešenia sú v kľúči.</li>`+
+      `<li>Mini hra a bonusové šanóny dávajú len XP, do známky sa nepočítajú.</li></ul></section>`+
+    `<section><h3>Výsledky triedy</h3><p class="small">Načítajte súbory, ktoré žiaci stiahli v šanóne 4. Kontrola „OK“ znamená, že súbor nikto neupravoval; „upravený“ – údaje v súbore boli zmenené; „iná hodina“ – súbor je z inej hodiny.</p>`+
+      (INFRAME?`<p class="small">${ico('info')} V tomto náhľade sa súbory sťahovať nedajú – na spracovanie výsledkov otvorte žiacky súbor s adresou končiacou <span class="mono">#ucitel</span>.</p>`:'')+
+      `<div class="row mt"><label class="btn sky sm filebtn">${ico('upload')} Načítať súbory .json<input type="file" accept=".json,application/json" multiple data-ch="imp"></label>`+
+      `<button class="btn ghost sm" data-a="csv"${IMP.length?'':' disabled'}>${ico('download')} Export CSV pre Excel</button>${IMP.length?`<button class="btn ghost sm" data-a="impClear">${ico('x')} Vyčistiť</button>`:''}</div>`+
+      (IMPMSG?`<p class="small mt">${esc(IMPMSG)}</p>`:'')+`<div class="mt">${impTable()}</div></section>`+
+    `<section><h3>Tipy</h3><ul>${TD.tips.map(x=>`<li>${x}</li>`).join('')}</ul></section>`+
+    `<section><label class="row" style="cursor:pointer"><input type="checkbox" data-ch="board" ${document.documentElement.classList.contains('board')?'checked':''} style="width:20px;height:20px;accent-color:var(--mint)"> <b>${ico('board')} Režim tabule – väčšie písmo pre projektor</b></label></section>`+
+    `<section><h3>Nový žiak na tomto zariadení</h3>${RESETQ?`<div class="fb warn"><p><b>Naozaj? Zmažú sa XP, odpovede, aktívny čas aj meno.</b></p><div class="row mt"><button class="btn coral sm" data-a="tresetYes">${ico('reset')} Áno, vymazať</button><button class="btn ghost sm" data-a="tresetNo">Nie</button></div></div>`:`<button class="btn ghost sm" data-a="treset">${ico('reset')} Vymazať postup na tomto zariadení</button>`}</section>`+
+    `<section><h3>Zdroje faktov (november 2026)</h3><ul>${TD.src.map(s=>`<li><a href="${s[0]}" target="_blank" rel="noopener noreferrer">${s[1]}</a></li>`).join('')}</ul></section>`+
+    `<p class="small">${esc(AUTHOR)}</p></div>`;
+}
+function teacherPaint(){const d=$('#tdlg'),f=grabFocus(d);d.innerHTML=renderTeacher();putFocus(d,f)}
+A.teacher=()=>{const d=$('#tdlg');RESETQ=false;d.innerHTML=renderTeacher();
+  if(typeof d.showModal==='function'){try{d.showModal()}catch(e){d.setAttribute('open','')}}else d.setAttribute('open','');
+  const c=d.querySelector('[data-a="tdclose"]');if(c) c.focus({preventScroll:true})};
+A.tdclose=()=>{const d=$('#tdlg');try{d.close()}catch(e){d.removeAttribute('open')}};
+A.treset=()=>{RESETQ=true;teacherPaint();const b=$('#tdlg [data-a="tresetNo"]');if(b) b.focus({preventScroll:true})};
+A.tresetNo=()=>{RESETQ=false;teacherPaint()};
+A.tresetYes=()=>{store.del(KEY);S=S0();RESETQ=false;resetTransient();renderAll();teacherPaint();toast(`${ico('reset')} Postup bol vymazaný.`,2200)};
+CH.board=el=>{document.documentElement.classList.toggle('board',el.checked);store.set('inf-board',el.checked?'1':'0');setPad()};
+function resetTransient(){
+  PGOPEN=null;PMFB=null;SSEL=null;SFB=null;LOPEN=null;
+  clearInterval(GM.iv);Object.assign(GM,{run:false,end:0,score:0,streak:0,miss:0,cur:-1,last:-1,iv:0,fb:null,res:null});
+  JUST=null;
+}
+function init(){
+  const th=store.get('inf-theme');if(th==='dark'||th==='light') document.documentElement.dataset.theme=th;
+  if(store.get('inf-board')==='1') document.documentElement.classList.add('board');
+  loadState();
+  document.title=LESSON.title;
+  renderAll();
+  addEventListener('resize',setPad);
+  try{new ResizeObserver(()=>setPad()).observe($('#top'))}catch(e){}
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(!document.documentElement.dataset.theme) renderTop()})}catch(e){}
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(setPad);
+  $('#tdlg').addEventListener('click',e=>{if(e.target.id==='tdlg') A.tdclose()});
+  addEventListener('hashchange',()=>{renderTop();setPad();if(false&&STUDENT) A.teacher()});
+  if(STUDENT&&false) setTimeout(A.teacher,80);
+  setInterval(()=>{const r=$('#resTbl');if(r) r.innerHTML=resTable(results())},5000);
+  const h=location.hash.slice(1);if(h&&h!=='ucitel'&&/^[\w-]+$/.test(h)&&document.getElementById(h)) setTimeout(()=>document.getElementById(h).scrollIntoView(),60);
+}
+init();
+
+</script>
+<div class="ml-author" style="font:13px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif;text-align:center;padding:14px 16px 18px;opacity:.75;color:inherit">© 2026 Miroslav Lajgút · Informatika · Gymnázium Ivana Kraska – Ivan Krasko Gimnázium a Obchodná akadémia – Kereskedelmi Akadémia, Rimavská Sobota<br>Všetky práva vyhradené · Použitie len so súhlasom autora · <a href="../" style="color:inherit">Všetky hodiny</a></div>
+</body>
+</html>
